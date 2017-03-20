@@ -63,6 +63,12 @@ public class Server {
         notifyClients();
     }
 
+    public synchronized void onClientLeft(int id) {
+        logger.debug("Client {} left", id);
+        game.removeSnake(id);
+        notifyClients();
+    }
+
     public synchronized void onDirectionReceived(int id, Direction direction) {
         logger.debug("Received new direction {} from client {}", direction, id);
         game.updateState(id, direction);

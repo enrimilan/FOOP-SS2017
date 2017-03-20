@@ -40,6 +40,7 @@ public class ClientHandler implements Runnable {
             logger.fatal(e.getMessage());
         }
         server.getClientHandlers().remove(this);
+        server.onClientLeft(clientId);
     }
 
     public void stop() {
