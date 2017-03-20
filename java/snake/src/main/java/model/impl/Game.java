@@ -30,6 +30,12 @@ public class Game implements IGame {
     }
 
     @Override
+    public void removeSnake(int id) {
+        ISnake snake = state.getSnakes().remove(id);
+        state.setToRemove(snake.getPoints());
+    }
+
+    @Override
     public IState updateState(int id, Direction direction) {
         ISnake snake = state.getSnakes().get(id);
 
