@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import model.IPoint;
@@ -62,10 +63,15 @@ public class Board extends Application {
             }
         }
 
-        gridPane.setStyle("-fx-background-color: white; -fx-padding: 2; -fx-hgap: 2; -fx-vgap: 2;");
+        gridPane.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-padding: 2; -fx-hgap: 2; -fx-vgap: 2;");
 
-        Scene scene = new Scene(gridPane, 800, 800);
+        HBox hBox = new HBox();
+        hBox.getChildren().add(gridPane);
+
+
+        Scene scene = new Scene(hBox, 1500, 540);
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
 
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -98,13 +104,19 @@ public class Board extends Application {
             n.setStyle("-fx-background-color: white;");
         }
 
+        IPoint food = state.getFood();
+        if(food != null) {
+            Node n = getNodeByRowColumnIndex(food.getY(), food.getX(), gridPane);
+            n.setStyle("-fx-background-color: red; -fx-background-radius: 25;");
+        }
+
         Iterator entries = state.getSnakes().entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
             Snake snake = (Snake) thisEntry.getValue();
             for(IPoint p : snake.getPoints()) {
                 Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), gridPane);
-                n.setStyle("-fx-background-color: blue;");
+                n.setStyle("-fx-background-color: "+snake.getColor()+";");
             }
         }
     }
