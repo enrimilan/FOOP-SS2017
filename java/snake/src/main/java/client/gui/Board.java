@@ -1,6 +1,8 @@
 package client.gui;
 
 import javafx.application.Application;
+import javafx.beans.property.*;
+import javafx.beans.value.*;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -9,9 +11,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import model.IPoint;
 import model.IState;
@@ -29,7 +29,13 @@ public class Board extends Application {
     private static final Logger logger = LogManager.getLogger(Board.class);
     private static OnLaunchedCallback onLaunchedCallback;
     private GridPane gridPane;
+    private GridPane infoPane;
     private Direction direction = Direction.RIGHT;
+
+    StringProperty healthString = new SimpleStringProperty("100");
+    StringProperty speedString = new SimpleStringProperty("100");
+    StringProperty lenString = new SimpleStringProperty("1");
+
 
     public static void launch(OnLaunchedCallback onLaunchedCallback1) {
         onLaunchedCallback = onLaunchedCallback1;
@@ -39,13 +45,32 @@ public class Board extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Snake");
+
+
+        //infopane
+        this.infoPane = new GridPane();
+        Label healthIcon = new Label();
+        healthIcon.setMinSize(30, 30);
+
+        infoPane.add(healthIcon,0,0);
+
+        Label healthValue = new Label();
+        healthValue.setMinSize(30, 30);
+        healthValue.textProperty().bind(healthString);
+
+        infoPane.add(healthValue, 1, 0);
+
+
         this.gridPane = new GridPane();
+
+        gridPane.add(healthIcon,0,0);
 
         for(int x = 0; x < Constants.BOARD_HEIGHT; x++) {
             for(int y = 0; y < Constants.BOARD_WIDTH; y++) {
                 Label label = new Label();
                 label.setMinSize(15, 15);
                 label.setMaxSize(15, 15);
+
                 gridPane.add(label, y, x, 1, 1);
             }
         }
@@ -65,11 +90,12 @@ public class Board extends Application {
 
         gridPane.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-padding: 2; -fx-hgap: 2; -fx-vgap: 2;");
 
-        HBox hBox = new HBox();
-        hBox.getChildren().add(gridPane);
+        VBox vBox = new VBox();
+        vBox.getChildren().add(infoPane);
+        vBox.getChildren().add(gridPane);
 
 
-        Scene scene = new Scene(hBox, 1500, 540);
+        Scene scene = new Scene(vBox, 1500, 540);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -78,6 +104,7 @@ public class Board extends Application {
             @Override
             public void handle(KeyEvent keyEvent) {
                 if (keyEvent.getCode().equals(KeyCode.RIGHT)) {
+                    healthString.set("asdf");
                     direction = Direction.RIGHT;
                 }
                 if (keyEvent.getCode().equals(KeyCode.LEFT)) {
@@ -117,6 +144,7 @@ public class Board extends Application {
             for(IPoint p : snake.getPoints()) {
                 Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), gridPane);
                 n.setStyle("-fx-background-color: "+snake.getColor()+";");
+
             }
         }
     }
