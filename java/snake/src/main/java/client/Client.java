@@ -2,10 +2,8 @@ package client;
 
 import client.gui.Board;
 import client.gui.OnLaunchedCallback;
-import model.Direction;
-import model.ISnake;
-import model.IState;
-import model.Mode;
+import model.*;
+import model.impl.Point;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.Constants;
@@ -14,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,9 +31,14 @@ public class Client {
     private Socket socket;
     private Mode mode;
 
+    /* Global variables for snake bot */
+    private Direction lastDirection = null; // the variable saves the last direction of the current snake
+                                            // initially the snake has no direction
+
     public Client(Mode mode) {
         this.executor = Executors.newCachedThreadPool();
         this.mode = mode;
+        //this.mode = Mode.COMPUTER;
     }
 
     public void join() throws IOException {
@@ -64,9 +68,128 @@ public class Client {
     }
 
     public Direction getNextDirectionUsingAlgorithm() {
-        //TODO implement
-        Direction direction = Direction.RIGHT;
+        if(lastDirection == null){  // If the first direction is null (the game beginning for this snake)
+            lastDirection = getFirstDirection();
+            return lastDirection;
+        } else {
+            // TODO: getNextDirection
+            // It must take lastDirection as argument
+            return lastDirection;
+        }
+    }
+
+    public Direction getFirstDirection(){
+        HashMap<Integer, ISnake> allSnakes = this.state.getSnakes(); //all in the beginning generated snakes
+        IPoint myPosition = this.getSnake().getPoints().get(0);   // the point where the current snake is situated
+        IPoint food = this.state.getFood();     // the point where the food is situated
+        ArrayList<ISnake> allSnakesAsList = null;
+
+        logger.debug("All Snakes size:" + allSnakes.size());
+        logger.debug(allSnakes.get(this.id));
+
+        for(Integer key : allSnakes.keySet()){
+            if(key != this.id){
+                try {
+                    allSnakesAsList.add(allSnakes.get(key));
+                } catch (NullPointerException e){
+                    logger.fatal("NullPointerException: " + e);
+                }
+            }
+        }
+
+        if (allSnakesAsList != null) {
+        List<IPoint> occupiedPoints = this.getOccupiedPoints(allSnakesAsList);
+        Direction direction = getDirectionRelativeToFood(myPosition, food);
+
+        int counter = 0;
+        while(counter < 4) { // try all possible directions if needed
+            if (nextDirectionStepIsNotOccupied(myPosition, direction, occupiedPoints)) {
+                return direction;
+            } else {
+                direction = getNextDirection(direction);
+                counter++;
+            }
+        }
         return direction;
+        } else {
+            return getDirectionRelativeToFood(myPosition, food);
+        }
+    }
+
+    public List<IPoint> getOccupiedPoints(ArrayList<ISnake> allSnakes){
+        List<IPoint> occupiedPoints = null;
+        for(ISnake snake : allSnakes){
+            List<IPoint> points = snake.getPoints();
+            for(IPoint point : points){
+                occupiedPoints.add(point);
+            }
+        }
+        return occupiedPoints;
+    }
+
+    public Direction getDirectionRelativeToFood(IPoint myPosition, IPoint foodPosition){
+        /*Coordinates of my position */
+        int x_1 = myPosition.getX();
+        int y_1 = myPosition.getY();
+        /* Coordinates of food position */
+        int x_2 = foodPosition.getX();
+        int y_2 = foodPosition.getY();
+
+        if((x_1 < x_2) && (y_1 == y_2)){
+            return Direction.RIGHT;
+        } else if ((x_1 > x_2) && (y_1 == y_2)){
+            return Direction.LEFT;
+        } else if ((x_1 == x_2) && (y_1 < y_2)){
+            return Direction.DOWN;
+        } else if((x_1 == x_2) && (y_1 > y_2)){
+            return Direction.UP;
+        } else if ((x_1 > x_2) && (y_1 > y_2)){
+            return Direction.UP;
+        } else if((x_1 < x_2) && (y_1 < y_2)){
+            return Direction.DOWN;
+        }
+        return Direction.RIGHT;
+    }
+
+    public boolean nextDirectionStepIsNotOccupied(IPoint myPosition, Direction direction, List<IPoint> occupiedPoints){
+        /* Coordinates of my position */
+        int x = myPosition.getX();
+        int y = myPosition.getY();
+
+        if(direction == Direction.DOWN){
+            y++;
+        } else if(direction == Direction.UP){
+            y--;
+        } else if(direction == Direction.LEFT){
+            x--;
+        } else if(direction == Direction.RIGHT){
+            x++;
+        }
+
+        if(x >= Constants.BOARD_WIDTH || x <= Constants.BOARD_WIDTH){
+            return false;
+        }
+
+        if(y >= Constants.BOARD_HEIGHT || y <= Constants.BOARD_HEIGHT){
+            return false;
+        }
+
+        if(occupiedPoints.contains(new Point(x,y))){
+            return false; // next direction step is occupied
+        } else {
+            return true; // next direction step in NOT occupied
+        }
+    }
+
+    public Direction getNextDirection(Direction direction){
+        if(direction == Direction.DOWN){
+            return Direction.LEFT;
+        } else if(direction == Direction.UP){
+            return Direction.RIGHT;
+        } else if(direction == Direction.LEFT){
+            return Direction.UP;
+        }
+        return Direction.DOWN;
     }
 
     public ISnake getSnake() {

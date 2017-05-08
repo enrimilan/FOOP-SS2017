@@ -51,4 +51,9 @@ public class Point implements IPoint, Serializable {
         result = 31 * result + y;
         return result;
     }
+
+    @Override
+    public String toString(){
+        return"("+x+";"+y+")";
+    }
 }
