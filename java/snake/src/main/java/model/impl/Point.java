@@ -3,11 +3,14 @@ package model.impl;
 import model.IPoint;
 
 import java.io.Serializable;
+import java.util.*;
 
 public class Point implements IPoint, Serializable {
 
     private int x;
     private int y;
+    private PointType type;
+    private int art;
 
     public Point(int x, int y) {
         this.x = x;
@@ -32,6 +35,26 @@ public class Point implements IPoint, Serializable {
     @Override
     public void setY(int y) {
         this.y = y;
+    }
+
+    @Override
+    public PointType getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(PointType type) {
+        this.type = type;
+    }
+
+    @Override
+    public int getArt() {
+        return this.art;
+    }
+
+    @Override
+    public void setArt(int i) {
+        this.art = i;
     }
 
     @Override

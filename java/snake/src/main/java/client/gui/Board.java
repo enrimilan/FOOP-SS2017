@@ -15,14 +15,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import model.*;
-import model.impl.Snake;
+import model.impl.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.Constants;
 
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class Board extends Application {
 
@@ -59,6 +58,7 @@ public class Board extends Application {
         //gather images
         Image heartImg = new Image(Board.class.getResourceAsStream("/img/heart.png"));
         Image speedImg = new Image(Board.class.getResourceAsStream("/img/speed.png"));
+
 
 
         //infopane
@@ -99,8 +99,8 @@ public class Board extends Application {
         for(int x = 0; x < Constants.BOARD_HEIGHT; x++) {
             for(int y = 0; y < Constants.BOARD_WIDTH; y++) {
                 Label label = new Label();
-                label.setMinSize(15, 15);
-                label.setMaxSize(15, 15);
+                label.setMinSize(20, 20);
+                label.setMaxSize(20, 20);
 
                 gridPane.add(label, y, x, 1, 1);
             }
@@ -126,7 +126,7 @@ public class Board extends Application {
         vBox.getChildren().add(gridPane);
 
 
-        Scene scene = new Scene(vBox, 1500, 540);
+        Scene scene = new Scene(vBox, 1500, 800);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -165,7 +165,11 @@ public class Board extends Application {
         IPoint food = state.getFood();
         if(food != null) {
             Node n = getNodeByRowColumnIndex(food.getY(), food.getX(), gridPane);
-            n.setStyle("-fx-background-color: red; -fx-background-radius: 25;");
+            //n.setStyle("-fx-background-color: red; -fx-background-radius: 25;");
+            logger.debug("Setting Food, type is: "+food.getArt());
+            String randString = "-fx-background-image: url(\"/img/food"+food.getArt()+".png\");";
+            n.setStyle(randString);
+
         }
 
         Iterator entries = state.getSnakes().entrySet().iterator();

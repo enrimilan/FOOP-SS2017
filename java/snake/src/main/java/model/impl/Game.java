@@ -4,8 +4,7 @@ import model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 
@@ -14,6 +13,8 @@ public class Game implements IGame {
     private static final Logger logger = LogManager.getLogger(Game.class);
     private IState state;
     private List<String> colors = new ArrayList<String>();
+    Random rand = new Random();
+    private static final int NUMOFART = 4;
 
     public Game(IState state) {
         this.state = state;
@@ -102,8 +103,12 @@ public class Game implements IGame {
 
     private void placeFood() {
         IPoint food = state.occupyRandomPoint();
-        logger.debug("Placing food at position ({},{})", food.getX(), food.getY());
+        food.setType(PointType.FOOD);
+        food.setArt(rand.nextInt(NUMOFART));
+        logger.info("Placing food of Art " + food.getArt() + " at position ({},{})", food.getX(), food.getY());
         state.setFood(food);
     }
+
+   
 
 }
