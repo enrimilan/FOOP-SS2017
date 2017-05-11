@@ -11,7 +11,17 @@ public class Snake implements ISnake, Serializable {
 
     private int id;
     private int speed = 100;
-    private int health; //TODO
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        System.out.println("health = [" + health + "]");
+        this.health = health;
+    }
+
+    private int health = 100;
     private String color;
     private List<IPoint> points = new ArrayList<IPoint>();
 

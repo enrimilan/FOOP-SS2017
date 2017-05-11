@@ -56,7 +56,7 @@ public class Client {
             executor.submit(snakeDirectionSender);
         }
         logger.debug("New state");
-        board.draw(state);
+        board.draw(state,this.id);
     }
 
     public Direction getNextDirectionFromBoard() {

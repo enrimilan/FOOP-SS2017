@@ -18,5 +18,8 @@ public interface ISnake {
 
     String getColor();
 
+    void setHealth(int health);
+
+    int getHealth();
 
 }

@@ -1,6 +1,6 @@
 package client.gui;
 
-import javafx.application.Application;
+import javafx.application.*;
 import javafx.beans.property.*;
 import javafx.beans.value.*;
 import javafx.collections.ObservableList;
@@ -9,17 +9,17 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.image.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import model.IPoint;
-import model.IState;
-import model.Direction;
+import model.*;
 import model.impl.Snake;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.Constants;
+
 
 import java.util.Iterator;
 import java.util.Map;
@@ -31,6 +31,16 @@ public class Board extends Application {
     private GridPane gridPane;
     private GridPane infoPane;
     private Direction direction = Direction.RIGHT;
+
+    public ISnake getSnake() {
+        return snake;
+    }
+
+    public void setSnake(ISnake snake) {
+        this.snake = snake;
+    }
+
+    private ISnake snake;
 
     StringProperty healthString = new SimpleStringProperty("100");
     StringProperty speedString = new SimpleStringProperty("100");
@@ -46,24 +56,45 @@ public class Board extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Snake");
 
+        //gather images
+        Image heartImg = new Image(Board.class.getResourceAsStream("/img/heart.png"));
+        Image speedImg = new Image(Board.class.getResourceAsStream("/img/speed.png"));
+
 
         //infopane
         this.infoPane = new GridPane();
+        infoPane.setHgap(10);
+
+        //health
         Label healthIcon = new Label();
         healthIcon.setMinSize(30, 30);
+        healthIcon.setGraphic(new ImageView(heartImg));
 
         infoPane.add(healthIcon,0,0);
 
         Label healthValue = new Label();
         healthValue.setMinSize(30, 30);
         healthValue.textProperty().bind(healthString);
-
         infoPane.add(healthValue, 1, 0);
+
+        // speed
+        Label speedIcon = new Label();
+        speedIcon.setMinSize(30, 30);
+        speedIcon.setGraphic(new ImageView(speedImg));
+        infoPane.add(speedIcon,2,0);
+
+        Label speedValue = new Label();
+        speedValue.setMinSize(30, 30);
+        speedValue.textProperty().bind(speedString);
+        infoPane.add(speedValue, 3, 0);
+
+
+
 
 
         this.gridPane = new GridPane();
 
-        gridPane.add(healthIcon,0,0);
+        //gridPane.add(healthIcon,0,0);
 
         for(int x = 0; x < Constants.BOARD_HEIGHT; x++) {
             for(int y = 0; y < Constants.BOARD_WIDTH; y++) {
@@ -104,7 +135,7 @@ public class Board extends Application {
             @Override
             public void handle(KeyEvent keyEvent) {
                 if (keyEvent.getCode().equals(KeyCode.RIGHT)) {
-                    healthString.set("asdf");
+
                     direction = Direction.RIGHT;
                 }
                 if (keyEvent.getCode().equals(KeyCode.LEFT)) {
@@ -122,8 +153,8 @@ public class Board extends Application {
         onLaunchedCallback.onApplicationLaunched(this);
     }
 
-    public void draw(IState state) {
-        logger.debug("Draw");
+    public void draw(IState state, int id) {
+        logger.debug("Draw with stateinformation: snakes:"+state.getSnakes().size()+"id: "+id+" health: "+state.getSnakes().get(id).getHealth()+" speed: "+state.getSnakes().get(id).getSpeed());
 
         // clear
         for(IPoint p : state.getToRemove()) {
@@ -147,6 +178,20 @@ public class Board extends Application {
 
             }
         }
+
+        logger.debug("set infopane");
+        logger.debug("setting health to: "+state.getSnakes().get(id).getHealth());
+
+            //TODO Workaround because of threading expception, revisit!
+        Platform.runLater(
+                () -> {
+                    healthString.set("" + state.getSnakes().get(id).getHealth());
+                    speedString.set("" + state.getSnakes().get(id).getSpeed());
+                }
+        );
+
+
+
     }
 
     private Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) {

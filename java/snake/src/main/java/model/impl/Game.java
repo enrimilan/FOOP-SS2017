@@ -77,8 +77,9 @@ public class Game implements IGame {
 
         if(head.equals(state.getFood())) {
             //eat food
-            if(snake.getSpeed() < 800) {
-                snake.setSpeed(snake.getSpeed() + 100);
+            if(snake.getSpeed() < 1000) {
+                snake.setSpeed(snake.getSpeed() + 20);
+                snake.setHealth(snake.getHealth() + 10);
             }
             placeFood();
             state.getAvailablePoints().remove(head);
