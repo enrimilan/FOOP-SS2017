@@ -9,8 +9,6 @@ public class Point implements IPoint, Serializable {
 
     private int x;
     private int y;
-    private PointType type;
-    private int art;
 
     public Point(int x, int y) {
         this.x = x;
@@ -37,25 +35,7 @@ public class Point implements IPoint, Serializable {
         this.y = y;
     }
 
-    @Override
-    public PointType getType() {
-        return type;
-    }
 
-    @Override
-    public void setType(PointType type) {
-        this.type = type;
-    }
-
-    @Override
-    public int getArt() {
-        return this.art;
-    }
-
-    @Override
-    public void setArt(int i) {
-        this.art = i;
-    }
 
     @Override
     public boolean equals(Object o) {

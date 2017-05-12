@@ -12,13 +12,6 @@ public interface IPoint {
 
     void setY(int y);
 
-    PointType getType();
-
-    void setType(PointType type);
-
-    int getArt();
-
-    void setArt(int artID);
 
 
 }

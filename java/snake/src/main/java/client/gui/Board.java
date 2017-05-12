@@ -162,7 +162,7 @@ public class Board extends Application {
             n.setStyle("-fx-background-color: white;");
         }
 
-        IPoint food = state.getFood();
+        Food food = state.getFood();
         if(food != null) {
             Node n = getNodeByRowColumnIndex(food.getY(), food.getX(), gridPane);
             //n.setStyle("-fx-background-color: red; -fx-background-radius: 25;");

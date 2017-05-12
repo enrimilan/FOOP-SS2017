@@ -76,7 +76,7 @@ public class Game implements IGame {
         IPoint head = points.get(points.size()-1);
         ArrayList<IPoint> toRemove = new ArrayList<IPoint>();
 
-        if(head.equals(state.getFood())) {
+        if(head.equals(state.getFood().decoratedPoint)) {//TODO ugh, decoratedpoint, this seems unneat
             //eat food
             if(snake.getSpeed() < 1000) {
                 snake.setSpeed(snake.getSpeed() + 20);
@@ -102,10 +102,8 @@ public class Game implements IGame {
     }
 
     private void placeFood() {
-        IPoint food = state.occupyRandomPoint();
-        food.setType(PointType.FOOD);
-        food.setArt(rand.nextInt(NUMOFART));
-        logger.info("Placing food of Art " + food.getArt() + " at position ({},{})", food.getX(), food.getY());
+        Food food = new Food(state.occupyRandomPoint());
+        logger.info("Placing food of Art " + food.getArt()+ " at position ({},{})", food.getX(), food.getY());
         state.setFood(food);
     }
 

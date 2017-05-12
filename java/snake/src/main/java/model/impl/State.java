@@ -15,7 +15,7 @@ public class State implements IState, Serializable {
     private HashMap<Integer, ISnake> snakes = new HashMap<Integer, ISnake>();
     private List<IPoint> toRemove = new ArrayList<IPoint>();
     private List<IPoint> availablePoints = new ArrayList<IPoint>();
-    private IPoint food;
+    private Food food;
 
     public State() {
         for(int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -41,12 +41,12 @@ public class State implements IState, Serializable {
     }
 
     @Override
-    public void setFood(IPoint food) {
+    public void setFood(Food food) {
         this.food = food;
     }
 
     @Override
-    public IPoint getFood() {
+    public Food getFood() {
         return food;
     }
 
