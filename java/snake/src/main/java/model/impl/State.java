@@ -16,6 +16,7 @@ public class State implements IState, Serializable {
     private List<IPoint> toRemove = new ArrayList<IPoint>();
     private List<IPoint> availablePoints = new ArrayList<IPoint>();
     private Food food;
+    private List<Poison> poison;
 
     public State() {
         for(int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -23,6 +24,7 @@ public class State implements IState, Serializable {
                 availablePoints.add(new Point(x, y));
             }
         }
+        poison = new ArrayList<>();
     }
 
     @Override
@@ -58,6 +60,16 @@ public class State implements IState, Serializable {
     @Override
     public IPoint occupyRandomPoint() {
         return availablePoints.remove((int)(Math.random() * availablePoints.size()));
+    }
+
+    @Override
+    public void setPoison(Poison poison) {
+        this.poison.add(poison);
+    }
+
+    @Override
+    public List<Poison> getPoison() {
+        return poison;
     }
 
 }

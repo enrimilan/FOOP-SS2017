@@ -21,4 +21,8 @@ public interface IState {
 
     IPoint occupyRandomPoint();
 
+    void setPoison(Poison poison);
+
+    List<Poison> getPoison();
+
 }

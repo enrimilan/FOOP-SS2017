@@ -13,8 +13,9 @@ public class Game implements IGame {
     private static final Logger logger = LogManager.getLogger(Game.class);
     private IState state;
     private List<String> colors = new ArrayList<String>();
-    Random rand = new Random();
-    private static final int NUMOFART = 4;
+    private Random rand = new Random();
+    private static final int POISONCHANCE = 10;
+    private static final int POISONMAX = 10;
 
     public Game(IState state) {
         this.state = state;
@@ -56,6 +57,7 @@ public class Game implements IGame {
     @Override
     public IState updateState(int id, Direction direction) {
 
+
         ISnake snake = state.getSnakes().get(id);
         List<IPoint> points = snake.getPoints();
 
@@ -76,11 +78,28 @@ public class Game implements IGame {
         IPoint head = points.get(points.size()-1);
         ArrayList<IPoint> toRemove = new ArrayList<IPoint>();
 
+        //place poison arbitrarily
+        if(rand.nextInt(100)<POISONCHANCE&&state.getPoison().size()<=POISONMAX){
+            placePoison();
+        }
+
+        //eat poison
+        if(!state.getPoison().isEmpty()){
+            for(Poison po : state.getPoison()) {
+                if (head.equals(po.decoratedPoint)) {
+                    snake.setHealth(snake.getHealth() - 50);
+                    state.getAvailablePoints().remove(head);
+                    state.getPoison().remove(po);
+                    break;
+                }
+            }
+        }
+
+        //eat food
         if(head.equals(state.getFood().decoratedPoint)) {//TODO ugh, decoratedpoint, this seems unneat
-            //eat food
             if(snake.getSpeed() < 1000) {
-                snake.setSpeed(snake.getSpeed() + 20);
-                snake.setHealth(snake.getHealth() + 10);
+                snake.setSpeed(snake.getSpeed() + 40);
+                snake.setHealth(snake.getHealth() + 30);
             }
             placeFood();
             state.getAvailablePoints().remove(head);
@@ -105,6 +124,12 @@ public class Game implements IGame {
         Food food = new Food(state.occupyRandomPoint());
         logger.info("Placing food of Art " + food.getArt()+ " at position ({},{})", food.getX(), food.getY());
         state.setFood(food);
+    }
+
+    private void placePoison() {
+        Poison poison = new Poison(state.occupyRandomPoint());
+        logger.info("Placing poison of Art " + poison.getArt()+ " at position ({},{})", poison.getX(), poison.getY());
+        state.setPoison(poison);
     }
 
    

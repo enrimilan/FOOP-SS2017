@@ -162,14 +162,26 @@ public class Board extends Application {
             n.setStyle("-fx-background-color: white;");
         }
 
+        //draw food
         Food food = state.getFood();
         if(food != null) {
             Node n = getNodeByRowColumnIndex(food.getY(), food.getX(), gridPane);
             //n.setStyle("-fx-background-color: red; -fx-background-radius: 25;");
             logger.debug("Setting Food, type is: "+food.getArt());
-            String randString = "-fx-background-image: url(\"/img/food"+food.getArt()+".png\");";
-            n.setStyle(randString);
 
+            n.setStyle("-fx-background-image: url(\"/img/food"+food.getArt()+".png\");");
+
+        }
+
+        //draw poisons
+        ArrayList<Poison> poison = (ArrayList<Poison>) state.getPoison();
+        if(!poison.isEmpty()) {
+            for(Poison p : poison) {
+                Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), gridPane);
+                //n.setStyle("-fx-background-color: red; -fx-background-radius: 25;");
+                logger.debug("Setting Poison, type is: " + p.getArt());
+                n.setStyle("-fx-background-image: url(\"/img/poison" + p.getArt() + ".png\");");
+            }
         }
 
         Iterator entries = state.getSnakes().entrySet().iterator();
