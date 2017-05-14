@@ -6,6 +6,7 @@ import model.*;
 import model.impl.Point;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.omg.PortableInterceptor.DISCARDING;
 import util.Constants;
 
 import java.io.IOException;
@@ -31,14 +32,19 @@ public class Client {
     private Socket socket;
     private Mode mode;
 
-    /* Global variables for snake bot */
+    /* Global variables for the snake bot */
+    /* --- */
     private Direction lastDirection = null; // the variable saves the last direction of the current snake
                                             // initially the snake has no direction
+    boolean flag = false; // flag denotes the state when the snake is not near the food
+                          // if the snake is near to food (is left one single step), then flag is true
+                         // otherwise false
+    /* --- */
 
     public Client(Mode mode) {
         this.executor = Executors.newCachedThreadPool();
-        this.mode = mode;
-        //this.mode = Mode.COMPUTER;
+        //this.mode = mode;
+        this.mode = Mode.COMPUTER;
     }
 
     public void join() throws IOException {
@@ -67,13 +73,13 @@ public class Client {
         return board.getNextDirection();
     }
 
+    /* Author: Gruzdev Eugen */
     public Direction getNextDirectionUsingAlgorithm() {
         if(lastDirection == null){  // If the first direction is null (the game beginning for this snake)
             lastDirection = getFirstDirection();
             return lastDirection;
         } else {
-            // TODO: getNextDirection
-            // It must take lastDirection as argument
+            lastDirection = getNextSnakeDirection(lastDirection);
             return lastDirection;
         }
     }
@@ -116,8 +122,82 @@ public class Client {
         }
     }
 
-    public List<IPoint> getOccupiedPoints(ArrayList<ISnake> allSnakes){
-        List<IPoint> occupiedPoints = null;
+    public Direction getNextSnakeDirection(Direction lastDirection){
+        HashMap<Integer, ISnake> allSnakes = this.state.getSnakes(); //all generated snakes
+        IPoint myPosition = this.getSnake().getPoints().get(this.getSnake().getPoints().size() - 1);
+                                                // the point where the head current snake is situated
+        int currentSnakeLength = this.getSnake().getPoints().size(); // the size of the current snake
+        List<IPoint> thisSnake = new ArrayList<IPoint>(this.getSnake().getPoints()); // all the points of the current snake
+        IPoint food = this.state.getFood();     // the point where the food is situated
+        ArrayList<ISnake> allSnakesAsList = new ArrayList<ISnake>();
+
+        logger.debug("All Snakes size:" + allSnakes.size());
+        logger.debug(allSnakes.get(this.id));
+
+        for(Integer key : allSnakes.keySet()){
+            if(key != this.id){
+                try {
+                    allSnakesAsList.add(allSnakes.get(key));
+                } catch (NullPointerException e){
+                    logger.fatal("NullPointerException: " + e);
+                }
+            }
+        }
+
+        List<IPoint> occupiedPoints = new ArrayList<IPoint>();   // list of all currently occupied points on the board
+                                                                 // here including the current snake
+
+        if(allSnakesAsList.size() >= 0) {
+            occupiedPoints.addAll(this.getOccupiedPoints(allSnakesAsList));
+            occupiedPoints.addAll(thisSnake);
+        }
+
+        logger.debug("Occ.P size:" + occupiedPoints.size());
+        for(IPoint p : occupiedPoints){
+            logger.debug("Point :" + p.toString());
+        }
+
+        if(this.differenceOfPoints(myPosition, food) == 1){
+            flag = true;
+            return lastDirection;
+        } else {
+            /*if (flag){
+                flag = false;
+                // TODO: Make so, that the snake cannot bite itself
+                // TODO: Make so, that the snake's head cannot move along the snake
+                return getDirectionRelativeToFood(myPosition, food);
+            } else {*/
+                Direction direction = getDirectionRelativeToFood(myPosition, food);
+
+               /* logger.debug("FOOD POSITION: " + food.toString());
+                logger.debug("MY POSITION: " + myPosition.toString());
+                logger.debug("DIFFERENCE: " + this.differenceOfPoints(myPosition, food));
+                logger.debug("DIRECTION: " + direction.toString());*/
+
+                return direction;
+            //}
+        }
+    }
+
+    public int differenceOfPoints(IPoint pointA, IPoint pointB){
+        return (Math.abs(pointA.getX() - pointB.getX()) + Math.abs(pointA.getY() - pointB.getY()));
+    }
+
+    public Direction contraryDirection(Direction direction){
+        if(direction == Direction.DOWN){
+            return Direction.UP;
+        } else if (direction == Direction.UP){
+            return Direction.DOWN;
+        } else if (direction == Direction.LEFT){
+            return Direction.RIGHT;
+        } else if (direction == Direction.RIGHT){
+            return Direction.LEFT;
+        }
+        return null;
+    }
+
+    public ArrayList<IPoint> getOccupiedPoints(ArrayList<ISnake> allSnakes){
+        ArrayList<IPoint> occupiedPoints = new ArrayList<IPoint>();
         for(ISnake snake : allSnakes){
             List<IPoint> points = snake.getPoints();
             for(IPoint point : points){
@@ -137,6 +217,28 @@ public class Client {
 
         if((x_1 < x_2) && (y_1 == y_2)){
             return Direction.RIGHT;
+        } else if((x_1 < x_2) && (y_1 > y_2)){
+            return Direction.UP;
+        } else if((x_1 < x_2) && (y_1 < y_2)){
+            return Direction.DOWN;
+        }
+        else if ((x_1 > x_2) && (y_1 == y_2)){
+            return Direction.LEFT;
+        } else if((x_1 > x_2) && (y_1 < y_2)){
+            return Direction.DOWN;
+        } else if((x_1 > x_2) && (y_1 > y_2)){
+            return Direction.UP;
+        }
+        else if ((x_1 == x_2) && (y_1 == y_2)){
+            return Direction.RIGHT;
+        } else if((x_1 == x_2) && (y_1 < y_2)){
+            return Direction.DOWN;
+        } else if((x_1 == x_2) && (y_1 > y_2)){
+            return Direction.UP;
+        }
+
+        /*if((x_1 < x_2) && (y_1 == y_2)){
+            return Direction.RIGHT;
         } else if ((x_1 > x_2) && (y_1 == y_2)){
             return Direction.LEFT;
         } else if ((x_1 == x_2) && (y_1 < y_2)){
@@ -147,7 +249,11 @@ public class Client {
             return Direction.UP;
         } else if((x_1 < x_2) && (y_1 < y_2)){
             return Direction.DOWN;
-        }
+        } else if((x_1 > x_2) && (y_1 < y_2)){
+            return Direction.LEFT;
+        } else if((x_1 < x_2) && (y_1 > y_2)){
+            return Direction.RIGHT;
+        }*/
         return Direction.RIGHT;
     }
 
@@ -178,6 +284,46 @@ public class Client {
             return false; // next direction step is occupied
         } else {
             return true; // next direction step in NOT occupied
+        }
+    }
+
+    public boolean nextNextDirectionStepIsNotOccupied(IPoint myPosition, Direction direction1, Direction direction2, List<IPoint> occupiedPoints){
+        /* Coordinates of my position */
+        int x = myPosition.getX();
+        int y = myPosition.getY();
+
+        if(direction1 == Direction.DOWN){
+            y++;
+        } else if(direction1 == Direction.UP){
+            y--;
+        } else if(direction1 == Direction.LEFT){
+            x--;
+        } else if(direction1 == Direction.RIGHT){
+            x++;
+        }
+
+        if(direction2 == Direction.DOWN){
+            y++;
+        } else if(direction2 == Direction.UP){
+            y--;
+        } else if(direction2 == Direction.LEFT){
+            x--;
+        } else if(direction2 == Direction.RIGHT){
+            x++;
+        }
+
+        if(x >= Constants.BOARD_WIDTH || x <= Constants.BOARD_WIDTH){
+            return false;
+        }
+
+        if(y >= Constants.BOARD_HEIGHT || y <= Constants.BOARD_HEIGHT){
+            return false;
+        }
+
+        if(occupiedPoints.contains(new Point(x,y))){
+            return false; // next next direction step is occupied
+        } else {
+            return true; // next next direction step in NOT occupied
         }
     }
 
