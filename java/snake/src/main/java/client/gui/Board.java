@@ -2,7 +2,6 @@ package client.gui;
 
 import javafx.application.*;
 import javafx.beans.property.*;
-import javafx.beans.value.*;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -174,13 +173,24 @@ public class Board extends Application {
         }
 
         //draw poisons
-        ArrayList<Poison> poison = (ArrayList<Poison>) state.getPoison();
+        ArrayList<Poison> poison = (ArrayList<Poison>) state.getPoisons();
         if(!poison.isEmpty()) {
             for(Poison p : poison) {
                 Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), gridPane);
                 //n.setStyle("-fx-background-color: red; -fx-background-radius: 25;");
                 logger.debug("Setting Poison, type is: " + p.getArt());
                 n.setStyle("-fx-background-image: url(\"/img/poison" + p.getArt() + ".png\");");
+            }
+        }
+
+        //draw powerups
+        ArrayList<PowerUp> powerups = (ArrayList<PowerUp>) state.getPowerups();
+        if(!powerups.isEmpty()) {
+            for(PowerUp p : powerups) {
+                Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), gridPane);
+                //n.setStyle("-fx-background-color: red; -fx-background-radius: 25;");
+                logger.debug("Setting Powerup, type is: " + p.getArt());
+                n.setStyle("-fx-background-image: url(\"/img/powerup" + p.getArt() + ".png\");");
             }
         }
 

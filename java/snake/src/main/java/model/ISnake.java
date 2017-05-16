@@ -1,6 +1,8 @@
 package model;
 
-import java.util.List;
+import model.impl.*;
+
+import java.util.*;
 
 public interface ISnake {
 
@@ -21,5 +23,20 @@ public interface ISnake {
     void setHealth(int health);
 
     int getHealth();
+
+    int getPowerUpInfluenceCount();
+
+    void setPowerUpInfluenceCount(int playerUnderPowerUPInfluence);
+
+    HashMap<PowerUpType, Long> getActivePowerUps();
+
+    void setActivePowerUps(PowerUpType powerUpType, Long timestamp);
+
+     void setActivePowerUps(HashMap<PowerUpType, Long> activePowerUps);
+
+    void removePowerUp(PowerUpType pT);
+
+
+
 
 }

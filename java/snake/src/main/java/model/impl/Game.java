@@ -14,8 +14,14 @@ public class Game implements IGame {
     private IState state;
     private List<String> colors = new ArrayList<String>();
     private Random rand = new Random();
-    private static final int POISONCHANCE = 10;
+    private static final int POISONCHANCE = 5;
+    private static final int POWERUPCHANCE = 20;
     private static final int POISONMAX = 10;
+    private static final int POWERUPMAX = 5;
+    private static final int POWERUPDURATION = 5000;
+
+
+
 
     public Game(IState state) {
         this.state = state;
@@ -78,29 +84,118 @@ public class Game implements IGame {
         IPoint head = points.get(points.size()-1);
         ArrayList<IPoint> toRemove = new ArrayList<IPoint>();
 
-        //place poison arbitrarily
-        if(rand.nextInt(100)<POISONCHANCE&&state.getPoison().size()<=POISONMAX){
-            placePoison();
+
+        //check for powerup timing:
+
+        if(snake.getPowerUpInfluenceCount()>0){
+          for(PowerUpType powerUpType : snake.getActivePowerUps().keySet()){
+              if(System.currentTimeMillis()>snake.getActivePowerUps().get(powerUpType)){
+                  switch (powerUpType){
+                      case SPEED:
+                            snake.setSpeed(snake.getSpeed()-100);
+                            snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount()-1);
+                            snake.removePowerUp(powerUpType);
+
+                  }
+              }
+          }
         }
 
+
+        //place poison arbitrarily
+        if(rand.nextInt(100)<POISONCHANCE&&state.getPoisons().size()<=POISONMAX){
+            placePoison();
+
+        }
+
+        //remove poison arbitrarily
+        if(state.getPoisons().size()>0&&rand.nextInt(100)<POISONCHANCE){
+            int j = rand.nextInt(state.getPoisons().size());
+            toRemove.add(state.getPoisons().get(j));
+            state.getPoisons().remove(j);
+
+        }
+
+        //place powerup arbitrarily
+        if(rand.nextInt(100)<POWERUPCHANCE&&state.getPowerups().size()<=POWERUPMAX){
+            placePowerUp();
+
+        }
+
+        //remove powerup arbitrarily
+        if(state.getPowerups().size()>0&&rand.nextInt(100)<POWERUPCHANCE/2){
+            int j = rand.nextInt(state.getPowerups().size());
+            toRemove.add(state.getPowerups().get(j));
+            state.getPowerups().remove(j);
+
+        }
+
+
         //eat poison
-        if(!state.getPoison().isEmpty()){
-            for(Poison po : state.getPoison()) {
+        if(!state.getPoisons().isEmpty()){
+            for(Poison po : state.getPoisons()) {
                 if (head.equals(po.decoratedPoint)) {
                     snake.setHealth(snake.getHealth() - 50);
                     state.getAvailablePoints().remove(head);
-                    state.getPoison().remove(po);
+                    state.getPoisons().remove(po);
                     break;
                 }
             }
         }
 
+        /**
+         * handles powerup consumption
+         */
+        if(!state.getPowerups().isEmpty()){
+            for(PowerUp po : state.getPowerups()) {
+                if (head.equals(po.decoratedPoint)) {
+
+                    if(po.getType()==PowerUpType.SPEED){
+                        snake.setSpeed(snake.getSpeed()+100);
+                        snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount() + 1);
+
+                        if(snake.getActivePowerUps().containsKey(PowerUpType.SPEED)){
+                            snake.setActivePowerUps(PowerUpType.SPEED, snake.getActivePowerUps().get(PowerUpType.SPEED)+POWERUPDURATION);
+                        }else{
+                            snake.setActivePowerUps(PowerUpType.SPEED, System.currentTimeMillis()+POWERUPDURATION);
+                        }
+                    }
+
+                    if(po.getType()==PowerUpType.HEALTH){
+                        snake.setHealth(snake.getHealth() + 200);
+                        snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount() + 1);
+
+                        if(snake.getActivePowerUps().containsKey(PowerUpType.HEALTH)){
+                            snake.setActivePowerUps(PowerUpType.HEALTH, snake.getActivePowerUps().get(PowerUpType.HEALTH)+POWERUPDURATION);
+                        }else{
+                            snake.setActivePowerUps(PowerUpType.HEALTH, System.currentTimeMillis()+POWERUPDURATION);
+                        }
+                    }
+
+                    if(po.getType()==PowerUpType.INVINCIBILITY){
+                     //TODO
+                    }
+
+                    if(po.getType()==PowerUpType.LENGTH){
+                     //TODO
+                    }
+
+
+
+                    state.getAvailablePoints().remove(head);
+                    state.getPowerups().remove(po);
+                    break;
+                }
+            }
+        }
+
+
         //eat food
         if(head.equals(state.getFood().decoratedPoint)) {//TODO ugh, decoratedpoint, this seems unneat
-            if(snake.getSpeed() < 1000) {
+            if(snake.getSpeed() < 300) {
                 snake.setSpeed(snake.getSpeed() + 40);
-                snake.setHealth(snake.getHealth() + 30);
             }
+            snake.setHealth(snake.getHealth() + 30);
             placeFood();
             state.getAvailablePoints().remove(head);
         }
@@ -130,6 +225,12 @@ public class Game implements IGame {
         Poison poison = new Poison(state.occupyRandomPoint());
         logger.info("Placing poison of Art " + poison.getArt()+ " at position ({},{})", poison.getX(), poison.getY());
         state.setPoison(poison);
+    }
+
+    private void placePowerUp() {
+        PowerUp powerup = new PowerUp(state.occupyRandomPoint());
+        logger.info("Placing powerup of Art " + powerup.getArt() + " at position ({},{})", powerup.getX(), powerup.getY());
+        state.setPowerUp(powerup);
     }
 
    

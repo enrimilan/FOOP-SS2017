@@ -23,6 +23,11 @@ public interface IState {
 
     void setPoison(Poison poison);
 
-    List<Poison> getPoison();
+    List<Poison> getPoisons();
+
+
+    void setPowerUp(PowerUp power);
+
+    List<PowerUp> getPowerups();
 
 }

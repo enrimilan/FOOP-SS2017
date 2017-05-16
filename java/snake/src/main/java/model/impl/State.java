@@ -17,6 +17,7 @@ public class State implements IState, Serializable {
     private List<IPoint> availablePoints = new ArrayList<IPoint>();
     private Food food;
     private List<Poison> poison;
+    private List<PowerUp> powerups;
 
     public State() {
         for(int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -25,6 +26,7 @@ public class State implements IState, Serializable {
             }
         }
         poison = new ArrayList<>();
+        powerups = new ArrayList<>();
     }
 
     @Override
@@ -68,8 +70,18 @@ public class State implements IState, Serializable {
     }
 
     @Override
-    public List<Poison> getPoison() {
+    public List<Poison> getPoisons() {
         return poison;
+    }
+
+    @Override
+    public void setPowerUp(PowerUp powerUp) {
+        this.powerups.add(powerUp);
+    }
+
+    @Override
+    public List<PowerUp> getPowerups() {
+        return powerups;
     }
 
 }
