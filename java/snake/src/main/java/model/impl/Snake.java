@@ -1,7 +1,6 @@
 package model.impl;
 
-import model.IPoint;
-import model.ISnake;
+import model.*;
 
 import java.io.Serializable;
 import java.util.*;
@@ -13,6 +12,7 @@ public class Snake implements ISnake, Serializable {
     //which type was at which timestamp(long) activated:
     private HashMap<PowerUpType, Long> activePowerUps = new HashMap<>();
     private int snakeUnderInflucenceOfPowerups = 0;
+    private Direction heading;
 
     public HashMap<PowerUpType, Long> getActivePowerUps() {
         return activePowerUps;
@@ -28,6 +28,16 @@ public class Snake implements ISnake, Serializable {
 
     public void removePowerUp(PowerUpType pT){
         this.activePowerUps.remove(pT);
+    }
+
+    @Override
+    public Direction getDirection() {
+        return heading;
+    }
+
+    @Override
+    public void setDirection(Direction dir) {
+        this.heading = dir;
     }
 
 

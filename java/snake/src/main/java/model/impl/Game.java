@@ -18,7 +18,7 @@ public class Game implements IGame {
     private static final int POWERUPCHANCE = 20;
     private static final int POISONMAX = 10;
     private static final int POWERUPMAX = 5;
-    private static final int POWERUPDURATION = 5000;
+    private static final int POWERUPDURATION = 10000;
 
 
 
@@ -67,25 +67,47 @@ public class Game implements IGame {
         ISnake snake = state.getSnakes().get(id);
         List<IPoint> points = snake.getPoints();
 
+
+        /**
+         *ensure snake cant go through itself if its longer than 1
+         */
+
+        if(snake.getPoints().size()>1) {
+            if (snake.getDirection() == Direction.RIGHT && direction == Direction.LEFT) direction = Direction.RIGHT;
+            if (snake.getDirection() == Direction.LEFT && direction == Direction.RIGHT) direction = Direction.LEFT;
+            if (snake.getDirection() == Direction.UP && direction == Direction.DOWN) direction = Direction.UP;
+            if (snake.getDirection() == Direction.DOWN && direction == Direction.UP) direction = Direction.DOWN;
+        }
+
+        /**
+         * directions
+         */
+
         IPoint p = points.get(points.size()-1);
         if(direction == Direction.RIGHT) {
             points.add(new Point(p.getX()+1, p.getY()));
+            snake.setDirection(Direction.RIGHT);
         }
         if(direction == Direction.LEFT) {
             points.add(new Point(p.getX()-1, p.getY()));
+            snake.setDirection(Direction.LEFT);
         }
         if(direction == Direction.UP) {
             points.add(new Point(p.getX(), p.getY()-1));
+            snake.setDirection(Direction.UP);
         }
         if(direction == Direction.DOWN) {
             points.add(new Point(p.getX(), p.getY()+1));
+            snake.setDirection(Direction.DOWN);
         }
 
         IPoint head = points.get(points.size()-1);
         ArrayList<IPoint> toRemove = new ArrayList<IPoint>();
 
 
-        //check for powerup timing:
+        /**
+         * check powerup timing
+         */
 
         if(snake.getPowerUpInfluenceCount()>0){
           for(PowerUpType powerUpType : snake.getActivePowerUps().keySet()){
@@ -95,11 +117,21 @@ public class Game implements IGame {
                             snake.setSpeed(snake.getSpeed()-100);
                             snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount()-1);
                             snake.removePowerUp(powerUpType);
-
+                            break;
+                      case HEALTH:
+                            snake.setHealth(snake.getHealth()-200);
+                            snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount()-1);
+                            snake.removePowerUp(powerUpType);
+                            break;
+                      case LENGTH:
+                            snake.removePowerUp(powerUpType);
+                            break;
+                      case INVINCIBILITY:
                   }
               }
           }
         }
+
 
 
         //place poison arbitrarily
@@ -144,7 +176,19 @@ public class Game implements IGame {
         }
 
         /**
-         * handles powerup consumption
+         * collision detection with other snakes
+         *
+         * Snakes touching each other increase their health level and speed for a while.
+         * But, the health level of a snake bitten by another snake (or itself) dramatically decreases,
+         * depending on the sizes of the biting and bitten snakes.
+         *
+         */
+
+
+        
+
+        /**
+         * handles powerup consumption (eat powerup/toxin)
          */
         if(!state.getPowerups().isEmpty()){
             for(PowerUp po : state.getPowerups()) {
@@ -173,11 +217,12 @@ public class Game implements IGame {
                     }
 
                     if(po.getType()==PowerUpType.INVINCIBILITY){
-                     //TODO
+
                     }
 
                     if(po.getType()==PowerUpType.LENGTH){
-                     //TODO
+                        snake.setActivePowerUps(PowerUpType.LENGTH,System.currentTimeMillis()+POWERUPDURATION-8000);
+                        snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount() + 1);
                     }
 
 
@@ -199,7 +244,7 @@ public class Game implements IGame {
             placeFood();
             state.getAvailablePoints().remove(head);
         }
-        else {
+        else if(!snake.getActivePowerUps().keySet().contains(PowerUpType.LENGTH)) {
             IPoint tail = points.get(0);
             points.remove(tail);
             toRemove.add(tail);

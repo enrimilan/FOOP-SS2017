@@ -36,7 +36,9 @@ public interface ISnake {
 
     void removePowerUp(PowerUpType pT);
 
+    Direction getDirection();
 
+    void setDirection(Direction dir);
 
 
 }
