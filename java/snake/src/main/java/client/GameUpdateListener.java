@@ -26,6 +26,7 @@ public class GameUpdateListener implements Runnable {
             while(running) {
                 State state = (State) in.readObject();
                 client.onGameStateChanged(state);
+                logger.debug("got state.");
             }
         } catch (IOException e) {
             logger.debug(e.getMessage());

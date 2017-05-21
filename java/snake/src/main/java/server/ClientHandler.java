@@ -31,6 +31,7 @@ public class ClientHandler implements Runnable {
         logger.debug("Start new ClientHandler for client {}", clientId);
         try {
             while(running) {
+                logger.debug("recv direction from client {}",clientId);
                 Direction direction = (Direction) in.readObject();
                 server.onDirectionReceived(clientId, direction);
             }

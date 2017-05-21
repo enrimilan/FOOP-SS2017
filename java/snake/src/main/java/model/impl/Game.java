@@ -3,6 +3,7 @@ package model.impl;
 import model.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.*;
 
 import java.util.*;
 
@@ -14,12 +15,6 @@ public class Game implements IGame {
     private IState state;
     private List<String> colors = new ArrayList<String>();
     private Random rand = new Random();
-    private static final int POISONCHANCE = 5;
-    private static final int POWERUPCHANCE = 20;
-    private static final int POISONMAX = 10;
-    private static final int POWERUPMAX = 5;
-    private static final int POWERUPDURATION = 10000;
-
 
 
 
@@ -60,6 +55,51 @@ public class Game implements IGame {
         state.getAvailablePoints().addAll(snake.getPoints());
     }
 
+    /**
+     * handles collision detection with itself or other snakes.
+     *
+     *
+     * Snakes touching each other increase their health level and speed for a while.
+     * But, the health level of a snake bitten by another snake (or itself) dramatically decreases,
+     * depending on the sizes of the biting and bitten snakes.
+     *
+     *
+     */
+
+    boolean checkForSnakeCollision(ISnake snake, int x, int y){
+
+        for(Map.Entry<Integer, ISnake> entry : state.getSnakes().entrySet()){
+            for(IPoint point : entry.getValue().getPoints()){
+                if(point.getX()==x&&point.getY()==y){
+                    //collision
+                    /**
+                     * SNAKE + speed and health, ISnake - speed and health
+                     */
+
+                    //alter biting snake:
+                    snake.setActiveGoodBiting(System.currentTimeMillis() + Constants.BITINGTIME);//TODO if already has biting
+                    snake.setHasBittenCount(snake.getHasBittenCount() + 1);
+                    snake.setHealth(snake.getHealth()+Constants.BITINGHEALTH);
+                    snake.setSpeed(snake.getSpeed() +Constants.BITINGSPEED);
+
+                    //alter bitten snake:
+                    entry.getValue().setActiveBadBiting(System.currentTimeMillis() + Constants.BITINGTIME);
+                    entry.getValue().setSnakeWasBittenByOtherSnake(snake.getSnakeWasBittenByOtherSnake() + 1);
+                    entry.getValue().setHealth(snake.getHealth() - Constants.BITINGHEALTH);
+                    entry.getValue().setSpeed(snake.getSpeed() - Constants.BITINGSPEED);
+
+                    return true;
+
+                }
+            }
+
+        }
+
+        return false;
+
+    }
+
+
     @Override
     public IState updateState(int id, Direction direction) {
 
@@ -85,24 +125,46 @@ public class Game implements IGame {
 
         IPoint p = points.get(points.size()-1);
         if(direction == Direction.RIGHT) {
-            points.add(new Point(p.getX()+1, p.getY()));
-            snake.setDirection(Direction.RIGHT);
+            if(!checkForSnakeCollision(snake, p.getX()+1, p.getY())){
+                points.add(new Point(p.getX() + 1, p.getY()));
+                snake.setDirection(Direction.RIGHT);
+            }
         }
         if(direction == Direction.LEFT) {
-            points.add(new Point(p.getX()-1, p.getY()));
-            snake.setDirection(Direction.LEFT);
+            if(!checkForSnakeCollision(snake, p.getX()-1, p.getY())) {
+                points.add(new Point(p.getX() - 1, p.getY()));
+                snake.setDirection(Direction.LEFT);
+            }
         }
         if(direction == Direction.UP) {
-            points.add(new Point(p.getX(), p.getY()-1));
-            snake.setDirection(Direction.UP);
+            if(!checkForSnakeCollision(snake, p.getX(), p.getY()-1)) {
+                points.add(new Point(p.getX(), p.getY() - 1));
+                snake.setDirection(Direction.UP);
+            }
         }
         if(direction == Direction.DOWN) {
-            points.add(new Point(p.getX(), p.getY()+1));
-            snake.setDirection(Direction.DOWN);
+            if(!checkForSnakeCollision(snake, p.getX()+1, p.getY()+1)){
+                points.add(new Point(p.getX(), p.getY()+1));
+                snake.setDirection(Direction.DOWN);
+            }
         }
 
         IPoint head = points.get(points.size()-1);
         ArrayList<IPoint> toRemove = new ArrayList<IPoint>();
+
+
+        /**
+         * check if snake collided with border
+         */
+
+        for(IPoint po : points){
+            if(po.getX()<0||po.getX()>=Constants.BOARD_WIDTH||
+               po.getY()<0||po.getY()>=Constants.BOARD_HEIGHT){
+                removeSnake(id);
+                return state;
+            }
+        }
+
 
 
         /**
@@ -135,13 +197,13 @@ public class Game implements IGame {
 
 
         //place poison arbitrarily
-        if(rand.nextInt(100)<POISONCHANCE&&state.getPoisons().size()<=POISONMAX){
+        if(rand.nextInt(100)<Constants.POISONCHANCE&&state.getPoisons().size()<=Constants.POISONMAX){
             placePoison();
 
         }
 
         //remove poison arbitrarily
-        if(state.getPoisons().size()>0&&rand.nextInt(100)<POISONCHANCE){
+        if(state.getPoisons().size()>0&&rand.nextInt(100)<Constants.POISONCHANCE){
             int j = rand.nextInt(state.getPoisons().size());
             toRemove.add(state.getPoisons().get(j));
             state.getPoisons().remove(j);
@@ -149,13 +211,13 @@ public class Game implements IGame {
         }
 
         //place powerup arbitrarily
-        if(rand.nextInt(100)<POWERUPCHANCE&&state.getPowerups().size()<=POWERUPMAX){
+        if(rand.nextInt(100)<Constants.POWERUPCHANCE&&state.getPowerups().size()<=Constants.POWERUPMAX){
             placePowerUp();
 
         }
 
         //remove powerup arbitrarily
-        if(state.getPowerups().size()>0&&rand.nextInt(100)<POWERUPCHANCE/2){
+        if(state.getPowerups().size()>0&&rand.nextInt(100)<Constants.POWERUPCHANCE/2){
             int j = rand.nextInt(state.getPowerups().size());
             toRemove.add(state.getPowerups().get(j));
             state.getPowerups().remove(j);
@@ -175,14 +237,6 @@ public class Game implements IGame {
             }
         }
 
-        /**
-         * collision detection with other snakes
-         *
-         * Snakes touching each other increase their health level and speed for a while.
-         * But, the health level of a snake bitten by another snake (or itself) dramatically decreases,
-         * depending on the sizes of the biting and bitten snakes.
-         *
-         */
 
 
         
@@ -199,9 +253,9 @@ public class Game implements IGame {
                         snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount() + 1);
 
                         if(snake.getActivePowerUps().containsKey(PowerUpType.SPEED)){
-                            snake.setActivePowerUps(PowerUpType.SPEED, snake.getActivePowerUps().get(PowerUpType.SPEED)+POWERUPDURATION);
+                            snake.setActivePowerUps(PowerUpType.SPEED, snake.getActivePowerUps().get(PowerUpType.SPEED)+Constants.POWERUPDURATION);
                         }else{
-                            snake.setActivePowerUps(PowerUpType.SPEED, System.currentTimeMillis()+POWERUPDURATION);
+                            snake.setActivePowerUps(PowerUpType.SPEED, System.currentTimeMillis()+Constants.POWERUPDURATION);
                         }
                     }
 
@@ -210,9 +264,9 @@ public class Game implements IGame {
                         snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount() + 1);
 
                         if(snake.getActivePowerUps().containsKey(PowerUpType.HEALTH)){
-                            snake.setActivePowerUps(PowerUpType.HEALTH, snake.getActivePowerUps().get(PowerUpType.HEALTH)+POWERUPDURATION);
+                            snake.setActivePowerUps(PowerUpType.HEALTH, snake.getActivePowerUps().get(PowerUpType.HEALTH)+Constants.POWERUPDURATION);
                         }else{
-                            snake.setActivePowerUps(PowerUpType.HEALTH, System.currentTimeMillis()+POWERUPDURATION);
+                            snake.setActivePowerUps(PowerUpType.HEALTH, System.currentTimeMillis()+Constants.POWERUPDURATION);
                         }
                     }
 
@@ -221,7 +275,7 @@ public class Game implements IGame {
                     }
 
                     if(po.getType()==PowerUpType.LENGTH){
-                        snake.setActivePowerUps(PowerUpType.LENGTH,System.currentTimeMillis()+POWERUPDURATION-8000);
+                        snake.setActivePowerUps(PowerUpType.LENGTH,System.currentTimeMillis()+Constants.POWERUPDURATION-8000);
                         snake.setPowerUpInfluenceCount(snake.getPowerUpInfluenceCount() + 1);
                     }
 

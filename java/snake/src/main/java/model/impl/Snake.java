@@ -12,7 +12,53 @@ public class Snake implements ISnake, Serializable {
     //which type was at which timestamp(long) activated:
     private HashMap<PowerUpType, Long> activePowerUps = new HashMap<>();
     private int snakeUnderInflucenceOfPowerups = 0;
+    private Long activeGoodBiting;
+    private Long activeBadBiting;
     private Direction heading;
+    private int snakeHasBittenOtherSnake = 0;
+
+
+    private int snakeWasBittenByOtherSnake = 0;
+    private int health = 100;
+    private String color;
+    private List<IPoint> points = new ArrayList<IPoint>();
+
+    public Snake(int id) {
+        this.id = id;
+    }
+
+
+    public int getSnakeWasBittenByOtherSnake() {
+        return snakeWasBittenByOtherSnake;
+    }
+
+    public void setSnakeWasBittenByOtherSnake(int snakeWasBittenByOtherSnake) {
+        this.snakeWasBittenByOtherSnake = snakeWasBittenByOtherSnake;
+    }
+
+    public Long getActiveBadBiting() {
+        return activeBadBiting;
+    }
+
+    public void setActiveBadBiting(Long activeBadBiting) {
+        this.activeBadBiting = activeBadBiting;
+    }
+
+    public Long getActiveGoodBiting() {
+        return activeGoodBiting;
+    }
+
+    public void setActiveGoodBiting(Long activeBiting) {
+        this.activeGoodBiting = activeBiting;
+    }
+
+    public int getHasBittenCount() {
+        return snakeHasBittenOtherSnake;
+    }
+
+    public void setHasBittenCount(int snakeHasBittenOtherSnake) {
+        this.snakeHasBittenOtherSnake = snakeHasBittenOtherSnake;
+    }
 
     public HashMap<PowerUpType, Long> getActivePowerUps() {
         return activePowerUps;
@@ -49,8 +95,6 @@ public class Snake implements ISnake, Serializable {
         this.snakeUnderInflucenceOfPowerups = p;
     }
 
-
-
     public int getHealth() {
         return health;
     }
@@ -58,14 +102,6 @@ public class Snake implements ISnake, Serializable {
     public void setHealth(int health) {
         System.out.println("health = [" + health + "]");
         this.health = health;
-    }
-
-    private int health = 100;
-    private String color;
-    private List<IPoint> points = new ArrayList<IPoint>();
-
-    public Snake(int id) {
-        this.id = id;
     }
 
     @Override

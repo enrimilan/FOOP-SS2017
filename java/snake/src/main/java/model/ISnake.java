@@ -40,5 +40,21 @@ public interface ISnake {
 
     void setDirection(Direction dir);
 
+    public int getHasBittenCount();
+
+    public void setHasBittenCount(int snakeHasBittenOtherSnake);
+
+    public Long getActiveGoodBiting();
+
+    public void setActiveGoodBiting(Long activeBiting);
+
+    public int getSnakeWasBittenByOtherSnake();
+
+    public void setSnakeWasBittenByOtherSnake(int snakeWasBittenByOtherSnake);
+
+    public Long getActiveBadBiting();
+
+    public void setActiveBadBiting(Long activeBadBiting);
+
 
 }

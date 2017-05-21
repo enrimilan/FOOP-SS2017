@@ -49,6 +49,10 @@ public class Client {
 
     public void onGameStateChanged(IState state) {
         this.state = state;
+        if(!state.getSnakes().containsKey(id)){
+            logger.debug("Snake dead. close?");
+            close();
+        }
         if(!firstState) {
             logger.debug("First state arrived");
             firstState = true;
