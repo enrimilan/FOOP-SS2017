@@ -38,7 +38,7 @@ public class Client {
                                             // initially the snake has no direction
     boolean flag = false; // flag denotes the state when the snake is not near the food
                           // if the snake is near to food (is left one single step), then flag is true
-                         // otherwise false
+                          // otherwise false
     /* --- */
 
     public Client(Mode mode) {
