@@ -153,7 +153,12 @@ public class Board extends Application {
     }
 
     public void draw(IState state, int id) {
+
+        
+
+
         logger.debug("Draw with stateinformation: snakes: "+state.getSnakes().size()+" id: "+id+" health: "+state.getSnakes().get(id).getHealth()+" speed: "+state.getSnakes().get(id).getSpeed());
+
         logger.debug("SNAKE POINTS:");
         for(ISnake snake : state.getSnakes().values()){
             String str = snake.getId()+": ";

@@ -75,7 +75,7 @@ public class Game implements IGame {
                     /**
                      * SNAKE + speed and health, ISnake - speed and health
                      */
-
+                    logger.info("snake "+snake.getColor()+" just bit "+entry.getValue().getColor());
                     //alter biting snake:
                     snake.setActiveGoodBiting(System.currentTimeMillis() + Constants.BITINGTIME);//TODO if already has biting
                     snake.setHasBittenCount(snake.getHasBittenCount() + 1);
@@ -103,7 +103,7 @@ public class Game implements IGame {
     @Override
     public IState updateState(int id, Direction direction) {
 
-
+        logger.info("direction: "+direction);
         ISnake snake = state.getSnakes().get(id);
         List<IPoint> points = snake.getPoints();
 
@@ -140,6 +140,9 @@ public class Game implements IGame {
             if(!checkForSnakeCollision(snake, p.getX(), p.getY()-1)) {
                 points.add(new Point(p.getX(), p.getY() - 1));
                 snake.setDirection(Direction.UP);
+            }else{
+                points.add(new Point(p.getX() + 1, p.getY()));
+                snake.setDirection(Direction.RIGHT);
             }
         }
         if(direction == Direction.DOWN) {
@@ -328,7 +331,7 @@ public class Game implements IGame {
 
     private void placePowerUp() {
         PowerUp powerup = new PowerUp(state.occupyRandomPoint());
-        logger.info("Placing powerup of Art " + powerup.getArt() + " at position ({},{})", powerup.getX(), powerup.getY());
+        logger.debug("Placing powerup of Art " + powerup.getArt() + " at position ({},{})", powerup.getX(), powerup.getY());
         state.setPowerUp(powerup);
     }
 
