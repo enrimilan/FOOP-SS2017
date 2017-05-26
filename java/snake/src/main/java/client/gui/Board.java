@@ -125,7 +125,7 @@ public class Board extends Application {
         vBox.getChildren().add(gridPane);
 
 
-        Scene scene = new Scene(vBox, 1500, 800);
+        Scene scene = new Scene(vBox, 870, 470);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
@@ -159,14 +159,6 @@ public class Board extends Application {
 
         logger.debug("Draw with stateinformation: snakes: "+state.getSnakes().size()+" id: "+id+" health: "+state.getSnakes().get(id).getHealth()+" speed: "+state.getSnakes().get(id).getSpeed());
 
-        logger.debug("SNAKE POINTS:");
-        for(ISnake snake : state.getSnakes().values()){
-            String str = snake.getId()+": ";
-            for(IPoint p : snake.getPoints()){
-                str+=p.getX()+"/"+p.getY();
-            }
-            logger.debug(str);
-        }
 
         // clear
         for(IPoint p : state.getToRemove()) {
@@ -206,7 +198,7 @@ public class Board extends Application {
                 n.setStyle("-fx-background-image: url(\"/img/powerup" + p.getArt() + ".png\");");
             }
         }
-
+        /**
         Iterator entries = state.getSnakes().entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
@@ -218,11 +210,22 @@ public class Board extends Application {
             }
         }
 
+
+         * draw snake without iterator?
+         */
+        for(ISnake snak : state.getSnakes().values()){
+            for(IPoint p : snak.getPoints()) {
+                Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), gridPane);
+                n.setStyle("-fx-background-color: "+snak.getColor()+";");
+
+            }
+        }
+
         logger.debug("set infopane");
         logger.debug("setting health to: "+state.getSnakes().get(id).getHealth());
 
             //TODO Workaround because of threading expception, revisit!
-        Platform.runLater(
+              Platform.runLater(
                 () -> {
                     healthString.set("" + state.getSnakes().get(id).getHealth());
                     speedString.set("" + state.getSnakes().get(id).getSpeed());

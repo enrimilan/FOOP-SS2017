@@ -20,6 +20,7 @@ public class ClientHandler implements Runnable {
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
+      //  socket.setSoTimeout(100);
         this.out = new ObjectOutputStream(socket.getOutputStream());
         this.in = new ObjectInputStream(socket.getInputStream());
         this.server = server;

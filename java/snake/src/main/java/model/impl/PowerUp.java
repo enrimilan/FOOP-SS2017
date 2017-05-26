@@ -14,10 +14,20 @@ public class PowerUp extends PointDecorator implements Serializable {
     Random rand = new Random();
     int arttype = 0;
     PowerUpType type;
+    Long systemTime;
 
+
+    public Long getSystemTime() {
+        return systemTime;
+    }
+
+    public void setSystemTime(Long systemTime) {
+        this.systemTime = systemTime;
+    }
     public PowerUp(IPoint point) {
         super(point);
-        arttype = rand.nextInt(4);
+        this.systemTime = System.currentTimeMillis();
+        arttype = rand.nextInt(2);
         switch (arttype){
             case 0: type = PowerUpType.HEALTH; break;
             case 1: type = PowerUpType.SPEED; break;
