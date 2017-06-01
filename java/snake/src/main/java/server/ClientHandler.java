@@ -20,6 +20,7 @@ public class ClientHandler implements Runnable {
 
     public ClientHandler(Socket socket, Server server) throws IOException {
         this.socket = socket;
+      //  socket.setSoTimeout(100);
         this.out = new ObjectOutputStream(socket.getOutputStream());
         this.in = new ObjectInputStream(socket.getInputStream());
         this.server = server;
@@ -31,6 +32,7 @@ public class ClientHandler implements Runnable {
         logger.debug("Start new ClientHandler for client {}", clientId);
         try {
             while(running) {
+                logger.debug("recv direction from client {}",clientId);
                 Direction direction = (Direction) in.readObject();
                 server.onDirectionReceived(clientId, direction);
             }

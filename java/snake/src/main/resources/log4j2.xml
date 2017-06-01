@@ -3,6 +3,16 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <Filters>
+
+                <!-- Now deny warn, error and fatal messages -->
+                <ThresholdFilter level="warn"  onMatch="DENY"   onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="error" onMatch="DENY"   onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="fatal" onMatch="DENY"   onMismatch="NEUTRAL"/>
+
+                <!-- This filter accepts info, warn, error, fatal and denies debug/trace -->
+                <ThresholdFilter level="info"  onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
         </Console>
     </Appenders>
     <Loggers>
@@ -14,6 +24,7 @@
         </Root>
         <Root level="debug">
             <AppenderRef ref="Console" />
+
         </Root>
     </Loggers>
 </Configuration>

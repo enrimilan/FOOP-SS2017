@@ -1,5 +1,7 @@
 package model;
 
+import model.impl.*;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,12 +13,21 @@ public interface IState {
 
     void setToRemove(List<IPoint> toRemove);
 
-    void setFood(IPoint food);
+    void setFood(Food food);
 
-    IPoint getFood();
+    Food getFood();
 
     List<IPoint> getAvailablePoints();
 
     IPoint occupyRandomPoint();
+
+    void setPoison(Poison poison);
+
+    List<Poison> getPoisons();
+
+
+    void setPowerUp(PowerUp power);
+
+    List<PowerUp> getPowerups();
 
 }

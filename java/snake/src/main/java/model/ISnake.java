@@ -1,6 +1,8 @@
 package model;
 
-import java.util.List;
+import model.impl.*;
+
+import java.util.*;
 
 public interface ISnake {
 
@@ -17,6 +19,42 @@ public interface ISnake {
     void setColor(String color);
 
     String getColor();
+
+    void setHealth(int health);
+
+    int getHealth();
+
+    int getPowerUpInfluenceCount();
+
+    void setPowerUpInfluenceCount(int playerUnderPowerUPInfluence);
+
+    HashMap<PowerUpType, Long> getActivePowerUps();
+
+    void setActivePowerUps(PowerUpType powerUpType, Long timestamp);
+
+     void setActivePowerUps(HashMap<PowerUpType, Long> activePowerUps);
+
+    void removePowerUp(PowerUpType pT);
+
+    Direction getDirection();
+
+    void setDirection(Direction dir);
+
+    public int getHasBittenCount();
+
+    public void setHasBittenCount(int snakeHasBittenOtherSnake);
+
+    public Long getActiveGoodBiting();
+
+    public void setActiveGoodBiting(Long activeBiting);
+
+    public int getSnakeWasBittenByOtherSnake();
+
+    public void setSnakeWasBittenByOtherSnake(int snakeWasBittenByOtherSnake);
+
+    public Long getActiveBadBiting();
+
+    public void setActiveBadBiting(Long activeBadBiting);
 
 
 }
