@@ -3,6 +3,7 @@ package model.impl;
 import model.IPoint;
 
 import java.io.Serializable;
+import java.util.*;
 
 public class Point implements IPoint, Serializable {
 
@@ -33,6 +34,8 @@ public class Point implements IPoint, Serializable {
     public void setY(int y) {
         this.y = y;
     }
+
+
 
     @Override
     public boolean equals(Object o) {
