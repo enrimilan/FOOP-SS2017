@@ -9,99 +9,19 @@ public class Snake implements ISnake, Serializable {
 
     private int id;
     private int speed = 100;
-    //which type was at which timestamp(long) activated:
-    private HashMap<PowerUpType, Long> activePowerUps = new HashMap<>();
-    private int snakeUnderInflucenceOfPowerups = 0;
-    private Long activeGoodBiting;
-    private Long activeBadBiting;
-    private Direction heading;
-    private int snakeHasBittenOtherSnake = 0;
-
-
-    private int snakeWasBittenByOtherSnake = 0;
     private int health = 100;
     private String color;
+    private Direction direction;
     private List<IPoint> points = new ArrayList<IPoint>();
+    private List<IInfluence> influences = new ArrayList<>();
 
     public Snake(int id) {
         this.id = id;
     }
 
-
-    public int getSnakeWasBittenByOtherSnake() {
-        return snakeWasBittenByOtherSnake;
-    }
-
-    public void setSnakeWasBittenByOtherSnake(int snakeWasBittenByOtherSnake) {
-        this.snakeWasBittenByOtherSnake = snakeWasBittenByOtherSnake;
-    }
-
-    public Long getActiveBadBiting() {
-        return activeBadBiting;
-    }
-
-    public void setActiveBadBiting(Long activeBadBiting) {
-        this.activeBadBiting = activeBadBiting;
-    }
-
-    public Long getActiveGoodBiting() {
-        return activeGoodBiting;
-    }
-
-    public void setActiveGoodBiting(Long activeBiting) {
-        this.activeGoodBiting = activeBiting;
-    }
-
-    public int getHasBittenCount() {
-        return snakeHasBittenOtherSnake;
-    }
-
-    public void setHasBittenCount(int snakeHasBittenOtherSnake) {
-        this.snakeHasBittenOtherSnake = snakeHasBittenOtherSnake;
-    }
-
-    public HashMap<PowerUpType, Long> getActivePowerUps() {
-        return activePowerUps;
-    }
-
-    public void setActivePowerUps(PowerUpType pT, Long tS) {
-        this.activePowerUps.put(pT,tS);
-    }
-
-    public void setActivePowerUps(HashMap<PowerUpType, Long> activePowerUps) {
-        this.activePowerUps = activePowerUps;
-    }
-
-    public void removePowerUp(PowerUpType pT){
-        this.activePowerUps.remove(pT);
-    }
-
     @Override
-    public Direction getDirection() {
-        return heading;
-    }
-
-    @Override
-    public void setDirection(Direction dir) {
-        this.heading = dir;
-    }
-
-
-    public int getPowerUpInfluenceCount() {
-        return snakeUnderInflucenceOfPowerups;
-    }
-
-    public void setPowerUpInfluenceCount(int p) {
-        this.snakeUnderInflucenceOfPowerups = p;
-    }
-
-    public int getHealth() {
-        return health;
-    }
-
-    public void setHealth(int health) {
-        System.out.println("health = [" + health + "]");
-        this.health = health;
+    public int getId() {
+        return id;
     }
 
     @Override
@@ -115,8 +35,12 @@ public class Snake implements ISnake, Serializable {
     }
 
     @Override
-    public int getId() {
-        return id;
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getHealth() {
+        return health;
     }
 
     @Override
@@ -130,6 +54,22 @@ public class Snake implements ISnake, Serializable {
     }
 
     @Override
+    public IPoint getHead() {
+        if(points.size() > 0) {
+            return points.get(points.size() - 1);
+        }
+        return null;
+    }
+
+    @Override
+    public IPoint getTail() {
+        if(points.size() > 0) {
+            return points.get(0);
+        }
+        return null;
+    }
+
+    @Override
     public void setColor(String color) {
         this.color = color;
     }
@@ -137,6 +77,21 @@ public class Snake implements ISnake, Serializable {
     @Override
     public String getColor() {
         return color;
+    }
+
+    @Override
+    public Direction getDirection() {
+        return direction;
+    }
+
+    @Override
+    public void setDirection(Direction dir) {
+        this.direction = dir;
+    }
+
+    @Override
+    public List<IInfluence> getInfluences() {
+        return influences;
     }
 
 }

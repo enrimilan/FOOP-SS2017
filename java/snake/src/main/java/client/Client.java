@@ -47,7 +47,7 @@ public class Client {
         executor.submit(gameUpdateListener);
     }
 
-    public void onGameStateChanged(IState state) {
+    public synchronized void onGameStateChanged(IState state) {
         this.state = state;
         if(!state.getSnakes().containsKey(id)){
             logger.debug("Snake dead. close?");

@@ -25,14 +25,9 @@ public class SnakeDirectionSender implements Runnable {
         logger.debug("Start SnakeDirectionSender");
         try {
             while(running) {
-                logger.debug("SnakeDirectionSender");
-                int sleep = 600;
-
-                    ISnake snake = client.getSnake();
-                    logger.debug("snake: "+snake.getId());
-                    sleep -= snake.getSpeed();
-
-                Thread.sleep(sleep);
+                ISnake snake = client.getSnake();
+                logger.debug("snake: "+snake.getId());
+                Thread.sleep(600 - snake.getSpeed());
                 if(client.getMode() == Mode.PLAYER) {
                     out.writeObject(client.getNextDirectionFromBoard());
                 }
