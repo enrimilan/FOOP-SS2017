@@ -35,14 +35,14 @@ public class Client {
     private Socket socket;
     private Mode mode;
 
-    private Direction lastDirection;
-    private boolean flag = false;
-    private boolean contraryDirectionFlag = false;
+    private Direction lastDirection; // denotes the last direction of the snake
+    private boolean flag = false;  // flag to show the snake's current state
+    private boolean contraryDirectionFlag = false; // flag to denote that the snake have to go in contrary direction
 
     public Client(Mode mode) {
         this.executor = Executors.newCachedThreadPool();
-        //this.mode = mode;
-        this.mode = Mode.COMPUTER;
+        this.mode = mode;
+        //this.mode = Mode.COMPUTER;
     }
 
     public void join() throws IOException {
@@ -181,7 +181,7 @@ public class Client {
         return null;
     }
 
-    public Direction sideDirectionReativeToFood (Direction direction){
+    public Direction sideDirectionRelativeToFood (Direction direction){
         if(direction == Direction.DOWN){
             return Direction.LEFT;
         } else if (direction == Direction.UP){
@@ -207,7 +207,7 @@ public class Client {
 
         if(!isContraryDirection(directionRelativeToFood, previousDirection)){
             contraryDirectionFlag = false;
-            return sideDirectionReativeToFood(directionRelativeToFood);
+            return sideDirectionRelativeToFood(directionRelativeToFood);
         }
 
         if(previousDirection == Direction.LEFT){
