@@ -55,7 +55,7 @@ public class Client {
         executor.submit(gameUpdateListener);
     }
 
-    public void onGameStateChanged(IState state) {
+    public synchronized void onGameStateChanged(IState state) {
         this.state = state;
         if(!state.getSnakes().containsKey(id)){
             logger.debug("Snake dead. close?");
@@ -92,7 +92,7 @@ public class Client {
         IPoint food = this.state.getFood();     // the point where the food is situated
         ArrayList<ISnake> allSnakesAsList = new ArrayList<ISnake>();
         List<Poison> poisons = this.state.getPoisons();
-        List<PowerUp> powerUps = this.state.getPowerups();
+        List<PowerUp> powerUps = this.state.getPowerUps();
         int currentSpeed = this.getSnake().getSpeed();
 
         logger.debug("All Snakes size:" + allSnakes.size());
@@ -129,7 +129,7 @@ public class Client {
         IPoint food = this.state.getFood();     // the point where the food is situated
         ArrayList<ISnake> allSnakesAsList = new ArrayList<ISnake>();
         List<Poison> poisons = this.state.getPoisons();
-        List<PowerUp> powerUps = this.state.getPowerups();
+        List<PowerUp> powerUps = this.state.getPowerUps();
         int currentSpeed = this.getSnake().getSpeed();
 
         for(Integer key : allSnakes.keySet()){

@@ -12,12 +12,11 @@ import java.util.List;
 
 public class State implements IState, Serializable {
 
-    private HashMap<Integer, ISnake> snakes = new HashMap<Integer, ISnake>();
-    private List<IPoint> toRemove = new ArrayList<IPoint>();
-    private List<IPoint> availablePoints = new ArrayList<IPoint>();
+    private HashMap<Integer, ISnake> snakes = new HashMap<>();
+    private List<IPoint> availablePoints = new ArrayList<>();
     private Food food;
-    private List<Poison> poison;
-    private List<PowerUp> powerups;
+    private List<Poison> poisons;
+    private List<PowerUp> powerUps;
 
     public State() {
         for(int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -25,23 +24,13 @@ public class State implements IState, Serializable {
                 availablePoints.add(new Point(x, y));
             }
         }
-        poison = new ArrayList<>();
-        powerups = new ArrayList<>();
+        poisons = new ArrayList<>();
+        powerUps = new ArrayList<>();
     }
 
     @Override
     public HashMap<Integer, ISnake> getSnakes() {
         return snakes;
-    }
-
-    @Override
-    public List<IPoint> getToRemove() {
-        return toRemove;
-    }
-
-    @Override
-    public void setToRemove(List<IPoint> toRemove) {
-        this.toRemove = toRemove;
     }
 
     @Override
@@ -61,27 +50,22 @@ public class State implements IState, Serializable {
 
     @Override
     public IPoint occupyRandomPoint() {
-        return availablePoints.remove((int)(Math.random() * availablePoints.size()));
+        return availablePoints.remove((int)(Math.random() * (availablePoints.size() - 1)));
     }
 
     @Override
-    public void setPoison(Poison poison) {
-        this.poison.add(poison);
+    public void occupyPoint(IPoint point) {
+        availablePoints.remove(point);
     }
 
     @Override
     public List<Poison> getPoisons() {
-        return poison;
+        return poisons;
     }
 
     @Override
-    public void setPowerUp(PowerUp powerUp) {
-        this.powerups.add(powerUp);
-    }
-
-    @Override
-    public List<PowerUp> getPowerups() {
-        return powerups;
+    public List<PowerUp> getPowerUps() {
+        return powerUps;
     }
 
 }

@@ -9,25 +9,18 @@ public interface IState {
 
     HashMap<Integer, ISnake> getSnakes();
 
-    List<IPoint> getToRemove();
-
-    void setToRemove(List<IPoint> toRemove);
-
     void setFood(Food food);
 
     Food getFood();
+
+    List<Poison> getPoisons();
+
+    List<PowerUp> getPowerUps();
 
     List<IPoint> getAvailablePoints();
 
     IPoint occupyRandomPoint();
 
-    void setPoison(Poison poison);
-
-    List<Poison> getPoisons();
-
-
-    void setPowerUp(PowerUp power);
-
-    List<PowerUp> getPowerups();
+    void occupyPoint(IPoint point);
 
 }
