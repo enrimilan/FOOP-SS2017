@@ -1,15 +1,10 @@
-package model.impl;
-
-import model.*;
+package model;
 
 import java.io.*;
 
-/**
- * Created by skep on 12.05.2017.
- */
 public abstract class PointDecorator implements IPoint, Serializable {
 
-    protected IPoint decoratedPoint;
+    public IPoint decoratedPoint;
 
     public PointDecorator(IPoint point) {
         this.decoratedPoint = point;

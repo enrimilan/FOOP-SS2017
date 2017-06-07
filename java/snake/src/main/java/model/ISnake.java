@@ -14,15 +14,15 @@ public interface ISnake {
 
     int getHealth();
 
-    List<IPoint> getPoints();
+    int getLength();
 
-    void setPoints(List<IPoint> points);
+    void addHead(IPoint point);
+
+    List<IPoint> getPoints();
 
     IPoint getHead();
 
     IPoint getTail();
-
-    void setColor(String color);
 
     String getColor();
 
@@ -31,5 +31,9 @@ public interface ISnake {
     void setDirection(Direction dir);
 
     List<IInfluence> getInfluences();
+
+    void setIsPlaying(boolean playing);
+
+    boolean isPlaying();
 
 }

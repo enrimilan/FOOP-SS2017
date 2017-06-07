@@ -1,47 +1,31 @@
-package model.impl;
-
-import model.*;
+package model;
 
 import java.io.*;
 import java.util.*;
 
-/**
- * Created by skep on 12.05.2017.
- */
 public class PowerUp extends PointDecorator implements Serializable {
 
+    private Long systemTime;
+    private PowerUpType type;
 
-    Random rand = new Random();
-    int arttype = 0;
-    PowerUpType type;
-    Long systemTime;
-
-
-    public Long getSystemTime() {
-        return systemTime;
-    }
-
-    public void setSystemTime(Long systemTime) {
-        this.systemTime = systemTime;
-    }
     public PowerUp(IPoint point) {
         super(point);
         this.systemTime = System.currentTimeMillis();
-        arttype = rand.nextInt(2);
-        switch (arttype){
+        Random rand = new Random();
+        switch (rand.nextInt(2)){
             case 0: type = PowerUpType.HEALTH; break;
             case 1: type = PowerUpType.SPEED; break;
             case 2: type = PowerUpType.INVINCIBILITY; break;
             case 3: type = PowerUpType.LENGTH;
         }
-
     }
 
-    public int getArt(){
-        return arttype;
+    public Long getSystemTime() {
+        return systemTime;
     }
 
     public PowerUpType getType(){
         return type;
     }
+
 }

@@ -14,9 +14,11 @@ public class Snake implements ISnake, Serializable {
     private Direction direction;
     private List<IPoint> points = new ArrayList<IPoint>();
     private List<IInfluence> influences = new ArrayList<>();
+    private boolean playing = true;
 
-    public Snake(int id) {
+    public Snake(int id, String color) {
         this.id = id;
+        this.color = color;
     }
 
     @Override
@@ -44,13 +46,18 @@ public class Snake implements ISnake, Serializable {
     }
 
     @Override
-    public List<IPoint> getPoints() {
-        return points;
+    public int getLength() {
+        return points.size();
     }
 
     @Override
-    public void setPoints(List<IPoint> points) {
-        this.points = points;
+    public void addHead(IPoint point) {
+        points.add(point);
+    }
+
+    @Override
+    public List<IPoint> getPoints() {
+        return points;
     }
 
     @Override
@@ -67,11 +74,6 @@ public class Snake implements ISnake, Serializable {
             return points.get(0);
         }
         return null;
-    }
-
-    @Override
-    public void setColor(String color) {
-        this.color = color;
     }
 
     @Override
@@ -92,6 +94,16 @@ public class Snake implements ISnake, Serializable {
     @Override
     public List<IInfluence> getInfluences() {
         return influences;
+    }
+
+    @Override
+    public void setIsPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return playing;
     }
 
 }
