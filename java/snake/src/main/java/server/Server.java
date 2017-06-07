@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,33 +28,6 @@ public class Server {
         this.executor = Executors.newCachedThreadPool();
     }
 
-    private void start() throws IOException {
-        logger.debug("Start server");
-        this.clientListener = new ClientListener(new ServerSocket(Constants.PORT), this);
-        executor.submit(clientListener);
-        readFromStdIn();
-    }
-
-    private void stop() {
-        logger.debug("Stop server");
-        clientListener.stop();
-        for(ClientHandler clientHandler : clientHandlers) {
-            clientHandler.stop();
-        }
-        executor.shutdown();
-    }
-
-    private void readFromStdIn() {
-        Scanner sc = new Scanner(System.in);
-        while(sc.hasNextLine())  {
-            String input = sc.nextLine();
-            if(input.equals("stop")) {
-                stop();
-                break;
-            }
-        }
-    }
-
     public synchronized void onClientJoined(Socket socket) {
         int id = socket.getPort();
         logger.debug("New client {}", id);
@@ -71,11 +43,32 @@ public class Server {
 
     public synchronized void onDirectionReceived(int id, Direction direction) {
         logger.debug("Received new direction {} from client {}", direction, id);
-        game.updateState(id, direction);
-        notifyClients();
+        IState state = game.updateState(id, direction);
+        if(state != null) {
+            notifyClients();
+        }
+        if(game.hasFinished()) {
+            logger.debug("Game finished");
+            stop();
+        }
     }
 
-    private synchronized void notifyClients() {
+    private void start() throws IOException {
+        logger.debug("Start server");
+        this.clientListener = new ClientListener(new ServerSocket(Constants.PORT), this);
+        executor.submit(clientListener);
+    }
+
+    private void stop() {
+        logger.debug("Stop server");
+        clientListener.stop();
+        for(ClientHandler clientHandler : clientHandlers) {
+            clientHandler.stop();
+        }
+        executor.shutdown();
+    }
+
+    private void notifyClients() {
         logger.debug("Notify clients with new state");
         for(ClientHandler clientHandler : clientHandlers) {
             clientHandler.notifyClient(game.getState());
@@ -84,6 +77,10 @@ public class Server {
 
     public List<ClientHandler> getClientHandlers() {
         return clientHandlers;
+    }
+
+    public IGame getGame() {
+        return game;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
