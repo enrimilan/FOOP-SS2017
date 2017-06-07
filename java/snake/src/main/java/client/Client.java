@@ -4,8 +4,8 @@ import client.gui.Board;
 import client.gui.OnLaunchedCallback;
 import model.*;
 import model.impl.Point;
-import model.impl.Poison;
-import model.impl.PowerUp;
+import model.Poison;
+import model.PowerUp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.Constants;
@@ -42,7 +42,6 @@ public class Client {
     public Client(Mode mode) {
         this.executor = Executors.newCachedThreadPool();
         this.mode = mode;
-        //this.mode = Mode.COMPUTER;
     }
 
     public void join() throws IOException {
@@ -55,12 +54,8 @@ public class Client {
         executor.submit(gameUpdateListener);
     }
 
-    public synchronized void onGameStateChanged(IState state) {
+    public void onGameStateChanged(IState state) {
         this.state = state;
-        if(!state.getSnakes().containsKey(id)){
-            logger.debug("Snake dead. close?");
-            close();
-        }
         if(!firstState) {
             logger.debug("First state arrived");
             firstState = true;
@@ -68,6 +63,11 @@ public class Client {
             executor.submit(snakeDirectionSender);
         }
         logger.debug("New state");
+        if(!state.getSnakes().get(id).isPlaying()) {
+            snakeDirectionSender.stop();
+            close();
+            logger.debug("Stop playing");
+        }
         board.draw(state, this.id);
     }
 
@@ -463,7 +463,10 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        final Client client = new Client(Mode.PLAYER);
+        if(args.length != 1) {
+            throw new IllegalArgumentException("Usage: Client [PLAYER | COMPUTER]");
+        }
+        final Client client = new Client(Mode.valueOf(args[0]));
 
         //blocks until window closed by user
         Board.launch(new OnLaunchedCallback() {
@@ -481,9 +484,7 @@ public class Client {
 
                             client.board = board;
                             client.join();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
+                        } catch (InterruptedException | IOException e) {
                             e.printStackTrace();
                         }
                     }
