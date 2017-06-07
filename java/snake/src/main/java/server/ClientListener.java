@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static util.Constants.MAX_PLAYERS;
+
 public class ClientListener implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(ClientListener.class);
@@ -33,6 +35,9 @@ public class ClientListener implements Runnable {
                 server.getClientHandlers().add(clientHandler);
                 executor.submit(clientHandler);
                 server.onClientJoined(clientSocket);
+                if(server.getGame().getState().getSnakes().values().size() == MAX_PLAYERS) {
+                    stop();
+                }
             }
         } catch (IOException e) {
             logger.debug(e.getMessage());
