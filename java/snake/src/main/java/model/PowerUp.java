@@ -28,4 +28,9 @@ public class PowerUp extends PointDecorator implements Serializable {
         return type;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj.getClass() == PowerUp.class && this.decoratedPoint.equals(((PowerUp)obj).decoratedPoint);
+    }
+
 }

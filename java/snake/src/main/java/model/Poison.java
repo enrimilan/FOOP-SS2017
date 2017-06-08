@@ -23,4 +23,9 @@ public class Poison extends PointDecorator implements Serializable {
         return type;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj.getClass() == Poison.class && this.decoratedPoint.equals(((Poison)obj).decoratedPoint);
+    }
+
 }

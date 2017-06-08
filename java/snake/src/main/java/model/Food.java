@@ -17,4 +17,9 @@ public class Food extends PointDecorator implements Serializable {
         return type;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj.getClass() == Food.class && this.decoratedPoint.equals(((Food)obj).decoratedPoint);
+    }
+
 }
