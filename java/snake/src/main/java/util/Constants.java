@@ -37,10 +37,9 @@ public class Constants {
     public static final int POWER_UP_SPEED = 50;
     public static final int POWER_UP_HEALTH = 100;
 
-    public static final int BITINGTIME = 10000;
-    public static final int BITINGHEALTH = 100;
-    public static final int BITINGSPEED = 80;
-    public static final int BITINGFACTOR = 10;
+    public static final int BITING_DURATION = 5000;
+    public static final int BITING_HEALTH = 10;
+    public static final int BITING_SPEED = 10;
 
     // game results
     public static final String LOST_MESSAGE = "You lost";

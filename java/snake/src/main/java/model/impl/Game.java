@@ -188,10 +188,13 @@ public class Game implements IGame {
                 int bitingIndex = bittenSnake.getPoints().indexOf(snake.getHead());
                 if(bitingIndex != -1) {
                     logger.debug("Snake bit another one");
+                    int speedGain = snake.getSpeed() + BITING_SPEED > MAX_SPEED? MAX_SPEED - snake.getSpeed() : BITING_SPEED;
+                    snake.getInfluences().add(new Influence(BITING_DURATION, speedGain, BITING_HEALTH, System.currentTimeMillis()));
+                    snake.setSpeed(snake.getSpeed() + speedGain);
+                    snake.setHealth(snake.getHealth() + BITING_HEALTH);
+                    bittenSnake.setHealth(bittenSnake.getHealth() - Math.round((snake.getLength() / bittenSnake.getLength()) * BITING_HEALTH));
                     removeSnakeTail(bittenSnake, bitingIndex);
                     occupyPoint(snake.getHead());
-                    // TODO
-                    bittenSnake.setHealth(bittenSnake.getHealth() - 150);
                     return true;
                 }
             }
