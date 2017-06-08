@@ -54,7 +54,7 @@ public class Client {
         executor.submit(gameUpdateListener);
     }
 
-    public void onGameStateChanged(IState state) {
+    public synchronized void onGameStateChanged(IState state) {
         this.state = state;
         if(!firstState) {
             logger.debug("First state arrived");
@@ -71,12 +71,12 @@ public class Client {
         board.draw(state, this.id);
     }
 
-    public Direction getNextDirectionFromBoard() {
+    public synchronized Direction getNextDirectionFromBoard() {
         return board.getNextDirection();
     }
 
     /* Author: Gruzdev Eugen */
-    public Direction getNextDirectionUsingAlgorithm() {
+    public synchronized Direction getNextDirectionUsingAlgorithm() {
        if(lastDirection == null){  // If the first direction is null (the game beginning for this snake)
             lastDirection = getFirstDirection();
             return lastDirection;
@@ -442,7 +442,7 @@ public class Client {
         return Direction.DOWN;
     }
 
-    public ISnake getSnake() {
+    public synchronized ISnake getSnake() {
         return state.getSnakes().get(id);
     }
 
