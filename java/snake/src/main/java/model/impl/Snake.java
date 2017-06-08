@@ -16,9 +16,10 @@ public class Snake implements ISnake, Serializable {
     private List<IInfluence> influences = new ArrayList<>();
     private boolean playing = true;
 
-    public Snake(int id, String color) {
+    public Snake(int id, String color, IPoint head) {
         this.id = id;
         this.color = color;
+        addHead(head);
     }
 
     @Override

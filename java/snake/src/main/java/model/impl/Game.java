@@ -27,8 +27,7 @@ public class Game implements IGame {
     @Override
     public void addSnake(int id) {
         if(startingTime == null) startingTime = System.currentTimeMillis();
-        ISnake snake = new Snake(id, colors.remove((int)(Math.random() * (colors.size()-1))));
-        snake.addHead(occupyRandomPoint());
+        ISnake snake = new Snake(id, colors.remove((int)(Math.random() * (colors.size()-1))), occupyRandomPoint());
         state.getSnakes().put(id, snake);
         logger.debug("Add snake for client {} at position ({},{})", id, snake.getHead().getX(), snake.getHead().getY());
         if(state.getFood() == null) placeFood();
