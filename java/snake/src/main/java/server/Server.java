@@ -85,8 +85,8 @@ public class Server {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // inject implementations
-        IState state = new State();
-        IGame game = new Game(state);
+        IState state = Factory.createState();
+        IGame game = Factory.createGame(state);
         Server server = new Server(game);
         server.start();
     }

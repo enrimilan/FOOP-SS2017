@@ -3,7 +3,6 @@ package client;
 import client.gui.Board;
 import client.gui.OnLaunchedCallback;
 import model.*;
-import model.impl.Point;
 import model.Poison;
 import model.PowerUp;
 import org.apache.logging.log4j.LogManager;
@@ -340,12 +339,12 @@ public class Client {
         }
 
         for(Poison p : poisons){
-            occupiedPoints.add(new Point(p.getX(), p.getY()));
+            occupiedPoints.add(Factory.createPoint(p.getX(), p.getY()));
         }
 
         if(speed >= 300){
             for(PowerUp p : powerUps){
-                occupiedPoints.add(new Point(p.getX(), p.getY()));
+                occupiedPoints.add(Factory.createPoint(p.getX(), p.getY()));
             }
         }
 
@@ -421,7 +420,7 @@ public class Client {
             noBorder = false;
         }
 
-        Point newPoint = new Point(a,b);
+        IPoint newPoint = Factory.createPoint(a,b);
 
         if(!occupiedPoints.contains(newPoint)){
             notOccupied = true;

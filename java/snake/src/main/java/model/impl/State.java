@@ -21,7 +21,7 @@ public class State implements IState, Serializable {
     public State() {
         for(int x = 0; x < Constants.BOARD_WIDTH; x++) {
             for(int y = 0; y < Constants.BOARD_HEIGHT; y++) {
-                availablePoints.add(new Point(x, y));
+                availablePoints.add(Factory.createPoint(x, y));
             }
         }
     }
