@@ -4,28 +4,27 @@ A snake game in 3 different languages: Java, Smalltalk and Eiffel
 ## Protocol
 The game consists of these artifacts:
 
-* Snake: has properties such as speed (default 600, max 100), health level(default 100) and length(default 1)
+* Snake: has properties such as speed (default 100, min 50, max 550), health level(default 100) and length(default 1)
 
-* Food: makes the snake grow and increases its health level and speed
+* Food(only 1 artifact at the same time, shows up as long as it is not eaten): makes the snake grow and increases its health level and speed
 
-* Poison: makes the snake shrink and decreases its health level and speed
+* Poison(max 3 artifacts at the same time, shows up for 10 seconds): decreases the health level or speed of a snake
 
-* Power-up: increases the speed of a snake for an amount of time
+* Power-up(max 2 artifacts at the same time, shows up for 10 seconds): increases the health level or speed of a snake for 10 seconds
 
 The following tables lists all possible situations that can occur during the game:
 
 |           Situation          |                  Length                 |     Health     |           Speed           | Effect                                              |
 |:----------------------------:|:---------------------------------------:|:--------------:|:-------------------------:|-----------------------------------------------------|
-|        Snake eats food       |                    +1                   |       +10      | if speed >= 100 then -15  | forever                                             |
-|       Snake eats poison      |                    -1                   |       -10      |            +15            | forever                                             |
-|      Snake eats power-up     |          if speed < 100 then +1         | doesn't change |  if speed >= 100 then -25 | some seconds for the speed,  forever for the length |
+|        Snake eats food       |                    +1                   |       +50    |  +30           | forever                                             |
+|       Snake eats poison      |                    doesn't change       |       -30      | or         -50            | forever                                             |
+|      Snake eats power-up     |          doesn't change         | +100 | or  +50 | 10 seconds |
 | Snake bites itself           | 0                                       | 0              | doesn't change            | forever                                             |
-| Snake bites another snake    | doesn't change                          | +10            | if speed >= 100 then -15  | some seconds                                        |
-| Snake gets bitten by another | -index_where_bitten (the tail falls of) | -50            | doesn't change            | forever                                             |
+| Snake A bites snake B | A: doesn't change; B: -index_where_bitten (the tail falls of) | A: +10; B: doesn't change             | A: +10; B: -((A.length/B.length) * 10)      | A: 5 seconds; B: forever                                             |
 | Snakes collides with border  | 0                                       | 0              | doesn't change            | forever                                             |
 
 
-A snakes loses because of eating poison, biting itself, getting bitten by another snake or colliding with the borders if
+A snakes loses (because of eating poison, biting itself, getting bitten by another snake, colliding with the borders or because the time is up) if
 
 * health<=0
 
@@ -38,8 +37,4 @@ The winner is elected as follows:
 
 * The duration of the game is 2 minutes. The winner is the longest snake on the field else
 
-* If some snakes are tied regarding their length, then the snake with the greatest health level wins else 
-
-* If some snakes are tied regarding their health, then the fastest snake wins else
-
-* If some snakes are tied regarding their speed, then there is no winner for this game
+* If some snakes are tied regarding their length, then it is a draw
