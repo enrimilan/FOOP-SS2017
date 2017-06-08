@@ -12,7 +12,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import model.*;
-import model.impl.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.Constants;
@@ -26,6 +25,8 @@ public class Board extends Application {
     private GridPane field;
     private StringProperty healthString = new SimpleStringProperty("100");
     private StringProperty speedString = new SimpleStringProperty("100");
+    private StringProperty timeString = new SimpleStringProperty();
+    private StringProperty gameResultString = new SimpleStringProperty();
     private Node foodNode;
     private ArrayList<Node> poisonNodes = new ArrayList<>();
     private ArrayList<Node> powerUpNodes = new ArrayList<>();
@@ -74,6 +75,10 @@ public class Board extends Application {
         Platform.runLater(() -> {
             healthString.set("" + state.getSnakes().get(id).getHealth());
             speedString.set("" + state.getSnakes().get(id).getSpeed());
+            long millis = Constants.GAME_DURATION - state.getTimeElapsed();
+            timeString.set((millis / 1000) / 60 + ":" + (millis / 1000) % 60);
+            String result = state.getResult(id);
+            if(result != null) gameResultString.set(result);
         });
     }
 
@@ -83,9 +88,7 @@ public class Board extends Application {
 
     private ISnake getSnake(int id) {
         for(ISnake snake : snakes) {
-            if(snake.getId() == id) {
-                return snake;
-            }
+            if(snake.getId() == id) return snake;
         }
         return null;
     }
@@ -123,6 +126,16 @@ public class Board extends Application {
         speedValue.textProperty().bind(speedString);
         infoPane.add(speedValue, 3, 0);
 
+        // time
+        Label time = new Label();
+        time.textProperty().bind(timeString);
+        infoPane.add(time,4,0);
+
+        // game result
+        Label gameResult = new Label();
+        gameResult.textProperty().bind(gameResultString);
+        infoPane.add(gameResult, 5, 0);
+
         return infoPane;
     }
 
@@ -155,9 +168,7 @@ public class Board extends Application {
     private Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) {
         ObservableList<Node> children = gridPane.getChildren();
         for (Node node : children) {
-            if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column) {
-                return node;
-            }
+            if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column) return node;
         }
         throw new IllegalArgumentException(column + ", " + row + " are invalid coordinates");
     }
@@ -165,12 +176,10 @@ public class Board extends Application {
     private void drawFood(IState state) {
         Food food = state.getFood();
         if(food != null) {
-            if(foodNode != null) {
-                foodNode.setStyle("-fx-background-color: white;");
-            }
+            if(foodNode != null) foodNode.setStyle("-fx-background-color: white;");
             foodNode = getNodeByRowColumnIndex(food.getY(), food.getX(), field);
-            logger.debug("Setting Food, type is: "+food.getArt());
-            foodNode.setStyle("-fx-background-image: url(\"/img/food"+food.getArt()+".png\");");
+            logger.debug("Setting Food, type is: "+food.getType());
+            foodNode.setStyle("-fx-background-image: url(\"/img/food"+food.getType()+".png\");");
         }
     }
 
@@ -182,7 +191,7 @@ public class Board extends Application {
         poisonNodes.clear();
         for(Poison p : poison) {
             Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), field);
-            n.setStyle("-fx-background-image: url(\"/img/poison" + p.getArt() + ".png\");");
+            n.setStyle("-fx-background-image: url(\"/img/poison" + p.getType() + ".png\");");
             poisonNodes.add(n);
         }
     }
@@ -195,7 +204,7 @@ public class Board extends Application {
         powerUpNodes.clear();
         for (PowerUp powerUp : powerUps) {
             Node n = getNodeByRowColumnIndex(powerUp.getY(), powerUp.getX(), field);
-            n.setStyle("-fx-background-image: url(\"/img/powerup" + powerUp.getArt() + ".png\");");
+            n.setStyle("-fx-background-image: url(\"/img/powerup" + powerUp.getType().ordinal() + ".png\");");
             powerUpNodes.add(n);
         }
     }
@@ -203,7 +212,10 @@ public class Board extends Application {
     private void drawSnakes(IState state) {
         for(ISnake snake : state.getSnakes().values()) {
             ISnake snakeFromPreviousState = getSnake(snake.getId());
+            if(snakeFromPreviousState != null && !snakeFromPreviousState.isPlaying()) continue;
+            if(snakeFromPreviousState == null && snake.getPoints().isEmpty()) continue;
             if(snakeFromPreviousState == null) {
+                // new snake
                 snakes.add(snake);
                 Node n = getNodeByRowColumnIndex(snake.getHead().getY(), snake.getHead().getX(), field);
                 n.setStyle("-fx-background-color: "+snake.getColor()+";");
@@ -212,22 +224,17 @@ public class Board extends Application {
             snakes.remove(snakeFromPreviousState);
             snakes.add(snake);
 
-            if(snakeFromPreviousState.getHead().equals(snake.getHead())) {
-                // the snake shrank, i.e it was bitten
-                if(snake.getPoints().size() < snakeFromPreviousState.getPoints().size()) {
-                    int tailLengthToCut = snakeFromPreviousState.getPoints().size() - snake.getPoints().size();
-                    int i = 0;
-                    while(i < tailLengthToCut) {
-                        IPoint tail = snakeFromPreviousState.getPoints().get(i);
-                        getNodeByRowColumnIndex(tail.getY(), tail.getX(), field).setStyle("-fx-background-color: white;");
-                        i++;
-                    }
-                }
-                continue;
+            int oldLength = snakeFromPreviousState.getPoints().size();
+            int newLength = snake.getPoints().size();
+
+            // nothing new
+            if(snakeFromPreviousState.getHead().equals(snake.getHead()) && oldLength == newLength) {
+                logger.debug("Nothing changed for this snake");
             }
 
             // normal movement
-            if(snakeFromPreviousState.getPoints().size() == snake.getPoints().size()) {
+            else if(oldLength == newLength) {
+                logger.debug("Snake moving normally");
                 // delete tail
                 IPoint tail = snakeFromPreviousState.getTail();
                 getNodeByRowColumnIndex(tail.getY(), tail.getX(), field).setStyle("-fx-background-color: white;");
@@ -237,11 +244,30 @@ public class Board extends Application {
             }
 
             // the snake grew
-            if(snakeFromPreviousState.getPoints().size() < snake.getPoints().size()) {
+            else if(oldLength < newLength) {
+                logger.debug("Snake grew");
                 // add new head
                 IPoint newHead = snake.getHead();
                 getNodeByRowColumnIndex(newHead.getY(), newHead.getX(), field).setStyle("-fx-background-color: "+snake.getColor()+";");
             }
+
+            // the snake shrank
+            else if(oldLength > newLength) {
+                logger.debug("Snake shrank, cut tail off");
+                int tailLengthToCut = oldLength - newLength;
+                int i = 0;
+                while(i < tailLengthToCut) {
+                    IPoint tail = snakeFromPreviousState.getPoints().get(i);
+                    Node n = getNodeByRowColumnIndex(tail.getY(), tail.getX(), field);
+
+                    // don't change the style if it was already overwritten by another snake for this step.
+                    if(n.getStyle().contains(snake.getColor())) {
+                        getNodeByRowColumnIndex(tail.getY(), tail.getX(), field).setStyle("-fx-background-color: white;");
+                    }
+                    i++;
+                }
+            }
+
         }
     }
 

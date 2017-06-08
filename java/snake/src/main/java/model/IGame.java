@@ -10,4 +10,6 @@ public interface IGame {
 
     IState getState();
 
+    boolean hasFinished();
+
 }

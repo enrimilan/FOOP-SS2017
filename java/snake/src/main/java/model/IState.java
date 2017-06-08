@@ -1,7 +1,5 @@
 package model;
 
-import model.impl.*;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,8 +17,12 @@ public interface IState {
 
     List<IPoint> getAvailablePoints();
 
-    IPoint occupyRandomPoint();
+    void addResult(int id, String result);
 
-    void occupyPoint(IPoint point);
+    String getResult(int id);
+
+    void setTimeElapsed(long timeElapsed);
+
+    Long getTimeElapsed();
 
 }

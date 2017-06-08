@@ -1,8 +1,6 @@
 package model.impl;
 
-import model.IPoint;
-import model.ISnake;
-import model.IState;
+import model.*;
 import util.Constants;
 
 import java.io.Serializable;
@@ -13,10 +11,12 @@ import java.util.List;
 public class State implements IState, Serializable {
 
     private HashMap<Integer, ISnake> snakes = new HashMap<>();
+    private HashMap<Integer, String> results = new HashMap<>();
     private List<IPoint> availablePoints = new ArrayList<>();
     private Food food;
-    private List<Poison> poisons;
-    private List<PowerUp> powerUps;
+    private List<Poison> poisons = new ArrayList<>();
+    private List<PowerUp> powerUps = new ArrayList<>();
+    private Long timeElapsed = 0L;
 
     public State() {
         for(int x = 0; x < Constants.BOARD_WIDTH; x++) {
@@ -24,8 +24,6 @@ public class State implements IState, Serializable {
                 availablePoints.add(new Point(x, y));
             }
         }
-        poisons = new ArrayList<>();
-        powerUps = new ArrayList<>();
     }
 
     @Override
@@ -49,13 +47,23 @@ public class State implements IState, Serializable {
     }
 
     @Override
-    public IPoint occupyRandomPoint() {
-        return availablePoints.remove((int)(Math.random() * (availablePoints.size() - 1)));
+    public void addResult(int id, String result) {
+        results.put(id, result);
     }
 
     @Override
-    public void occupyPoint(IPoint point) {
-        availablePoints.remove(point);
+    public String getResult(int id) {
+        return results.get(id);
+    }
+
+    @Override
+    public void setTimeElapsed(long staringTime) {
+        this.timeElapsed = staringTime;
+    }
+
+    @Override
+    public Long getTimeElapsed() {
+        return timeElapsed;
     }
 
     @Override
