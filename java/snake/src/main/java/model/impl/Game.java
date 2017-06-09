@@ -27,7 +27,7 @@ public class Game implements IGame {
     @Override
     public void addSnake(int id) {
         if(startingTime == null) startingTime = System.currentTimeMillis();
-        ISnake snake = new Snake(id, colors.remove((int)(Math.random() * (colors.size()-1))), occupyRandomPoint());
+        ISnake snake = Factory.createSnake(id, colors.remove((int)(Math.random() * (colors.size()-1))), occupyRandomPoint());
         state.getSnakes().put(id, snake);
         logger.debug("Add snake for client {} at position ({},{})", id, snake.getHead().getX(), snake.getHead().getY());
         if(state.getFood() == null) placeFood();
@@ -54,10 +54,10 @@ public class Game implements IGame {
 
         // new snake head
         IPoint head = snake.getHead();
-        if(snake.getDirection() == Direction.RIGHT) snake.addHead(new Point(head.getX() + 1, head.getY()));
-        if(snake.getDirection() == Direction.LEFT) snake.addHead(new Point(head.getX() - 1, head.getY()));
-        if(snake.getDirection() == Direction.UP) snake.addHead(new Point(head.getX(), head.getY() - 1));
-        if(snake.getDirection() == Direction.DOWN) snake.addHead(new Point(head.getX(), head.getY() + 1));
+        if(snake.getDirection() == Direction.RIGHT) snake.addHead(Factory.createPoint(head.getX() + 1, head.getY()));
+        if(snake.getDirection() == Direction.LEFT) snake.addHead(Factory.createPoint(head.getX() - 1, head.getY()));
+        if(snake.getDirection() == Direction.UP) snake.addHead(Factory.createPoint(head.getX(), head.getY() - 1));
+        if(snake.getDirection() == Direction.DOWN) snake.addHead(Factory.createPoint(head.getX(), head.getY() + 1));
         head = snake.getHead();
         occupyPoint(head);
 
@@ -155,11 +155,11 @@ public class Game implements IGame {
             if (head.equals(powerUp.decoratedPoint)) {
                 logger.debug("Snake ate power-up");
                 if(powerUp.getType()==PowerUpType.SPEED && snake.getSpeed() + POWER_UP_SPEED <= MAX_SPEED){
-                    snake.getInfluences().add(new Influence(POWER_UP_DURATION, POWER_UP_SPEED, 0, System.currentTimeMillis()));
+                    snake.getInfluences().add(Factory.createInfluence(POWER_UP_DURATION, POWER_UP_SPEED, 0, System.currentTimeMillis()));
                     snake.setSpeed(snake.getSpeed() + POWER_UP_SPEED);
                 }
                 else {
-                    snake.getInfluences().add(new Influence(POWER_UP_DURATION, 0, POWER_UP_HEALTH, System.currentTimeMillis()));
+                    snake.getInfluences().add(Factory.createInfluence(POWER_UP_DURATION, 0, POWER_UP_HEALTH, System.currentTimeMillis()));
                     snake.setHealth(snake.getHealth() + POWER_UP_HEALTH);
                 }
                 state.getPowerUps().remove(powerUp);
@@ -188,7 +188,7 @@ public class Game implements IGame {
                 if(bitingIndex != -1) {
                     logger.debug("Snake bit another one");
                     int speedGain = snake.getSpeed() + BITING_SPEED > MAX_SPEED? MAX_SPEED - snake.getSpeed() : BITING_SPEED;
-                    snake.getInfluences().add(new Influence(BITING_DURATION, speedGain, BITING_HEALTH, System.currentTimeMillis()));
+                    snake.getInfluences().add(Factory.createInfluence(BITING_DURATION, speedGain, BITING_HEALTH, System.currentTimeMillis()));
                     snake.setSpeed(snake.getSpeed() + speedGain);
                     snake.setHealth(snake.getHealth() + BITING_HEALTH);
                     bittenSnake.setHealth(bittenSnake.getHealth() - Math.round((snake.getLength() / bittenSnake.getLength()) * BITING_HEALTH));
@@ -249,19 +249,19 @@ public class Game implements IGame {
     }
 
     private void placeFood() {
-        Food food = new Food(occupyRandomPoint());
+        Food food = Factory.createFood(occupyRandomPoint());
         logger.debug("Place food of type " + food.getType()+ " at position ({},{})", food.getX(), food.getY());
         state.setFood(food);
     }
 
     private void placePoison() {
-        Poison poison = new Poison(occupyRandomPoint());
+        Poison poison = Factory.createPoison(occupyRandomPoint());
         logger.info("Place poison of type " + poison.getType()+ " at position ({},{})", poison.getX(), poison.getY());
         state.getPoisons().add(poison);
     }
 
     private void placePowerUp() {
-        PowerUp powerUp = new PowerUp(occupyRandomPoint());
+        PowerUp powerUp = Factory.createPowerUp(occupyRandomPoint());
         logger.debug("Place power-up of type " + powerUp.getType() + " at position ({},{})", powerUp.getX(), powerUp.getY());
         state.getPowerUps().add(powerUp);
     }

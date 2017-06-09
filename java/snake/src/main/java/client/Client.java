@@ -3,7 +3,6 @@ package client;
 import client.gui.Board;
 import client.gui.OnLaunchedCallback;
 import model.*;
-import model.impl.Point;
 import model.Poison;
 import model.PowerUp;
 import org.apache.logging.log4j.LogManager;
@@ -54,7 +53,7 @@ public class Client {
         executor.submit(gameUpdateListener);
     }
 
-    public void onGameStateChanged(IState state) {
+    public synchronized void onGameStateChanged(IState state) {
         this.state = state;
         if(!firstState) {
             logger.debug("First state arrived");
@@ -71,12 +70,12 @@ public class Client {
         board.draw(state, this.id);
     }
 
-    public Direction getNextDirectionFromBoard() {
+    public synchronized Direction getNextDirectionFromBoard() {
         return board.getNextDirection();
     }
 
     /* Author: Gruzdev Eugen */
-    public Direction getNextDirectionUsingAlgorithm() {
+    public synchronized Direction getNextDirectionUsingAlgorithm() {
        if(lastDirection == null){  // If the first direction is null (the game beginning for this snake)
             lastDirection = getFirstDirection();
             return lastDirection;
@@ -340,12 +339,12 @@ public class Client {
         }
 
         for(Poison p : poisons){
-            occupiedPoints.add(new Point(p.getX(), p.getY()));
+            occupiedPoints.add(Factory.createPoint(p.getX(), p.getY()));
         }
 
         if(speed >= 300){
             for(PowerUp p : powerUps){
-                occupiedPoints.add(new Point(p.getX(), p.getY()));
+                occupiedPoints.add(Factory.createPoint(p.getX(), p.getY()));
             }
         }
 
@@ -421,7 +420,7 @@ public class Client {
             noBorder = false;
         }
 
-        Point newPoint = new Point(a,b);
+        IPoint newPoint = Factory.createPoint(a,b);
 
         if(!occupiedPoints.contains(newPoint)){
             notOccupied = true;
@@ -442,7 +441,7 @@ public class Client {
         return Direction.DOWN;
     }
 
-    public ISnake getSnake() {
+    public synchronized ISnake getSnake() {
         return state.getSnakes().get(id);
     }
 

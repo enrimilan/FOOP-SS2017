@@ -16,7 +16,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.Constants;
 
-import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 public class Board extends Application {
 
@@ -27,11 +28,8 @@ public class Board extends Application {
     private StringProperty speedString = new SimpleStringProperty("100");
     private StringProperty timeString = new SimpleStringProperty();
     private StringProperty gameResultString = new SimpleStringProperty();
-    private Node foodNode;
-    private ArrayList<Node> poisonNodes = new ArrayList<>();
-    private ArrayList<Node> powerUpNodes = new ArrayList<>();
-    private ArrayList<ISnake> snakes = new ArrayList<>();
     private Direction direction = Direction.RIGHT;
+    private IState lastState;
 
     public static void launch(OnLaunchedCallback onLaunchedCallback1) {
         onLaunchedCallback = onLaunchedCallback1;
@@ -68,29 +66,60 @@ public class Board extends Application {
     }
 
     public void draw(IState state, int id) {
-        drawFood(state);
-        drawPoisons(state);
-        drawPowerUps(state);
-        drawSnakes(state);
-        Platform.runLater(() -> {
+        logger.debug("Start drawing");
+        clear(state);
+
+        // drawSnakes
+        for(ISnake snake : state.getSnakes().values()) {
+            for (IPoint p : snake.getPoints()) {
+                getNodeByRowColumnIndex(p.getY(), p.getX(), field).setStyle("-fx-background-color: " + snake.getColor() + ";");
+            }
+        }
+
+        // draw food
+        Food food = state.getFood();
+        if(food != null) {
+            logger.debug("Draw food of type {} ", food.getType());
+            Node n = getNodeByRowColumnIndex(food.getY(), food.getX(), field);
+            n.setStyle("-fx-background-image: url(\"/img/food"+food.getType()+".png\");");
+        }
+
+        // draw poisons
+        for(Poison p : state.getPoisons()) {
+            logger.debug("Draw poison of type {}", p.getType());
+            Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), field);
+            n.setStyle("-fx-background-image: url(\"/img/poison" + p.getType() + ".png\");");
+        }
+
+        // draw power-ups
+        for (PowerUp powerUp : state.getPowerUps()) {
+            logger.debug("Draw power-up of type {} ({})", powerUp.getType().ordinal(), powerUp.getType());
+            Node n = getNodeByRowColumnIndex(powerUp.getY(), powerUp.getX(), field);
+            n.setStyle("-fx-background-image: url(\"/img/powerup" + powerUp.getType().ordinal() + ".png\");");
+        }
+
+        FutureTask<Void> task = new FutureTask<>(() -> {
             healthString.set("" + state.getSnakes().get(id).getHealth());
             speedString.set("" + state.getSnakes().get(id).getSpeed());
             long millis = Constants.GAME_DURATION - state.getTimeElapsed();
             timeString.set((millis / 1000) / 60 + ":" + (millis / 1000) % 60);
             String result = state.getResult(id);
-            if(result != null) gameResultString.set(result);
+            if (result != null) gameResultString.set(result);
+            return null;
         });
+        Platform.runLater(task);
+        try {
+            task.get();
+            logger.debug("Updated info pane");
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        logger.debug("Finished drawing");
+        lastState = state;
     }
 
     public Direction getNextDirection() {
         return direction;
-    }
-
-    private ISnake getSnake(int id) {
-        for(ISnake snake : snakes) {
-            if(snake.getId() == id) return snake;
-        }
-        return null;
     }
 
     private GridPane createInfoPane() {
@@ -165,109 +194,52 @@ public class Board extends Application {
         return field;
     }
 
-    private Node getNodeByRowColumnIndex (final int row, final int column, GridPane gridPane) {
+    private Node getNodeByRowColumnIndex (final int y, final int x, GridPane gridPane) {
+        if(y < 0 || y >= Constants.BOARD_HEIGHT || x < 0 || x >= Constants.BOARD_WIDTH) {
+            throw new IllegalArgumentException(y + ", " + x + " are invalid coordinates");
+        }
         ObservableList<Node> children = gridPane.getChildren();
         for (Node node : children) {
-            if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column) return node;
+            if(GridPane.getRowIndex(node) == y && GridPane.getColumnIndex(node) == x) return node;
         }
-        throw new IllegalArgumentException(column + ", " + row + " are invalid coordinates");
+        throw new IllegalArgumentException(y + ", " + x + " are invalid coordinates");
     }
 
-    private void drawFood(IState state) {
-        Food food = state.getFood();
-        if(food != null) {
-            if(foodNode != null) foodNode.setStyle("-fx-background-color: white;");
-            foodNode = getNodeByRowColumnIndex(food.getY(), food.getX(), field);
-            logger.debug("Setting Food, type is: "+food.getType());
-            foodNode.setStyle("-fx-background-image: url(\"/img/food"+food.getType()+".png\");");
-        }
-    }
+    private void clear(IState state) {
+        if(lastState != null) {
 
-    private void drawPoisons(IState state) {
-        List<Poison> poison = state.getPoisons();
-        for(Node poisonNode : poisonNodes) {
-            poisonNode.setStyle("-fx-background-color: white;");
-        }
-        poisonNodes.clear();
-        for(Poison p : poison) {
-            Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), field);
-            n.setStyle("-fx-background-image: url(\"/img/poison" + p.getType() + ".png\");");
-            poisonNodes.add(n);
-        }
-    }
-
-    private void drawPowerUps(IState state) {
-        List<PowerUp> powerUps = state.getPowerUps();
-        for (Node powerUpNode : powerUpNodes) {
-            powerUpNode.setStyle("-fx-background-color: white;");
-        }
-        powerUpNodes.clear();
-        for (PowerUp powerUp : powerUps) {
-            Node n = getNodeByRowColumnIndex(powerUp.getY(), powerUp.getX(), field);
-            n.setStyle("-fx-background-image: url(\"/img/powerup" + powerUp.getType().ordinal() + ".png\");");
-            powerUpNodes.add(n);
-        }
-    }
-
-    private void drawSnakes(IState state) {
-        for(ISnake snake : state.getSnakes().values()) {
-            ISnake snakeFromPreviousState = getSnake(snake.getId());
-            if(snakeFromPreviousState != null && !snakeFromPreviousState.isPlaying()) continue;
-            if(snakeFromPreviousState == null && snake.getPoints().isEmpty()) continue;
-            if(snakeFromPreviousState == null) {
-                // new snake
-                snakes.add(snake);
-                Node n = getNodeByRowColumnIndex(snake.getHead().getY(), snake.getHead().getX(), field);
-                n.setStyle("-fx-background-color: "+snake.getColor()+";");
-                continue;
-            }
-            snakes.remove(snakeFromPreviousState);
-            snakes.add(snake);
-
-            int oldLength = snakeFromPreviousState.getPoints().size();
-            int newLength = snake.getPoints().size();
-
-            // nothing new
-            if(snakeFromPreviousState.getHead().equals(snake.getHead()) && oldLength == newLength) {
-                logger.debug("Nothing changed for this snake");
-            }
-
-            // normal movement
-            else if(oldLength == newLength) {
-                logger.debug("Snake moving normally");
-                // delete tail
-                IPoint tail = snakeFromPreviousState.getTail();
-                getNodeByRowColumnIndex(tail.getY(), tail.getX(), field).setStyle("-fx-background-color: white;");
-                // add new head
-                IPoint newHead = snake.getHead();
-                getNodeByRowColumnIndex(newHead.getY(), newHead.getX(), field).setStyle("-fx-background-color: "+snake.getColor()+";");
-            }
-
-            // the snake grew
-            else if(oldLength < newLength) {
-                logger.debug("Snake grew");
-                // add new head
-                IPoint newHead = snake.getHead();
-                getNodeByRowColumnIndex(newHead.getY(), newHead.getX(), field).setStyle("-fx-background-color: "+snake.getColor()+";");
-            }
-
-            // the snake shrank
-            else if(oldLength > newLength) {
-                logger.debug("Snake shrank, cut tail off");
-                int tailLengthToCut = oldLength - newLength;
-                int i = 0;
-                while(i < tailLengthToCut) {
-                    IPoint tail = snakeFromPreviousState.getPoints().get(i);
-                    Node n = getNodeByRowColumnIndex(tail.getY(), tail.getX(), field);
-
-                    // don't change the style if it was already overwritten by another snake for this step.
-                    if(n.getStyle().contains(snake.getColor())) {
-                        getNodeByRowColumnIndex(tail.getY(), tail.getX(), field).setStyle("-fx-background-color: white;");
-                    }
-                    i++;
+            logger.debug("clear food");
+            Food food = lastState.getFood();
+            if(lastState.getFood() != null) {
+                if(!food.equals(state.getFood())) {
+                    Node n = getNodeByRowColumnIndex(food.getY(), food.getX(), field);
+                    n.setStyle("-fx-background-color: white;");
                 }
             }
 
+            logger.debug("clear poisons");
+            for(Poison poison : lastState.getPoisons()) {
+                if(!state.getPoisons().contains(poison)) {
+                    getNodeByRowColumnIndex(poison.getY(), poison.getX(), field).setStyle("-fx-background-color: white;");
+                }
+            }
+
+            logger.debug("clear power-ups");
+            for(PowerUp powerUp : lastState.getPowerUps()) {
+                if(!state.getPowerUps().contains(powerUp)) {
+                    getNodeByRowColumnIndex(powerUp.getY(), powerUp.getX(), field).setStyle("-fx-background-color: white;");
+                }
+            }
+
+            logger.debug("clear snakes");
+            for(ISnake snake : lastState.getSnakes().values()) {
+                ISnake newerSnake = state.getSnakes().get(snake.getId());
+                for(IPoint p : snake.getPoints()) {
+                    if(newerSnake != null && !newerSnake.getPoints().contains(p)) {
+                        getNodeByRowColumnIndex(p.getY(), p.getX(), field).setStyle("-fx-background-color: white;");
+                    }
+                }
+            }
         }
     }
 
