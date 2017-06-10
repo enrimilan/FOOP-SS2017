@@ -20,7 +20,6 @@ feature {NONE} -- Private variables
 	snakeWasBittenByOtherSnake: INTEGER
 	snakeHasBittenOtherSnake: INTEGER
 	snakeUnderInflucenceOfPowerups: INTEGER
---	direction: STRING
 
 feature {NONE} -- Initialization
 
