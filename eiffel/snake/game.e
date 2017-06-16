@@ -11,7 +11,7 @@ feature
 
 	add_snake(id: INTEGER) deferred end
 
-	remove_snake(id: INTEGER) deferred end
+	hasFinished: BOOLEAN deferred end
 
 	update_state(id: INTEGER; direction: STRING) deferred end
 

@@ -34,4 +34,14 @@ feature {ANY} -- Public features
 			Result := y
 		end
 
+	set_x(newX: INTEGER)
+		do
+			x := newX
+		end
+
+	set_y(newY: INTEGER)
+		do
+			y := newY
+		end
+
 end

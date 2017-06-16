@@ -15,6 +15,7 @@ create
 feature {NONE} -- Private variables
 	game: GAME
 	keyboard_definition: KEYBOARD_DEFINITION
+	direct: DIRECTION
 	player1: PLAYER
 	player2: PLAYER
 	player3: PLAYER
@@ -24,13 +25,16 @@ feature {NONE} -- Initialization and main entry point
 	make
 		local
 			factory: FACTORY
+			direction: STRING
 		do
 			create factory
-			game := factory.create_game
+			create direct
+			direction := direct.right			-- default direction: right
+			game := factory.create_game(factory)
 			create keyboard_definition
-			create player1.make_new(current, 1, "RIGHT")
-			create player2.make_new(current, 2, "RIGHT")
-			create player3.make_new(current, 3, "RIGHT")
+			create player1.make_new(current, 1, direction)
+			create player2.make_new(current, 2, direction)
+			create player3.make_new(current, 3, direction)
 			draw_game
 
 			-- Start playing
