@@ -122,3 +122,189 @@ APPLICATION         root's creation
 
 
 snake: PANIC: caught signal #21 (Ctrl-Break) -- Giving up...
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Child thread           0x1CC (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         remove @2              writable:                    
+<000000000443D788>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           occupypoint @4                                      
+<000000000444F318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           update_state @25                                    
+<000000000444F318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         on_new_direction @5                                 
+<000000000443D5A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              execute @2                                          
+<000000000444F468>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              thr_main @3                                         
+<000000000444F468>  (From THREAD)          Routine failure.              Rescue
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<000000000443D5A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Root thread            0x0 (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         item @2                readable:                    
+<00000000046DD6E8>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           occupyrandompoint @13                               
+<00000000046DD318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           add_snake @1                                        
+<00000000046DD318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         listen_for_keyboard_input @5
+<00000000046CB5A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         make @10                                            
+<00000000046CB5A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<00000000046CB5A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------
+
+
+snake: PANIC: caught signal #21 (Ctrl-Break) -- Giving up...
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Child thread           0x1D4 (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         remove @2              writable:                    
+<00000000044FF788>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           occupypoint @4                                      
+<0000000004511318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           update_state @25                                    
+<0000000004511318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         on_new_direction @5                                 
+<00000000044FF5A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              execute @2                                          
+<0000000004511468>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              thr_main @3                                         
+<0000000004511468>  (From THREAD)          Routine failure.              Rescue
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<00000000044FF5A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Child thread           0x1C4 (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         remove @2              writable:                    
+<00000000046AB788>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           occupypoint @4                                      
+<00000000046BD318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           update_state @25                                    
+<00000000046BD318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         on_new_direction @5                                 
+<00000000046AB5A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              execute @2                                          
+<00000000046BD468>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              thr_main @3                                         
+<00000000046BD468>  (From THREAD)          Routine failure.              Rescue
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<00000000046AB5A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Child thread           0x1CC (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         item @2                readable:                    
+<000000000459C788>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           occupypoint @4                                      
+<00000000045AE318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           update_state @25                                    
+<00000000045AE318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         on_new_direction @5                                 
+<000000000459C5A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              execute @2                                          
+<00000000045AE468>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              thr_main @3                                         
+<00000000045AE468>  (From THREAD)          Routine failure.              Rescue
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<000000000459C5A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Child thread           0x1CC (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         at @1                  valid_key:                   
+<000000000452F788>  (From CHAIN)           Precondition violated.        Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           occupypoint @4                                      
+<0000000004541318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           update_state @25                                    
+<0000000004541318>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         on_new_direction @5                                 
+<000000000452F5A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              execute @2                                          
+<0000000004541468>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              thr_main @3                                         
+<0000000004541468>  (From THREAD)          Routine failure.              Rescue
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<000000000452F5A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------

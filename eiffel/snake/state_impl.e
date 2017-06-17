@@ -22,15 +22,15 @@ feature {NONE} -- variables
 	timeElapsed: INTEGER
 
 	food: POINT
-	theResult: INTEGER
+	theResult: STRING
 
 feature {ANY} -- Initialization
 
 	make
 		local
 			p: POINT
-			i: INTEGER
-			j: INTEGER
+			i: INTEGER_32
+			j: INTEGER_32
 		do
 			create snakes.make
 			create poisons.make
@@ -40,14 +40,16 @@ feature {ANY} -- Initialization
 			timeElapsed := 0
 
 			create food.make(-1,-1) -- dummy values
-			theResult := 0 -- dummy value
+			theResult := " " -- dummy value
+
+			--io.put_string ("I AM HERE")
 
 			from i := 0
-			invariant (i >= 0) and (i <= constants.board_width)
+			--invariant (i >= 0) and (i <= constants.board_width)
 			until i >= (constants.board_width - constants.cell_side_length)
 			loop
 				from j := 0
-				invariant (j >= 0) and (j <= constants.board_height)
+				--invariant (j >= 0) and (j <= constants.board_height)
 				until j >= (constants.board_height - constants.cell_side_length)
 				loop
 					create p.make(i,j)
@@ -57,12 +59,14 @@ feature {ANY} -- Initialization
 				i := i + constants.cell_side_length
 			end
 
+			--io.put_string ("AND NOW HERE")
+
 			-- FOR TESTING PURPOSES
 			--across
             --            avaliablePoints as aP
             --loop
             --           p := aP.item
-            --            io.put_integer (p.get_x)
+            --           io.put_integer (p.get_x)
             --            io.put_string (" ; ")
             --            io.put_integer (p.get_y)
             --            io.put_new_line
@@ -86,12 +90,12 @@ feature {ANY} -- Public features
 			food := newFood
 		end
 
-	getResults: INTEGER
+	getResults: STRING
 		do
 			Result := theResult
 		end
 
-	setResults(newResult: INTEGER)
+	setResults(newResult: STRING)
 		do
 			theResult := newResult
 		end

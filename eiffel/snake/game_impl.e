@@ -59,9 +59,65 @@ feature {ANY} -- Public features
 
 	bitesItselfOrOtherSnake(snake: SNAKE): BOOLEAN
 		local
+			index: INTEGER
 			speedGain:INTEGER
+			snakePoints: LINKED_LIST[POINT]
+			snakeHead: POINT
+			snakePoint: POINT
+			snakes: LINKED_LIST[SNAKE]
+			bittenSnake: SNAKE
+			r: REAL_64
+			i: INTEGER
 		do
-			--TODO!
+			-- biting itself
+			if snake.getlength > 3 then
+				snakePoints := snake.getpoints
+				snakeHead := snake.gethead
+				from i := 1
+				until i >=  (snakePoints.count - 1)
+				loop
+					snakePoint := snakePoints.at (i)
+					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
+					then
+						Current.removesnaketail (snake, snake.getlength)
+						snake.sethealth (0)
+						Result := true
+					end
+					i := i + 1
+				end
+			end
+
+			-- biting other snake
+			snakes := state.getsnakes
+			index := 0
+			from snakes.start
+			until snakes.off
+			loop
+				bittenSnake := snakes.item
+				if not(bittenSnake.getid = snake.getid)
+				then
+					index := bittenSnake.getpoints.index_of (snake.gethead, 1)
+					if not (index = 0)
+					then
+						if (snake.getspeed + constants.bitting_speed > constants.max_speed)
+						then
+							speedGain := constants.max_speed - snake.getspeed
+						else
+							speedGain := constants.bitting_speed
+						end
+						snake.getinfluences.extend (factory.create_influence (constants.bitting_duration, speedGain, constants.bitting_health, clock.time_now))
+						snake.setspeed (snake.getspeed + speedGain)
+						snake.sethealth (snake.gethealth + constants.bitting_health)
+						r := (snake.getlength / bittenSnake.getlength) * constants.bitting_health
+						bittenSnake.sethealth (bittenSnake.gethealth - r.rounded)
+						current.removesnaketail (bittenSnake, index)
+						current.occupypoint (snake.gethead)
+						Result := true
+					end
+				end
+				snakes.forth
+			end
+			Result := false
 		end
 
 	eatsFood(snake: SNAKE; head: POINT): BOOLEAN
@@ -171,14 +227,15 @@ feature {ANY} -- Public features
 		do
 			toRemove := snake.getpoints
 			from
-				i := 1
+				i := 0
 			until
 				i >= index
 			loop
-				point := toRemove.at (snake.getlength-i)
-				toRemove.go_i_th (snake.getlength-i)
+				point := toRemove.at (snake.getlength)
+				toRemove.go_i_th (snake.getlength)
 				toRemove.remove
 				makePointAvailable(point)
+				i := i + 1
 			end
 		end
 
@@ -292,14 +349,158 @@ feature {ANY} -- Public features
 		end
 
 	update_state(id: INTEGER; direction: STRING)
+		local
+			snake: SNAKE
+			head: POINT
+			x: INTEGER
+			y: INTEGER
+			p: POINT
+			rand: INTEGER
+			flag: BOOLEAN
+			timeElapsed: DT_TIME_DURATION
+			game: GAME
 		do
-			--TODO!
+			snake := state.getsnakes.at (id)
+				snake.setdirection (current.calculatesnake (snake, direction))
+
+				--NEW SNAKE HEAD
+				head := snake.gethead
+				if(snake.getdirection = "RIGHT")
+				then
+					x := head.get_x + constants.cell_side_length
+					y := head.get_y
+					create p.make (x, y)
+					snake.addhead (p)
+				end
+
+				if(snake.getdirection = "LEFT")
+				then
+					x := head.get_x - constants.cell_side_length
+					y := head.get_y
+					create p.make (x, y)
+					snake.addhead (p)
+				end
+
+				if(snake.getdirection = "UP")
+				then
+					x := head.get_x
+					y := head.get_y - constants.cell_side_length
+					create p.make (x, y)
+					snake.addhead (p)
+				end
+
+				if(snake.getdirection = "DOWN")
+				then
+					x := head.get_x
+					y := head.get_y + constants.cell_side_length
+					create p.make (x, y)
+					snake.addhead (p)
+				end
+
+			head := snake.gethead
+			current.occupypoint (head)
+
+			if not (current.eatsfood (snake, head))
+			then
+				current.removesnaketail (snake, 1)
+			end
+
+			flag := current.eatspoison (snake, head)
+			flag := current.eatspowerup (snake, head)
+		--	flag := current.bitesitselforothersnake (snake)
+			flag := current.collideswithborder (snake, head)
+			current.checktimeouts (snake)
+
+			-- Place poisons and powerUps randomly
+		--	rand := current.getrandomnumber
+		--	if(state.getposions.count < constants.poison_max and rand.divisible (3))
+		--		then
+		--			current.placepoison
+		--		end
+		--		rand := current.getrandomnumber
+		--		if(state.getpowerups.count < constants.power_up_max and rand.divisible (3))
+		--			then
+		--				current.placepowerup
+		--			end
+
+		--		timeElapsed := clock.time_now - startingTime
+		--		state.settimeelapsed (timeElapsed.second_count)
+		--		game := current.updategameresult
+
 		end
 
-
 	updateGameResult: GAME
+		local
+			snakesPlayingNumber: INTEGER
+			snakesPlaying: LINKED_LIST[SNAKE]
+			greatestLength: INTEGER
+			longestSnake: SNAKE
+			snake: SNAKE
 		do
-			-- TODO!
+			snakesPlayingNumber := state.getsnakes.count
+			greatestLength := 0
+			-- Snake that lost while playing
+			snakesPlaying := state.getsnakes
+			from snakesPlaying.start
+			until snakesPlaying.off
+			loop
+				snake := snakesPlaying.item
+				if (snake.gethealth = 0 or snake.getlength = 0)
+				then
+					snake.setisplaying (false)
+					snakesPlayingNumber := snakesPlayingNumber - 1
+				else
+					if(snake.getlength > greatestLength)
+					then
+						greatestLength := snake.getlength
+					end
+				end
+				snakesPlaying.forth
+			end
+
+			-- If all are out and only one remains playing
+			if(state.getsnakes.count = constants.max_players and snakesPlaying = 1)
+			then
+				snakesPlaying := state.getsnakes
+				from snakesPlaying.start
+				until snakesPlaying.off
+				loop
+					snake := snakesPlaying.item
+					if(snake.isplaying = true)
+					then
+						state.setresults ("Player " + snake.getid.out + " won")
+						snake.setisplaying (false)
+						finished := true
+						Result := current
+					end
+				end
+			end
+
+			-- Time is up, elect winner
+			if(state.gettimeelapsed >= constants.game_duration)
+			then
+				state.settimeelapsed (constants.game_duration)
+				finished := true
+				snakesPlaying := state.getsnakes
+				from snakesPlaying.start
+				until snakesPlaying.off
+				loop
+					snake := snakesPlaying.item
+					if(snake.isplaying = true and snake.getlength = greatestLength)
+					then
+						if (longestSnake = void)
+						then longestSnake := snake
+						else state.setresults ("It is draw")
+							Result := current
+						end
+					end
+				end
+				if(longestSnake /= void)
+				then state.setresults ("Player " + longestSnake.getid.out + " won")
+					 Result := current
+				end
+			end
+			Result := current
 		end
 
 	get_state : STATE
@@ -374,16 +575,47 @@ feature {ANY} -- Public features
 			Result := rn.random_integer
 		end
 
+	occupyPoint(point: POINT)
+		local
+			index: INTEGER
+			avaliablePoints: LINKED_LIST[POINT]
+			avaliablePoint: POINT
+			i: INTEGER
+		do
+			index := -1
+			avaliablePoints := state.getavaliablepoints
+			avaliablePoints.start
+			from i := 0
+			until i >= avaliablePoints.count
+			loop
+				avaliablePoint := avaliablePoints.item
+				if(avaliablePoint.get_x = point.get_x and avaliablePoint.get_y = avaliablePoint.get_y)
+				then
+					index := i
+				end
+				avaliablePoints.forth
+				i := i + 1
+			end
+			if(index > -1)
+			then
+				avaliablePoints.go_i_th (index)
+				avaliablePoints.remove
+			end
+		end
+
 	occupyRandomPoint: POINT
 		local
 			p: POINT
 			avaliablePoints: LINKED_LIST[POINT]
-			random_sequence: RANDOM
 			number: INTEGER
 			rn: RANDOM_NUMBERS
 			-- FOR TESTING PURPOSES
+			--random_sequence: RANDOM
 			--arbTime: DT_TIME
 			--dif: DT_TIME_DURATION
+			--intList: LINKED_LIST[INTEGER]
+			--i: INTEGER
+			--index: INTEGER
 		do
 			create p.make (0,0)
 			avaliablePoints := state.getavaliablepoints
@@ -392,6 +624,34 @@ feature {ANY} -- Public features
 			number := rn.random_integer \\ (avaliablePoints.count) + 1
 
 			p := avaliablePoints.at (number)
+
+			-- FOR TESTING PURPOSES
+		--	create intList.make
+		--	from i:= 0
+		--	until i >= 10
+		--	loop
+		--		intList.extend (i)
+		--		i := i + 1
+		--	end
+
+		--	index := 4
+		--	from i := 0
+		--	until i >= index
+		--	loop
+		--		intList.go_i_th (intList.count)
+		--		intList.remove
+		--		i := i + 1
+		--	end
+
+		--	intList.start
+
+		--	from i:= 0
+		--	until i >= intList.count
+		--	loop
+		--		io.put_integer (intList.item)
+		--		i := i + 1
+		--		intList.forth
+		--	end
 
 			-- FOR TESTING PURPOSES
 			--io.put_string ("POINT: ")

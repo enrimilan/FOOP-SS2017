@@ -12,8 +12,8 @@ feature
 	getAvaliablePoints: LINKED_LIST[POINT] deferred end
 	getFood: POINT deferred end
 	setFood(newFood: POINT) deferred end
-	getResults: INTEGER deferred end
-	setResults(newResult: INTEGER) deferred end
+	getResults: STRING deferred end
+	setResults(newResult: STRING) deferred end
 	getTimeElapsed: INTEGER deferred end
 	setTimeElapsed(newTime: INTEGER) deferred end
 	getPosions: LINKED_LIST[POISON] deferred end

@@ -21,6 +21,24 @@ feature
 			Result := 800
 		end
 
+	BITTING_SPEED: INTEGER
+		-- Result is an integer constant
+		once
+			Result := 10
+		end
+
+	BITTING_DURATION: INTEGER
+		-- Result is an integer constant
+		once
+			Result := 5
+		end
+
+	BITTING_HEALTH: INTEGER
+		-- Result is an integer constant
+		once
+			Result := 10
+		end
+
 	CELL_SIDE_LENGTH: INTEGER
 		-- Result is an integer constant
 		once
