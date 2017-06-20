@@ -188,7 +188,7 @@ feature {ANY} -- Public features
 			loop
 				powerUp := powerUps.item
 				if ((powerUp.get_x = head.get_x) and (powerUp.get_y = head.get_y)) then
-					if((powerUp.gettype = "SPEED") and (snake.getspeed + constants.power_up_speed <= constants.max_speed))
+					if((powerUp.gettype.is_equal ("SPEED")) and (snake.getspeed + constants.power_up_speed <= constants.max_speed))
 					then
 						snake.setspeed (snake.getspeed + constants.power_up_speed)
 						snake.getinfluences.extend (factory.create_influence (constants.power_up_duration, constants.power_up_speed, 0, clock.time_now))
@@ -210,8 +210,9 @@ feature {ANY} -- Public features
 
 	collidesWithBorder(snake: SNAKE; head:POINT): BOOLEAN
 		do
-			if (head.get_x < 0 or head.get_x > (constants.board_width-constants.cell_side_length) or head.get_y < 0 or head.get_y < (constants.board_height-constants.cell_side_length))
+			if (head.get_x < 0 or head.get_x > (constants.board_width-constants.cell_side_length) or head.get_y < 0 or head.get_y > (constants.board_height-constants.cell_side_length))
 			then
+				--io.put_string ("GAME_IMPL.collidesWithBorderI: AM HERE")
 				removeSnakeTail(snake, snake.getlength)
 				snake.sethealth (0)
 				Result := true
@@ -244,19 +245,19 @@ feature {ANY} -- Public features
 		do
 			if (snake.getlength > 1)
 			then
-				if(direction = "LEFT" and snake.getdirection = "RIGHT")
+				if(direction.is_equal ("LEFT") and snake.getdirection.is_equal ("RIGHT"))
 				then
 					Result := "RIGHT"
 				end
-				if(direction = "RIGHT" and snake.getdirection = "LEFT")
+				if(direction.is_equal ("RIGHT") and snake.getdirection.is_equal ("LEFT"))
 					then
 						Result := "LEFT"
 					end
-				if(direction = "UP" and snake.getdirection = "DOWN")
+				if(direction.is_equal ("UP") and snake.getdirection.is_equal ("DOWN"))
 					then
 						Result := "DOWN"
 					end
-				if(direction = "DOWN" and snake.getdirection = "UP")
+				if(direction.is_equal ("DOWN") and snake.getdirection.is_equal ("UP"))
 					then
 						Result := "UP"
 					end
@@ -284,7 +285,9 @@ feature {ANY} -- Public features
 			itemNr: INTEGER
 		do
 			-- Check for timeouts for poisons
-			poisons := state.getposions
+			create poisons.make
+			--poisons.fill(state.getposions)
+			poisons.copy (state.getposions)
 			itemNr := 0
 			from poisons.start
 			until poisons.off
@@ -294,10 +297,8 @@ feature {ANY} -- Public features
 				if (difference.second_count >= constants.max_artifact_time)
 				then
 					-- remove poison from list
-					removeListPoisons := state.getposions
-					removeListPoisons.go_i_th (itemNr)
-					removeListPoisons.remove
-					makePointAvailable(poison.getpoisonpoint)
+					-- TODO!
+					--makePointAvailable(poison.getpoisonpoint)
 				end
 				poisons.forth
 				itemNr := itemNr + 1
@@ -314,10 +315,8 @@ feature {ANY} -- Public features
 				if (difference.second_count >= constants.max_artifact_time)
 				then
 					-- remove poison from list
-					removeListPowerUps := state.getpowerups
-					removeListPowerUps.go_i_th (itemNr)
-					removeListPowerUps.remove
-					makePointAvailable(powerUp.getpoweruppoint)
+					-- TODO!
+	--				makePointAvailable(powerUp.getpoweruppoint)
 				end
 				powerUps.forth
 				itemNr := itemNr + 1
@@ -339,13 +338,13 @@ feature {ANY} -- Public features
 					end
 					snake.sethealth (snake.gethealth - influence.gethealth)
 					-- remove Influence
-					removeListInfluences := snake.getinfluences
-					removeListInfluences.go_i_th (itemNr)
-					removeListInfluences.remove
+					-- TODO!
 				end
 				powerUps.forth
 				itemNr := itemNr + 1
 			end
+
+	--		io.put_string ("I AM HERE")
 		end
 
 	update_state(id: INTEGER; direction: STRING)
@@ -355,17 +354,17 @@ feature {ANY} -- Public features
 			x: INTEGER
 			y: INTEGER
 			p: POINT
-			rand: INTEGER
+			rand: INTEGER_64
 			flag: BOOLEAN
 			timeElapsed: DT_TIME_DURATION
 			game: GAME
 		do
 			snake := state.getsnakes.at (id)
-				snake.setdirection (current.calculatesnake (snake, direction))
+			snake.setdirection (current.calculatesnake (snake, direction))
 
-				--NEW SNAKE HEAD
-				head := snake.gethead
-				if(snake.getdirection = "RIGHT")
+			--NEW SNAKE HEAD
+			head := snake.gethead
+			if(snake.getdirection.is_equal ("RIGHT"))
 				then
 					x := head.get_x + constants.cell_side_length
 					y := head.get_y
@@ -373,7 +372,7 @@ feature {ANY} -- Public features
 					snake.addhead (p)
 				end
 
-				if(snake.getdirection = "LEFT")
+			if(snake.getdirection.is_equal ("LEFT"))
 				then
 					x := head.get_x - constants.cell_side_length
 					y := head.get_y
@@ -381,7 +380,7 @@ feature {ANY} -- Public features
 					snake.addhead (p)
 				end
 
-				if(snake.getdirection = "UP")
+			if(snake.getdirection.is_equal ("UP"))
 				then
 					x := head.get_x
 					y := head.get_y - constants.cell_side_length
@@ -389,7 +388,7 @@ feature {ANY} -- Public features
 					snake.addhead (p)
 				end
 
-				if(snake.getdirection = "DOWN")
+			if(snake.getdirection.is_equal ("DOWN"))
 				then
 					x := head.get_x
 					y := head.get_y + constants.cell_side_length
@@ -405,27 +404,34 @@ feature {ANY} -- Public features
 				current.removesnaketail (snake, 1)
 			end
 
+		--	io.put_string ("The length of the snake: " + snake.getpoints.count.out)
+		--	io.new_line
+		--	io.put_string("The head of the snake: X:  " + snake.gethead.get_x.out + " ; Y: " + snake.gethead.get_y.out)
+		--	io.new_line
+
 			flag := current.eatspoison (snake, head)
 			flag := current.eatspowerup (snake, head)
-		--	flag := current.bitesitselforothersnake (snake)
+			flag := current.bitesitselforothersnake (snake)
 			flag := current.collideswithborder (snake, head)
 			current.checktimeouts (snake)
 
-			-- Place poisons and powerUps randomly
-		--	rand := current.getrandomnumber
-		--	if(state.getposions.count < constants.poison_max and rand.divisible (3))
-		--		then
-		--			current.placepoison
-		--		end
-		--		rand := current.getrandomnumber
-		--		if(state.getpowerups.count < constants.power_up_max and rand.divisible (3))
-		--			then
-		--				current.placepowerup
-		--			end
+			-- Place poisons and powerUps
+		--	io.put_string ("The count of poisons in state: " + state.getposions.count.out)
+		--	io.new_line
+			if(state.getposions.count < constants.poison_max)
+				then
+					current.placepoison
+		--			io.put_string("Poison count after placing a poison: " + state.getposions.count.out)
+		--			io.new_line
+				end
+			if(state.getpowerups.count < constants.power_up_max)
+				then
+					current.placepowerup
+				end
 
-		--		timeElapsed := clock.time_now - startingTime
-		--		state.settimeelapsed (timeElapsed.second_count)
-		--		game := current.updategameresult
+			timeElapsed := clock.time_now - startingTime
+			state.settimeelapsed (timeElapsed.second_count)
+			game := current.updategameresult
 
 		end
 
@@ -529,20 +535,20 @@ feature {ANY} -- Public features
 			actualTime := clock.time_now
 			poison.settimeplaced (actualTime)
 
-			state.getposions.extend (poison)
+			state.addpoison (poison)
 		end
 
 	placePowerUp
 		local
 			powerUp: POWERUP
-			randomNr: INTEGER
+			randomNr: INTEGER_64
 			type: STRING
 			actualTime: DT_TIME
 		do
 			powerUp := factory.create_powerup (occupyRandomPoint)
 
 			randomNr := getRandomNumber
-			if randomNr.divisible (2)
+			if randomNr > 10000
 			then type := "SPEED"
 			else type := "HEALTH"
 			end
@@ -552,7 +558,7 @@ feature {ANY} -- Public features
 			actualTime := clock.time_now
 			powerUp.settimeplaced (actualTime)
 
-			state.getpowerups.extend (powerUp)
+			state.addpowerup(powerUp)
 		end
 
 	makePointAvailable(point: POINT)
@@ -634,6 +640,9 @@ feature {ANY} -- Public features
 		--		i := i + 1
 		--	end
 
+		--	intList.go_i_th (4)
+		--	intList.remove
+
 		--	index := 4
 		--	from i := 0
 		--	until i >= index
@@ -645,11 +654,10 @@ feature {ANY} -- Public features
 
 		--	intList.start
 
-		--	from i:= 0
-		--	until i >= intList.count
+		--	from intList.start
+		--	until intList.off
 		--	loop
 		--		io.put_integer (intList.item)
-		--		i := i + 1
 		--		intList.forth
 		--	end
 

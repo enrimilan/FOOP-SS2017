@@ -9,7 +9,7 @@ class
 
 feature {ANY} -- This class is used to create instances. This should be the only place where we inject the implementations.
 
-	create_game(factory: FACTORY): GAME
+	create_game: GAME
 		local
 			state: STATE
 			state_impl: STATE_IMPL
@@ -17,7 +17,7 @@ feature {ANY} -- This class is used to create instances. This should be the only
 		do
 			create state_impl.make
 			state := state_impl
-			create game.make(state, factory)
+			create game.make(state, current)
 			Result := game
 		end
 
@@ -29,6 +29,7 @@ feature {ANY} -- This class is used to create instances. This should be the only
 			create snake_impl.make(id)
 			snake_impl.addhead (newhead)
 			snake := snake_impl
+			--io.put_integer (snake.gethead.get_x)
 			Result := snake
 		end
 

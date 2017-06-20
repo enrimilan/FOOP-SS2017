@@ -45,11 +45,11 @@ feature {ANY} -- Initialization
 			--io.put_string ("I AM HERE")
 
 			from i := 0
-			--invariant (i >= 0) and (i <= constants.board_width)
+			invariant (i >= 0) and (i <= constants.board_width)
 			until i >= (constants.board_width - constants.cell_side_length)
 			loop
 				from j := 0
-				--invariant (j >= 0) and (j <= constants.board_height)
+				invariant (j >= 0) and (j <= constants.board_height)
 				until j >= (constants.board_height - constants.cell_side_length)
 				loop
 					create p.make(i,j)
@@ -115,9 +115,19 @@ feature {ANY} -- Public features
 			Result := poisons
 		end
 
+	addPoison(newPoison: POISON)
+		do
+			poisons.extend (newPoison)
+		end
+
 	getPowerUps: LINKED_LIST[POWERUP]
 		do
 			Result := powerUps
+		end
+
+	addPowerUp(newPowerUp: POWERUP)
+		do
+			powerUps.extend (newPowerUp)
 		end
 
 	getSnakes: LINKED_LIST[SNAKE]

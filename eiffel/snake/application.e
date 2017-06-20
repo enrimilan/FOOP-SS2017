@@ -30,7 +30,7 @@ feature {NONE} -- Initialization and main entry point
 			create factory
 			create direct
 			direction := direct.right			-- default direction: right
-			game := factory.create_game(factory)
+			game := factory.create_game
 			create keyboard_definition
 			create player1.make_new(current, 1, direction)
 			create player2.make_new(current, 2, direction)

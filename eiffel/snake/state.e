@@ -17,6 +17,8 @@ feature
 	getTimeElapsed: INTEGER deferred end
 	setTimeElapsed(newTime: INTEGER) deferred end
 	getPosions: LINKED_LIST[POISON] deferred end
+	addPoison(newPoison: POISON) deferred end
 	getPowerUps: LINKED_LIST[POWERUP] deferred end
+	addPowerUp(newPowerUp: POWERUP) deferred end
 	getSnakes: LINKED_LIST[SNAKE] deferred end
 end
