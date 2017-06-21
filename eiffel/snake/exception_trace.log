@@ -308,3 +308,118 @@ PLAYER              thr_main @3
 APPLICATION         root's creation                                     
 <000000000452F5A8>                         Routine failure.              Exit
 -------------------------------------------------------------------------------
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Root thread            0x0 (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+ARRAY2              put @1                 valid_row:                   
+<0000000003EC2488>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+APPLICATION         draw_game @7                                        
+<0000000003EB05A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         listen_for_keyboard_input @12
+<0000000003EB05A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         make @12                                            
+<0000000003EB05A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<0000000003EB05A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Child thread           0x9C (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         item @2                readable:                    
+<0000000003EB07C8>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           occupypoint @6                                      
+<0000000003EC2358>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           update_state @25                                    
+<0000000003EC2358>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         on_new_direction @5                                 
+<0000000003EB05A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              execute @2                                          
+<0000000003EC24D8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              thr_main @3                                         
+<0000000003EC24D8>  (From THREAD)          Routine failure.              Rescue
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<0000000003EB05A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Child thread           0x9C (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         put_left @2            not_before:                  
+<000000000403CA18>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           removesnaketail @5                                  
+<0000000003F12358>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+GAME_IMPL           update_state @27                                    
+<0000000003F12358>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         on_new_direction @5                                 
+<0000000003F005A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              execute @2                                          
+<0000000003F124D8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              thr_main @3                                         
+<0000000003F124D8>  (From THREAD)          Routine failure.              Rescue
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<0000000003F005A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------
+
+snake: system execution failed.
+Following is the set of recorded exceptions:
+
+******************************** Thread exception *****************************
+In thread           Child thread           0x9C (thread id)
+*******************************************************************************
+-------------------------------------------------------------------------------
+Class / Object      Routine                Nature of exception           Effect
+-------------------------------------------------------------------------------
+LINKED_LIST         item @2                readable:                    
+<0000000003D60738>                         Precondition violated.        Fail
+-------------------------------------------------------------------------------
+APPLICATION         draw_game @13                                       
+<0000000003D605A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+APPLICATION         on_new_direction @6                                 
+<0000000003D605A8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              execute @2                                          
+<0000000003D724D8>                         Routine failure.              Fail
+-------------------------------------------------------------------------------
+PLAYER              thr_main @3                                         
+<0000000003D724D8>  (From THREAD)          Routine failure.              Rescue
+-------------------------------------------------------------------------------
+APPLICATION         root's creation                                     
+<0000000003D605A8>                         Routine failure.              Exit
+-------------------------------------------------------------------------------

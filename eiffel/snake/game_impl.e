@@ -124,17 +124,28 @@ feature {ANY} -- Public features
 		local
 			food: POINT
 		do
+--			print("CHECKING FOODEAT: ")
+--			print("Food at: ")
+--			print(state.getfood.get_x)
+--			print("/")
+--			print(state.getfood.get_y)
+--			print("%NSnake at: ")
+--			print(head.get_x)
+--			print("/")
+--			print(head.get_y)
 			food := state.getfood
 			if ((food.get_x = head.get_x) and (food.get_y = head.get_y)) then
+			--	print("FOOD EATEN")
 				if(snake.getspeed + constants.food_speed > constants.max_speed) then
 					snake.setspeed (constants.max_speed)
-				else snake.setspeed (constants.food_speed)
+				else snake.setspeed (snake.getspeed + constants.food_speed)
 				end
 				snake.sethealth (snake.gethealth + constants.food_health)
 				placeFood
 				Result := true
+			else
+				Result := false
 			end
-			Result := false
 		end
 
 	eatsPoison(snake: SNAKE; head: POINT): BOOLEAN
@@ -228,12 +239,12 @@ feature {ANY} -- Public features
 		do
 			toRemove := snake.getpoints
 			from
-				i := 0
+				i := 1
 			until
-				i >= index
+				i >= index+1
 			loop
-				point := toRemove.at (snake.getlength)
-				toRemove.go_i_th (snake.getlength)
+				point := toRemove.at (i)
+				toRemove.go_i_th (i)
 				toRemove.remove
 				makePointAvailable(point)
 				i := i + 1
@@ -362,6 +373,12 @@ feature {ANY} -- Public features
 			snake := state.getsnakes.at (id)
 			snake.setdirection (current.calculatesnake (snake, direction))
 
+			if
+				(snake.getlength > 1)
+			then
+				print("break")
+			end
+
 			--NEW SNAKE HEAD
 			head := snake.gethead
 			if(snake.getdirection.is_equal ("RIGHT"))
@@ -402,19 +419,21 @@ feature {ANY} -- Public features
 			if not (current.eatsfood (snake, head))
 			then
 				current.removesnaketail (snake, 1)
+			else
+				print("FOOD EATEN")
 			end
 
-		--	io.put_string ("The length of the snake: " + snake.getpoints.count.out)
-		--	io.new_line
-		--	io.put_string("The head of the snake: X:  " + snake.gethead.get_x.out + " ; Y: " + snake.gethead.get_y.out)
-		--	io.new_line
+			io.put_string ("The length of the snake: " + snake.getpoints.count.out)
+			io.new_line
+			io.put_string("The head of the snake: X:  " + snake.gethead.get_x.out + " ; Y: " + snake.gethead.get_y.out)
+			io.new_line
 
 			flag := current.eatspoison (snake, head)
 			flag := current.eatspowerup (snake, head)
 			flag := current.bitesitselforothersnake (snake)
 			flag := current.collideswithborder (snake, head)
-			current.checktimeouts (snake)
-
+		--	current.checktimeouts (snake)
+		-- GEORG
 			-- Place poisons and powerUps
 		--	io.put_string ("The count of poisons in state: " + state.getposions.count.out)
 		--	io.new_line

@@ -27,7 +27,7 @@ feature {NONE} -- Initialization
 	make(snakeId: INTEGER)
 		do
 			id := snakeId
-			speed := 100
+			speed := 1000
 			health := 100
 			create direct
 			direction := direct.right
