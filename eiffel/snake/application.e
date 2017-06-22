@@ -84,6 +84,15 @@ feature {NONE} -- Private features
 					print("%N")
 			end
 
+			--poison
+			from state.getposions.start
+			until state.getposions.exhausted
+			loop
+				board.put ('P',state.getposions.item.get_y//20,state.getposions.item.get_x//20)
+				state.getposions.forth
+			end
+
+
 			--snakes
 			from state.getsnakes.start
 			until state.getsnakes.exhausted

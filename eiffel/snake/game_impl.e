@@ -151,13 +151,16 @@ feature {ANY} -- Public features
 	eatsPoison(snake: SNAKE; head: POINT): BOOLEAN
 		local
 			poisons: LINKED_LIST[POISON]
-			removeList: LINKED_LIST[POISON]
+			poison_to_remove: POISON
 			poison: POISON
 			itemNr: INTEGER
-			randomNumber: INTEGER
+			randomNumber: REAL
+			toRet: BOOLEAN
 		do
+			toRet := false
 			poisons := state.getposions
-			itemNr := 0
+			itemNr := 1
+
 			from poisons.start
 			until poisons.off
 			loop
@@ -165,7 +168,7 @@ feature {ANY} -- Public features
 				if ((poison.get_x = head.get_x) and (poison.get_y = head.get_y)) then
 					--Decrease health or speed randomly
 					randomNumber := getRandomNumber
-					if(randomNumber.divisible (2))
+					if(randomNumber < 0.5)
 					then
 						snake.sethealth (snake.gethealth - constants.poison_health)
 					else
@@ -173,16 +176,22 @@ feature {ANY} -- Public features
 							snake.setspeed (snake.getspeed - constants.poison_speed)
 						end
 					end
-					-- remove poison from list
-					removeList := state.getposions
-					removeList.go_i_th (itemNr)
-					removeList.remove
-					Result := true
+					-- add poison to list to be removed
+					state.removepoison(poison)
+					toRet := true
 				end
 				poisons.forth
 				itemNr := itemNr + 1
 			end
-			Result := false
+			if toRet /= true then
+				Result := false
+			else
+				Result := true
+			end
+			--TODO remove poison at poisonToRemove.
+
+
+
 		end
 
 	eatsPowerUp(snake: SNAKE; head: POINT): BOOLEAN
@@ -432,6 +441,9 @@ feature {ANY} -- Public features
 			flag := current.eatspowerup (snake, head)
 			flag := current.bitesitselforothersnake (snake)
 			flag := current.collideswithborder (snake, head)
+
+
+
 		--	current.checktimeouts (snake)
 		-- GEORG
 			-- Place poisons and powerUps
@@ -555,19 +567,20 @@ feature {ANY} -- Public features
 			poison.settimeplaced (actualTime)
 
 			state.addpoison (poison)
+
 		end
 
 	placePowerUp
 		local
 			powerUp: POWERUP
-			randomNr: INTEGER_64
+			randomNr: REAL
 			type: STRING
 			actualTime: DT_TIME
 		do
 			powerUp := factory.create_powerup (occupyRandomPoint)
 
 			randomNr := getRandomNumber
-			if randomNr > 10000
+			if randomNr > 0.5
 			then type := "SPEED"
 			else type := "HEALTH"
 			end
@@ -592,12 +605,12 @@ feature {ANY} -- Public features
 			end
 		end
 
-	getRandomNumber: INTEGER
+	getRandomNumber: REAL
 		local
-			rn: RANDOM_NUMBERS
+			rn2: RANDOM
 		do
-			create rn.make
-			Result := rn.random_integer
+			create rn2.make
+			Result := rn2.real_item
 		end
 
 	occupyPoint(point: POINT)

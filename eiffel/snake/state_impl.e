@@ -75,6 +75,16 @@ feature {ANY} -- Initialization
 
 feature {ANY} -- Public features
 
+	removePoison(poison: POISON)
+		local
+			i: INTEGER
+		do
+			i := poisons.index_of(poison,1)
+			
+			poisons.go_i_th (i)
+			poisons.remove
+		end
+
 	getAvaliablePoints: LINKED_LIST[POINT]
 		do
 			Result := avaliablePoints
