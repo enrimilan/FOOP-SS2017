@@ -70,7 +70,7 @@ feature {ANY} -- Public features
 			i: INTEGER
 		do
 			-- biting itself
-			if snake.getlength > 3 then
+			if (snake.getlength > 3) then
 				snakePoints := snake.getpoints
 				snakeHead := snake.gethead
 				from i := 1

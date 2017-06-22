@@ -70,7 +70,7 @@ feature {ANY} -- Public functions
 
 	getHead: POINT
 		do
-			Result := points.first
+			Result := points.last
 		end
 
 	getDirection: String
