@@ -80,9 +80,19 @@ feature {ANY} -- Public features
 			i: INTEGER
 		do
 			i := poisons.index_of(poison,1)
-			
+
 			poisons.go_i_th (i)
 			poisons.remove
+		end
+
+	removePowerUp(powerup: POWERUP)
+		local
+			i: INTEGER
+		do
+			i := powerups.index_of(powerup,1)
+			
+			powerups.go_i_th (i)
+			powerups.remove
 		end
 
 	getAvaliablePoints: LINKED_LIST[POINT]

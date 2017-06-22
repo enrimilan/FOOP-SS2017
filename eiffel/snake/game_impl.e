@@ -178,6 +178,7 @@ feature {ANY} -- Public features
 					end
 					-- add poison to list to be removed
 					state.removepoison(poison)
+					poisons.finish
 					toRet := true
 				end
 				poisons.forth
@@ -188,10 +189,6 @@ feature {ANY} -- Public features
 			else
 				Result := true
 			end
-			--TODO remove poison at poisonToRemove.
-
-
-
 		end
 
 	eatsPowerUp(snake: SNAKE; head: POINT): BOOLEAN
@@ -200,7 +197,9 @@ feature {ANY} -- Public features
 			removeList: LINKED_LIST[POWERUP]
 			powerUp : POWERUP
 			itemNr: INTEGER
+			toRet: BOOLEAN
 		do
+			toRet := false
 			powerUps := state.getpowerups
 			itemNr := 0
 			from powerUps.start
@@ -217,15 +216,18 @@ feature {ANY} -- Public features
 						snake.getinfluences.extend (factory.create_influence (constants.power_up_duration, 0, constants.poison_health, clock.time_now))
 					end
 					-- remove powerUp from list
-					removeList := state.getpowerups
-					removeList.go_i_th (itemNr)
-					removeList.remove
-					Result := true
+					state.removepowerup (powerUp)
+					powerUps.finish
+					toRet := true
 				end
 				powerUps.forth
 				itemNr := itemNr + 1
 			end
-			Result := false
+			if toRet /= true then
+				Result := false
+			else
+				Result := true
+			end
 		end
 
 	collidesWithBorder(snake: SNAKE; head:POINT): BOOLEAN
@@ -712,6 +714,14 @@ feature {ANY} -- Public features
 			avaliablePoints.go_i_th (number)
 			avaliablePoints.remove
 
+			--WORKAROUND georg
+			if p.get_x < 20 then
+				p.set_x (20)
+			end
+			if p.get_y < 20 then
+				p.set_y (20)
+
+			end
 			Result := p
 		end
 

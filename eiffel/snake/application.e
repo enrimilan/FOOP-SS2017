@@ -92,6 +92,13 @@ feature {NONE} -- Private features
 				state.getposions.forth
 			end
 
+			--powerups
+			from state.getpowerups.start
+			until state.getpowerups.exhausted
+			loop
+				board.put('U',state.getpowerups.item.get_y//20,state.getpowerups.item.get_x//20)
+				state.getpowerups.forth
+			end
 
 			--snakes
 			from state.getsnakes.start
@@ -112,8 +119,9 @@ feature {NONE} -- Private features
 			end
 
 
-
-			--system("cls")
+			--CHANGE THIS ACCORDING TO OS
+			--OR REMOVE IT FOR A "DEBUG" VIEW
+			system("cls")
 			from i:= 1
 			until i >= (constants.board_height//20)
 			loop
@@ -126,7 +134,6 @@ feature {NONE} -- Private features
 				print("%N")
 				i := i+1
 			end
-			--print("%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N%N")
 
 		end
 

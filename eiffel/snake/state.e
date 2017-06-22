@@ -22,4 +22,5 @@ feature
 	addPowerUp(newPowerUp: POWERUP) deferred end
 	getSnakes: LINKED_LIST[SNAKE] deferred end
 	removePoison(poison: POISON) deferred end
+	removePowerUp(powerup: POWERUP) deferred end
 end
