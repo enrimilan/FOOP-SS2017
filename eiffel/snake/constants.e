@@ -12,13 +12,13 @@ feature
 	BOARD_HEIGHT: INTEGER
 		-- Result is an integer constant denoting board height
 		once
-			Result := 600
+			Result := 20
 		end
 
 	BOARD_WIDTH: INTEGER
 		-- Rseult is an integer constant denoting board width
 		once
-			Result := 800
+			Result := 40
 		end
 
 	BITTING_SPEED: INTEGER
@@ -37,12 +37,6 @@ feature
 		-- Result is an integer constant
 		once
 			Result := 10
-		end
-
-	CELL_SIDE_LENGTH: INTEGER
-		-- Result is an integer constant
-		once
-			Result := 20						 -- May be changed during UI development
 		end
 
 	FOOD_HEALTH: INTEGER

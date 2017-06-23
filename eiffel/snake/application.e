@@ -7,20 +7,20 @@ class
 	APPLICATION
 
 inherit
-	--ARGUMENTS
 	EXECUTION_ENVIRONMENT
 
 create
 	make
 
 feature {NONE} -- Private variables
-	game: separate GAME
+	game: GAME
 	keyboard_definition: KEYBOARD_DEFINITION
 	direct: DIRECTION
 	player1: PLAYER
 	player2: PLAYER
 	constants: CONSTANTS
 	board: ARRAY2[CHARACTER]
+	my_mutex: MUTEX
 
 feature {NONE} -- Initialization and main entry point
 
@@ -32,6 +32,7 @@ feature {NONE} -- Initialization and main entry point
 			create factory
 			create direct
 			create constants
+			create my_mutex.make
 			direction := direct.right			-- default direction: right
 
 			game := factory.create_game
@@ -50,8 +51,6 @@ feature {NONE} -- Initialization and main entry point
 			player2.set_joined_game(true)
             player2.set_interval(8)
 
-            draw_game
-
 			-- Start playing
 			player1.launch
 			player2.launch
@@ -63,6 +62,7 @@ feature {ANY} -- Public features
 
 	on_new_direction(player_id: INTEGER; direction: STRING)
 		do
+			my_mutex.lock
 			print(player_id)
 			print(" ")
 			print(direction)
@@ -71,6 +71,7 @@ feature {ANY} -- Public features
 			-- maybe change the interval or stop a player here if he lost
 
 			draw_game
+			my_mutex.unlock
 		end
 
 feature {NONE} -- Private features
@@ -82,12 +83,14 @@ feature {NONE} -- Private features
 			j: INTEGER
 
 		do
+			print("Start drawing %N")
 			state := game.get_state
 			board.fill_with (' ')
 
+			print("Draw food %N")
 			--food
 			if state.getfood.get_y /= -1 then
-				board.put ('F', state.getfood.get_y//constants.cell_side_length, state.getfood.get_x//constants.cell_side_length)
+				board.put ('F', state.getfood.get_y+1, state.getfood.get_x+1)
 					print("Food at: ")
 					print(state.getfood.get_x)
 					print("/")
@@ -95,22 +98,26 @@ feature {NONE} -- Private features
 					print("%N")
 			end
 
+
+			print("Draw poisons %N")
 			--poison
 			from state.getposions.start
 			until state.getposions.exhausted
 			loop
-				board.put ('P',state.getposions.item.get_y//constants.cell_side_length,state.getposions.item.get_x//constants.cell_side_length)
+				board.put ('P',state.getposions.item.get_y,state.getposions.item.get_x)
 				state.getposions.forth
 			end
 
+			print("Draw power-ups %N")
 			--powerups
 			from state.getpowerups.start
 			until state.getpowerups.exhausted
 			loop
-				board.put('U',state.getpowerups.item.get_y//constants.cell_side_length,state.getpowerups.item.get_x//constants.cell_side_length)
+				board.put('U',state.getpowerups.item.get_y+1, state.getpowerups.item.get_x+1)
 				state.getpowerups.forth
 			end
 
+			print("Draw snakes %N")
 			--snakes
 			from state.getsnakes.start
 			until state.getsnakes.exhausted
@@ -118,23 +125,23 @@ feature {NONE} -- Private features
 				from state.getsnakes.item.getpoints.start
 				until state.getsnakes.item.getpoints.exhausted
 				loop
-					board.put (state.getsnakes.item.get_character_representation, state.getsnakes.item.getpoints.item.get_y//constants.cell_side_length, state.getsnakes.item.getpoints.item.get_x//constants.cell_side_length)
-				--	print("Snake at: ")
-				--	print(state.getsnakes.item.getpoints.item.get_x)
-				--	print("/")
-				--	print(state.getsnakes.item.getpoints.item.get_y)
-				--	print("%N")
+					board.put (state.getsnakes.item.get_character_representation, state.getsnakes.item.getpoints.item.get_y+1, state.getsnakes.item.getpoints.item.get_x+1)
+					print("Snake at: ")
+					print(state.getsnakes.item.getpoints.item.get_x)
+					print("/")
+					print(state.getsnakes.item.getpoints.item.get_y)
+					print("%N")
 					state.getsnakes.item.getpoints.forth
 				end
 
-				print("Snake ")
-				print(state.getsnakes.item.getid)
-				print(" has influence: ")
-				if state.getsnakes.item.getinfluences.count > 0 then
-					print(state.getsnakes.item.getinfluences.first.getstarttime)
-				else
-					print("none")
-				end
+				--print("Snake ")
+				--print(state.getsnakes.item.getid)
+				--print(" has influence: ")
+				--if state.getsnakes.item.getinfluences.count > 0 then
+				--	print(state.getsnakes.item.getinfluences.first.getstarttime)
+				--else
+				--	print("none")
+				--end
 
 				print("%N")
 				state.getsnakes.forth
@@ -144,23 +151,24 @@ feature {NONE} -- Private features
 			--CHANGE THIS ACCORDING TO OS
 			--OR REMOVE IT FOR A "DEBUG" VIEW
 			system("cls")
-			--print("--------------------------------------%N")
+			print("-----------------------------------------%N")
 			from i:= 1
-			until i >= (constants.board_height//constants.cell_side_length)
+			until i >= (constants.board_height)
 			loop
+				print("|")
 				from j := 1
-				until j >= (constants.board_width//constants.cell_side_length)
+				until j >= (constants.board_width)
 
 				loop
 					print(board.item(i,j))
 					j := j+1
 				end
-				--print("|")
+				print("|")
 				print("%N")
-				--print("|")
 				i := i+1
 			end
-			--print("---------------------------------------%N")
+			print("-----------------------------------------%N")
+			print("Finished drawing %N")
 
 		end
 
@@ -171,13 +179,13 @@ feature {NONE} -- Private features
 			width: INTEGER
 			height: INTEGER
 		do
-			width := (constants.board_width)//constants.cell_side_length
-			height := (constants.board_height)//constants.cell_side_length
+			width := (constants.board_width)
+			height := (constants.board_height)
 
 			create board.make_filled('x',height,width)
 			Result := board
 		ensure
-			Result.count = 	constants.board_width//constants.cell_side_length*constants.board_height//constants.cell_side_length
+			Result.count = 	constants.board_width*constants.board_height
 		end
 
 	listen_for_keyboard_input

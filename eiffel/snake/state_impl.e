@@ -16,7 +16,7 @@ feature {NONE} -- variables
 	snakes: LINKED_LIST[SNAKE]
 	poisons: LINKED_LIST[POISON]
 	powerUps: LINKED_LIST[POWERUP]
-	avaliablePoints: LINKED_LIST[POINT]
+	avaliablePoints:LINKED_LIST[POINT]
 	constants: CONSTANTS
 
 	timeElapsed: INTEGER
@@ -38,6 +38,7 @@ feature {ANY} -- Initialization
 			create avaliablePoints.make
 			create constants
 			timeElapsed := 0
+			avaliablePoints.compare_objects
 
 			create food.make(-1,-1) -- dummy values
 			theResult := " " -- dummy value
@@ -46,17 +47,17 @@ feature {ANY} -- Initialization
 
 			from i := 0
 			invariant (i >= 0) and (i <= constants.board_width)
-			until i >= (constants.board_width - constants.cell_side_length)
+			until i >= constants.board_width
 			loop
 				from j := 0
 				invariant (j >= 0) and (j <= constants.board_height)
-				until j >= (constants.board_height - constants.cell_side_length)
+				until j >= constants.board_height
 				loop
 					create p.make(i,j)
 					avaliablePoints.extend (p)
-					j := j + constants.cell_side_length
+					j := j + 1
 				end
-				i := i + constants.cell_side_length
+				i := i + 1
 			end
 
 			--io.put_string ("AND NOW HERE")
@@ -79,16 +80,26 @@ feature {ANY} -- Public features
 		local
 			avaliablePoint: POINT
 		do
-			from avaliablePoints.start
-			until avaliablePoints.exhausted
-			loop
-				if(avaliablePoints.item.get_x = point.get_x and avaliablePoints.item.get_y = point.get_y)
-				then
-					avaliablePoints.remove
-					avaliablePoints.finish
-				end
-				avaliablePoints.forth
-			end
+			print("Remove point %N")
+			io.put_boolean (avaliablePoints.has (point))
+			io.put_integer (avaliablePoints.count)
+			avaliablePoints.prune(point)
+			print("Removed point %N")
+			io.put_integer (avaliablePoints.count)
+
+
+
+			--from avaliablePoints.start
+			--until avaliablePoints.exhausted
+			--loop
+			--	if(avaliablePoints.item.get_x = point.get_x and avaliablePoints.item.get_y = point.get_y)
+			--	then
+			--		avaliablePoints.remove
+			--		avaliablePoints.finish
+			--	end
+			--	avaliablePoints.forth
+			--end
+			--print("Finished removing %N")
 		end
 
 

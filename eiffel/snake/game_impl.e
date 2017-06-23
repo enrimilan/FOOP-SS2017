@@ -233,7 +233,7 @@ feature {ANY} -- Public features
 	collidesWithBorder(snake: SNAKE; head:POINT): BOOLEAN
 		do
 			Result := false
-			if (head.get_x < 0 or head.get_x > (constants.board_width-constants.cell_side_length) or head.get_y < 0 or head.get_y > (constants.board_height-constants.cell_side_length))
+			if (head.get_x < 0 or head.get_x > (constants.board_width) or head.get_y < 0 or head.get_y > (constants.board_height))
 			then
 				--io.put_string ("GAME_IMPL.collidesWithBorderI: AM HERE")
 				removeSnakeTail(snake, snake.getlength)
@@ -385,8 +385,11 @@ feature {ANY} -- Public features
 			timeElapsed: DT_TIME_DURATION
 			game: GAME
 		do
+			io.putstring("Start update state for " + id.out)
+			io.new_line
 			snake := state.getsnakes.at (id)
 			snake.setdirection (current.calculatesnake (snake, direction))
+
 
 			if
 				(snake.getlength > 1)
@@ -398,7 +401,7 @@ feature {ANY} -- Public features
 			head := snake.gethead
 			if(snake.getdirection.is_equal ("RIGHT"))
 				then
-					x := head.get_x + constants.cell_side_length
+					x := head.get_x + 1
 					y := head.get_y
 					create p.make (x, y)
 					snake.addhead (p)
@@ -406,7 +409,7 @@ feature {ANY} -- Public features
 
 			if(snake.getdirection.is_equal ("LEFT"))
 				then
-					x := head.get_x - constants.cell_side_length
+					x := head.get_x - 1
 					y := head.get_y
 					create p.make (x, y)
 					snake.addhead (p)
@@ -415,7 +418,7 @@ feature {ANY} -- Public features
 			if(snake.getdirection.is_equal ("UP"))
 				then
 					x := head.get_x
-					y := head.get_y - constants.cell_side_length
+					y := head.get_y - 1
 					create p.make (x, y)
 					snake.addhead (p)
 				end
@@ -423,7 +426,7 @@ feature {ANY} -- Public features
 			if(snake.getdirection.is_equal ("DOWN"))
 				then
 					x := head.get_x
-					y := head.get_y + constants.cell_side_length
+					y := head.get_y + 1
 					create p.make (x, y)
 					snake.addhead (p)
 				end
@@ -458,8 +461,8 @@ feature {ANY} -- Public features
 			if(state.getposions.count < constants.poison_max)
 				then
 					current.placepoison
-		--			io.put_string("Poison count after placing a poison: " + state.getposions.count.out)
-		--			io.new_line
+					io.put_string("Poison count after placing a poison: " + state.getposions.count.out)
+					io.new_line
 				end
 			if(state.getpowerups.count < constants.power_up_max)
 				then
@@ -470,6 +473,8 @@ feature {ANY} -- Public features
 			state.settimeelapsed (timeElapsed.second_count)
 			game := current.updategameresult
 
+		io.putstring("Finish update state for " + id.out)
+		io.new_line
 		end
 
 	updateGameResult: GAME
@@ -603,8 +608,8 @@ feature {ANY} -- Public features
 		do
 			if not(state.getavaliablepoints.has (point))
 			then
-				if((point.get_x >= 0 and point.get_x <= (constants.board_width - constants.cell_side_length)) and
-				  (point.get_y >= 0 and point.get_y <= (constants.board_height - constants.cell_side_length)))
+				if((point.get_x >= 0 and point.get_x <= (constants.board_width)) and
+				  (point.get_y >= 0 and point.get_y <= (constants.board_height)))
 				then
 					state.getavaliablepoints.extend (point)
 				end
@@ -695,14 +700,6 @@ feature {ANY} -- Public features
 			avaliablePoints.go_i_th (number)
 			avaliablePoints.remove
 
-			--WORKAROUND georg
-			if p.get_x < 20 then
-				p.set_x (20)
-			end
-			if p.get_y < 20 then
-				p.set_y (20)
-
-			end
 			Result := p
 		end
 
