@@ -79,7 +79,7 @@ feature {ANY} -- Public features
 					snakePoint := snakePoints.at (i)
 					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
 					then
-						Current.removesnaketail (snake, snake.getlength)
+						Current.removesnaketail (snake, i)
 						snake.sethealth (0)
 						Result := true
 					end
@@ -232,6 +232,7 @@ feature {ANY} -- Public features
 
 	collidesWithBorder(snake: SNAKE; head:POINT): BOOLEAN
 		do
+			Result := false
 			if (head.get_x < 0 or head.get_x > (constants.board_width-constants.cell_side_length) or head.get_y < 0 or head.get_y > (constants.board_height-constants.cell_side_length))
 			then
 				--io.put_string ("GAME_IMPL.collidesWithBorderI: AM HERE")
@@ -239,7 +240,7 @@ feature {ANY} -- Public features
 				snake.sethealth (0)
 				Result := true
 			end
-			Result := false
+
 		end
 
 	removeSnakeTail(snake: SNAKE; index: INTEGER)
@@ -265,6 +266,7 @@ feature {ANY} -- Public features
 	calculateSnake(snake: SNAKE; direction: STRING): STRING
 		-- ensure that the snake cannot move in the opposite direction, if it's length is bigger than 1
 		do
+			Result := direction
 			if (snake.getlength > 1)
 			then
 				if(direction.is_equal ("LEFT") and snake.getdirection.is_equal ("RIGHT"))
@@ -284,8 +286,8 @@ feature {ANY} -- Public features
 						Result := "UP"
 					end
 			end
-			-- should never be reached
-			Result := direction
+			-- IS reached.
+			-- Result := direction
 		end
 
 	checkTimeouts(snake: SNAKE)
@@ -312,15 +314,15 @@ feature {ANY} -- Public features
 			poisons.copy (state.getposions)
 			itemNr := 0
 			from poisons.start
-			until poisons.off
+			until poisons.exhausted
 			loop
 				poison := poisons.item
 				difference := clock.time_now - poison.gettimeplaced
 				if (difference.second_count >= constants.max_artifact_time)
 				then
-					-- remove poison from list
-					-- TODO!
-					--makePointAvailable(poison.getpoisonpoint)
+					state.removepoison (poison)
+					makePointAvailable(poison.getpoisonpoint)
+
 				end
 				poisons.forth
 				itemNr := itemNr + 1
@@ -330,15 +332,15 @@ feature {ANY} -- Public features
 			powerUps := state.getpowerups
 			itemNr := 0
 			from powerUps.start
-			until powerUps.off
+			until powerUps.exhausted
 			loop
 				powerUp := powerUps.item
 				difference := clock.time_now - powerUp.gettimeplaced
 				if (difference.second_count >= constants.max_artifact_time)
 				then
-					-- remove poison from list
-					-- TODO!
-	--				makePointAvailable(powerUp.getpoweruppoint)
+					state.removepowerup (powerUp)
+					makePointAvailable(powerUp.getpoweruppoint)
+
 				end
 				powerUps.forth
 				itemNr := itemNr + 1
@@ -361,8 +363,10 @@ feature {ANY} -- Public features
 					snake.sethealth (snake.gethealth - influence.gethealth)
 					-- remove Influence
 					-- TODO!
+					influences.remove
+					influences.finish
 				end
-				powerUps.forth
+				influences.forth
 				itemNr := itemNr + 1
 			end
 
@@ -446,8 +450,8 @@ feature {ANY} -- Public features
 
 
 
-		--	current.checktimeouts (snake)
-		-- GEORG
+			current.checktimeouts (snake)
+
 			-- Place poisons and powerUps
 		--	io.put_string ("The count of poisons in state: " + state.getposions.count.out)
 		--	io.new_line
@@ -616,31 +620,8 @@ feature {ANY} -- Public features
 		end
 
 	occupyPoint(point: POINT)
-		local
-			index: INTEGER
-			avaliablePoints: LINKED_LIST[POINT]
-			avaliablePoint: POINT
-			i: INTEGER
 		do
-			index := -1
-			avaliablePoints := state.getavaliablepoints
-			avaliablePoints.start
-			from i := 0
-			until i >= avaliablePoints.count
-			loop
-				avaliablePoint := avaliablePoints.item
-				if(avaliablePoint.get_x = point.get_x and avaliablePoint.get_y = avaliablePoint.get_y)
-				then
-					index := i
-				end
-				avaliablePoints.forth
-				i := i + 1
-			end
-			if(index > -1)
-			then
-				avaliablePoints.go_i_th (index)
-				avaliablePoints.remove
-			end
+			state.removeavaliablepoint (point)
 		end
 
 	occupyRandomPoint: POINT

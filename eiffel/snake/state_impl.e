@@ -75,6 +75,23 @@ feature {ANY} -- Initialization
 
 feature {ANY} -- Public features
 
+	removeAvaliablePoint(point: POINT)
+		local
+			avaliablePoint: POINT
+		do
+			from avaliablePoints.start
+			until avaliablePoints.exhausted
+			loop
+				if(avaliablePoints.item.get_x = point.get_x and avaliablePoints.item.get_y = point.get_y)
+				then
+					avaliablePoints.remove
+					avaliablePoints.finish
+				end
+				avaliablePoints.forth
+			end
+		end
+
+
 	removePoison(poison: POISON)
 		local
 			i: INTEGER
@@ -90,7 +107,7 @@ feature {ANY} -- Public features
 			i: INTEGER
 		do
 			i := powerups.index_of(powerup,1)
-			
+
 			powerups.go_i_th (i)
 			powerups.remove
 		end

@@ -23,4 +23,5 @@ feature
 	getSnakes: LINKED_LIST[SNAKE] deferred end
 	removePoison(poison: POISON) deferred end
 	removePowerUp(powerup: POWERUP) deferred end
+	removeAvaliablePoint(point: POINT) deferred end
 end

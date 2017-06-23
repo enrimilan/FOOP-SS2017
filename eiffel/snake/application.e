@@ -76,7 +76,7 @@ feature {NONE} -- Private features
 
 			--food
 			if state.getfood.get_y /= -1 then
-				board.put ('F', state.getfood.get_y//20, state.getfood.get_x//20)
+				board.put ('F', state.getfood.get_y//constants.cell_side_length, state.getfood.get_x//constants.cell_side_length)
 					print("Food at: ")
 					print(state.getfood.get_x)
 					print("/")
@@ -88,7 +88,7 @@ feature {NONE} -- Private features
 			from state.getposions.start
 			until state.getposions.exhausted
 			loop
-				board.put ('P',state.getposions.item.get_y//20,state.getposions.item.get_x//20)
+				board.put ('P',state.getposions.item.get_y//constants.cell_side_length,state.getposions.item.get_x//constants.cell_side_length)
 				state.getposions.forth
 			end
 
@@ -96,7 +96,7 @@ feature {NONE} -- Private features
 			from state.getpowerups.start
 			until state.getpowerups.exhausted
 			loop
-				board.put('U',state.getpowerups.item.get_y//20,state.getpowerups.item.get_x//20)
+				board.put('U',state.getpowerups.item.get_y//constants.cell_side_length,state.getpowerups.item.get_x//constants.cell_side_length)
 				state.getpowerups.forth
 			end
 
@@ -107,14 +107,25 @@ feature {NONE} -- Private features
 				from state.getsnakes.item.getpoints.start
 				until state.getsnakes.item.getpoints.exhausted
 				loop
-					board.put (state.getsnakes.item.getid.to_character_8, state.getsnakes.item.getpoints.item.get_y//20, state.getsnakes.item.getpoints.item.get_x//20)
-					print("Snake at: ")
-					print(state.getsnakes.item.getpoints.item.get_x)
-					print("/")
-					print(state.getsnakes.item.getpoints.item.get_y)
-					print("%N")
+					board.put (state.getsnakes.item.getid.to_character_8, state.getsnakes.item.getpoints.item.get_y//constants.cell_side_length, state.getsnakes.item.getpoints.item.get_x//constants.cell_side_length)
+				--	print("Snake at: ")
+				--	print(state.getsnakes.item.getpoints.item.get_x)
+				--	print("/")
+				--	print(state.getsnakes.item.getpoints.item.get_y)
+				--	print("%N")
 					state.getsnakes.item.getpoints.forth
 				end
+
+				print("Snake ")
+				print(state.getsnakes.item.getid)
+				print(" has influence: ")
+				if state.getsnakes.item.getinfluences.count > 0 then
+					print(state.getsnakes.item.getinfluences.first.getstarttime)
+				else
+					print("none")
+				end
+
+				print("%N")
 				state.getsnakes.forth
 			end
 
@@ -123,10 +134,10 @@ feature {NONE} -- Private features
 			--OR REMOVE IT FOR A "DEBUG" VIEW
 			system("cls")
 			from i:= 1
-			until i >= (constants.board_height//20)
+			until i >= (constants.board_height//constants.cell_side_length)
 			loop
 				from j := 1
-				until j >= (constants.board_width//20)
+				until j >= (constants.board_width//constants.cell_side_length)
 				loop
 					print(board.item(i,j))
 					j := j+1
@@ -144,13 +155,13 @@ feature {NONE} -- Private features
 			width: INTEGER
 			height: INTEGER
 		do
-			width := (constants.board_width)//20
-			height := (constants.board_height)//20
+			width := (constants.board_width)//constants.cell_side_length
+			height := (constants.board_height)//constants.cell_side_length
 
 			create board.make_filled('x',height,width)
 			Result := board
 		ensure
-			Result.count = 	constants.board_width//20*constants.board_height//20
+			Result.count = 	constants.board_width//constants.cell_side_length*constants.board_height//constants.cell_side_length
 		end
 
 	listen_for_keyboard_input
@@ -168,16 +179,18 @@ feature {NONE} -- Private features
             			game.add_snake(1)
             		--	draw_game
             			player1.set_joined_game(true)
-            			player1.set_interval(1)
+            			player1.set_interval(8)
             			player1.launch
             		elseif(not player2.has_joined_game) then
             			game.add_snake(2)
+            			player2.set_interval(8)
             	--		draw_game
             			player2.set_joined_game(true)
             			player2.launch
             		elseif(not player3.has_joined_game) then
             			game.add_snake(3)
             	--		draw_game
+            			player3.set_interval(8)
             			player3.set_joined_game(true)
             			player3.launch
             		end
