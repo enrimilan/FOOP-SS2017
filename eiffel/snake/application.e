@@ -14,12 +14,11 @@ create
 	make
 
 feature {NONE} -- Private variables
-	game: GAME
+	game: separate GAME
 	keyboard_definition: KEYBOARD_DEFINITION
 	direct: DIRECTION
 	player1: PLAYER
 	player2: PLAYER
-	player3: PLAYER
 	constants: CONSTANTS
 	board: ARRAY2[CHARACTER]
 
@@ -39,12 +38,24 @@ feature {NONE} -- Initialization and main entry point
 			board := build_board
 
 			create keyboard_definition
+
 			create player1.make_new(current, 1, direction)
 			create player2.make_new(current, 2, direction)
-			create player3.make_new(current, 3, direction)
-			draw_game
+
+			game.add_snake(1, 'o')
+			player1.set_joined_game(true)
+            player1.set_interval(8)
+
+			game.add_snake(2, 'a')
+			player2.set_joined_game(true)
+            player2.set_interval(8)
+
+            draw_game
 
 			-- Start playing
+			player1.launch
+			player2.launch
+			--important: this operation blocks)
 			listen_for_keyboard_input
 		end
 
@@ -107,7 +118,7 @@ feature {NONE} -- Private features
 				from state.getsnakes.item.getpoints.start
 				until state.getsnakes.item.getpoints.exhausted
 				loop
-					board.put (state.getsnakes.item.getid.to_character_8, state.getsnakes.item.getpoints.item.get_y//constants.cell_side_length, state.getsnakes.item.getpoints.item.get_x//constants.cell_side_length)
+					board.put (state.getsnakes.item.get_character_representation, state.getsnakes.item.getpoints.item.get_y//constants.cell_side_length, state.getsnakes.item.getpoints.item.get_x//constants.cell_side_length)
 				--	print("Snake at: ")
 				--	print(state.getsnakes.item.getpoints.item.get_x)
 				--	print("/")
@@ -133,18 +144,23 @@ feature {NONE} -- Private features
 			--CHANGE THIS ACCORDING TO OS
 			--OR REMOVE IT FOR A "DEBUG" VIEW
 			system("cls")
+			--print("--------------------------------------%N")
 			from i:= 1
 			until i >= (constants.board_height//constants.cell_side_length)
 			loop
 				from j := 1
 				until j >= (constants.board_width//constants.cell_side_length)
+
 				loop
 					print(board.item(i,j))
 					j := j+1
 				end
+				--print("|")
 				print("%N")
+				--print("|")
 				i := i+1
 			end
+			--print("---------------------------------------%N")
 
 		end
 
@@ -173,39 +189,13 @@ feature {NONE} -- Private features
             	c = 'q'
         	loop
             	c := read_char
-            	if(c = 'x') then
-            		-- New player to join
-            		if(not player1.has_joined_game) then
-            			game.add_snake(1)
-            		--	draw_game
-            			player1.set_joined_game(true)
-            			player1.set_interval(8)
-            			player1.launch
-            		elseif(not player2.has_joined_game) then
-            			game.add_snake(2)
-            			player2.set_interval(8)
-            	--		draw_game
-            			player2.set_joined_game(true)
-            			player2.launch
-            		elseif(not player3.has_joined_game) then
-            			game.add_snake(3)
-            	--		draw_game
-            			player3.set_interval(8)
-            			player3.set_joined_game(true)
-            			player3.launch
-            		end
-            	else
-            		-- Prepare next direction
-            		if(keyboard_definition.get_player_id_for_input(c) = 1) then
-            			player1.set_direction(keyboard_definition.translate_input_to_direction(c))
-            		end
-            		if(keyboard_definition.get_player_id_for_input(c) = 2) then
-						player2.set_direction(keyboard_definition.translate_input_to_direction(c))
-					end
-					if(keyboard_definition.get_player_id_for_input(c) = 3) then
-						player3.set_direction(keyboard_definition.translate_input_to_direction(c))
-					end
+            	-- Prepare next direction
+            	if(keyboard_definition.get_player_id_for_input(c) = 1) then
+            		player1.set_direction(keyboard_definition.translate_input_to_direction(c))
             	end
+            	if(keyboard_definition.get_player_id_for_input(c) = 2) then
+					player2.set_direction(keyboard_definition.translate_input_to_direction(c))
+				end
 
             	-- TODO used for debugging atm, later to be removed!
             	io.put_character(c)
@@ -215,7 +205,6 @@ feature {NONE} -- Private features
         	-- End of the game, stop players
         	player1.stop
         	player2.stop
-       		player3.stop
 		end
 
 	read_char: CHARACTER

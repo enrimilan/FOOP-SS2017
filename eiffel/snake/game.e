@@ -9,7 +9,7 @@ deferred class
 
 feature
 
-	add_snake(id: INTEGER) deferred end
+	add_snake(id: INTEGER; character_representation_in: CHARACTER) deferred end
 
 	hasFinished: BOOLEAN deferred end
 

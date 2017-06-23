@@ -14,6 +14,7 @@ create
 
 feature {NONE} -- Private variables
 	id: INTEGER
+	character_representation: CHARACTER
 	speed: INTEGER
 	health: INTEGER
 	direct: DIRECTION
@@ -24,9 +25,10 @@ feature {NONE} -- Private variables
 
 feature {NONE} -- Initialization
 
-	make(snakeId: INTEGER)
+	make(snakeId: INTEGER; character_representation_in: CHARACTER)
 		do
 			id := snakeId
+			character_representation := character_representation_in
 			speed := 1000
 			health := 100
 			create direct
@@ -111,5 +113,10 @@ feature {ANY} -- Public functions
 	getInfluences: LINKED_LIST[INFLUENCE]
 		do
 			Result := influences
+		end
+
+	get_character_representation: CHARACTER
+		do
+			Result := character_representation
 		end
 end

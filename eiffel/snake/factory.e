@@ -21,12 +21,12 @@ feature {ANY} -- This class is used to create instances. This should be the only
 			Result := game
 		end
 
-	create_snake(id: INTEGER; newhead: POINT): SNAKE
+	create_snake(id: INTEGER; newhead: POINT; character_representation_in: CHARACTER): SNAKE
 		local
 			snake: SNAKE
 			snake_impl: SNAKE_IMPL
 		do
-			create snake_impl.make(id)
+			create snake_impl.make(id, character_representation_in)
 			snake_impl.addhead (newhead)
 			snake := snake_impl
 			--io.put_integer (snake.gethead.get_x)

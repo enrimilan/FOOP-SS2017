@@ -24,5 +24,6 @@ feature
 	getSpeed: INTEGER deferred end
 	getInfluences: LINKED_LIST[INFLUENCE] deferred end
 	getTail: POINT deferred end
+	get_character_representation: CHARACTER deferred end
 
 end

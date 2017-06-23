@@ -38,7 +38,7 @@ feature {ANY} -- Initialization
 
 feature {ANY} -- Public features
 
-	add_snake(id: INTEGER)
+	add_snake(id: INTEGER; character_representation_in: CHARACTER)
 		-- Adding the snake and placing the food
 		local
 			point: POINT
@@ -47,7 +47,7 @@ feature {ANY} -- Public features
 		do
 			-- Adding the snake
 			point := occupyRandomPoint
-			snake := factory.create_snake (id, point)
+			snake := factory.create_snake (id, point, character_representation_in)
 			state.getsnakes.extend (snake)
 
 			-- Place food
