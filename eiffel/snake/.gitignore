@@ -1,3 +1,4 @@
 EIFGENs
 *.rc
 exception_trace.txt
+.log
