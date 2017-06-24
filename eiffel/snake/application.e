@@ -39,9 +39,9 @@ feature {NONE} -- Initialization and main entry point
 			board := build_board
 
 			create keyboard_definition
-
-			create player1.make_new(current, 1, direction)
-			create player2.make_new(current, 2, direction)
+		
+			create player1.make_new(current, 1, direction, false, game)
+			create player2.make_new(current, 2, direction, false, game)
 
 			game.add_snake(1, 'o')
 			player1.set_joined_game(true)
@@ -220,5 +220,7 @@ feature {NONE} -- Private features
 		external "C inline use <conio.h>"
         	alias "return getch();"
     	end
+
+
 
 end

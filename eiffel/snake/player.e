@@ -18,18 +18,26 @@ feature {NONE} -- Private variables
 	next_direction: STRING
 	running: BOOLEAN
 	joined_game: BOOLEAN
+
 	interval: INTEGER_64
+	is_human: BOOLEAN
+--	algo: SNAKE_ALGO
+	game: GAME
 
 feature {ANY} -- Initialization
-	make_new(application: APPLICATION; id_in: INTEGER; direction: STRING)
+	make_new(application: APPLICATION; id_in: INTEGER; direction: STRING; human: BOOLEAN; game_: GAME)
 		do
+			game:=game_
 			app := application
 			id := id_in
 			next_direction := direction
 			running := true
 			joined_game := false
 			interval := 10000000000
+			is_human := human
+		--	create algo.make(game_, id_in)
 			create launch_mutex.make
+
 		end
 
 feature {ANY} -- Public features
@@ -41,6 +49,9 @@ feature {ANY} -- Public features
 			until
 				not running
 			loop
+				if not is_human then
+			--		next_direction := algo.get_next_direction
+				end
 				app.on_new_direction(id, next_direction)
 				sleep(interval)
 			end
