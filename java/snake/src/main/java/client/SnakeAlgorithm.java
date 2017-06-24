@@ -106,11 +106,11 @@ public class SnakeAlgorithm {
         }
     }
 
-    public int differenceOfPoints(IPoint pointA, IPoint pointB){
+    private int differenceOfPoints(IPoint pointA, IPoint pointB){
         return (Math.abs(pointA.getX() - pointB.getX()) + Math.abs(pointA.getY() - pointB.getY()));
     }
 
-    public Direction contraryDirection(Direction direction){
+    private Direction contraryDirection(Direction direction){
         if(direction == Direction.DOWN){
             return Direction.UP;
         } else if (direction == Direction.UP){
@@ -123,7 +123,7 @@ public class SnakeAlgorithm {
         return null;
     }
 
-    public Direction sideDirectionRelativeToFood (Direction direction){
+    private Direction sideDirectionRelativeToFood (Direction direction){
         if(direction == Direction.DOWN){
             return Direction.LEFT;
         } else if (direction == Direction.UP){
@@ -136,14 +136,14 @@ public class SnakeAlgorithm {
         return null;
     }
 
-    public boolean isContraryDirection(Direction direction1, Direction direction2){
+    private boolean isContraryDirection(Direction direction1, Direction direction2){
         if(contraryDirection(direction1).equals(direction2)){
             return true;
         }
         return false;
     }
 
-    public Direction contraryDirectionHandler(IPoint myPosition, Direction previousDirection, IPoint food, List<IPoint> occupiedPoints){
+    private Direction contraryDirectionHandler(IPoint myPosition, Direction previousDirection, IPoint food, List<IPoint> occupiedPoints){
         Direction newDirection;
         Direction directionRelativeToFood = this.getDirectionRelativeToFood(myPosition,food);
 
@@ -208,7 +208,7 @@ public class SnakeAlgorithm {
         return previousDirection;
     }
 
-    public Direction getNewDirectionAfterOccupiedPrevious
+    private Direction getNewDirectionAfterOccupiedPrevious
             (IPoint myPosition, Direction previousDirection, IPoint food, List<IPoint> occupiedPoints){
 
         Direction newDirection;
@@ -271,7 +271,7 @@ public class SnakeAlgorithm {
         return previousDirection;
     }
 
-    public ArrayList<IPoint> getOccupiedPoints
+    private ArrayList<IPoint> getOccupiedPoints
             (ArrayList<ISnake> allSnakes, List<Poison> poisons, List<PowerUp> powerUps, int speed){
         ArrayList<IPoint> occupiedPoints = new ArrayList<IPoint>();
         for(ISnake snake : allSnakes){
@@ -294,7 +294,7 @@ public class SnakeAlgorithm {
         return occupiedPoints;
     }
 
-    public Direction getDirectionRelativeToFood(IPoint myPosition, IPoint foodPosition){
+    private Direction getDirectionRelativeToFood(IPoint myPosition, IPoint foodPosition){
         /*Coordinates of my position */
         int x_1 = myPosition.getX();
         int y_1 = myPosition.getY();
@@ -327,7 +327,7 @@ public class SnakeAlgorithm {
         return Direction.RIGHT;
     }
 
-    public boolean nextDirectionStepIsNotOccupied(IPoint myPosition, Direction direction, List<IPoint> occupiedPoints){
+    private boolean nextDirectionStepIsNotOccupied(IPoint myPosition, Direction direction, List<IPoint> occupiedPoints){
         /* Coordinates of my position */
         int x = myPosition.getX();
         int y = myPosition.getY();
@@ -371,18 +371,5 @@ public class SnakeAlgorithm {
 
         return noBorder && notOccupied; // next direction step is not occupied
     }
-
-
-    public Direction getNextDirection(Direction direction){
-        if(direction == Direction.DOWN){
-            return Direction.LEFT;
-        } else if(direction == Direction.UP){
-            return Direction.RIGHT;
-        } else if(direction == Direction.LEFT){
-            return Direction.UP;
-        }
-        return Direction.DOWN;
-    }
-
 
 }
