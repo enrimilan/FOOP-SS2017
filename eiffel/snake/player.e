@@ -18,39 +18,40 @@ feature {NONE} -- Private variables
 	next_direction: STRING
 	running: BOOLEAN
 	joined_game: BOOLEAN
-
 	interval: INTEGER_64
-	is_human: BOOLEAN
---	algo: SNAKE_ALGO
+	mode: MODE
+	mode_value: STRING
 	game: GAME
 
 feature {ANY} -- Initialization
-	make_new(application: APPLICATION; id_in: INTEGER; direction: STRING; human: BOOLEAN; game_: GAME)
+	make_new(application: APPLICATION; id_in: INTEGER; direction: STRING; mode_in: STRING; game_: GAME)
 		do
+			create mode
 			game:=game_
 			app := application
 			id := id_in
+			mode_value := mode_in
 			next_direction := direction
 			running := true
 			joined_game := false
 			interval := 10000000000
-			is_human := human
-		--	create algo.make(game_, id_in)
 			create launch_mutex.make
-
 		end
 
 feature {ANY} -- Public features
 
 	execute
+	local
+		algo: SNAKE_ALGO
 	-- Start thread execution
 		do
+			create algo.make (game)
 			from
 			until
 				not running
 			loop
-				if not is_human then
-			--		next_direction := algo.get_next_direction
+				if(mode_value.is_equal(mode.computer)) then
+					next_direction := algo.get_next_direction
 				end
 				app.on_new_direction(id, next_direction)
 				sleep(interval)
@@ -70,7 +71,9 @@ feature {ANY} -- Public features
 
 	set_direction(direction: STRING)
 		do
-			next_direction := direction
+			if(mode_value.is_equal(mode.player)) then
+				next_direction := direction
+			end
 		end
 
 	set_joined_game(joined_game_in: BOOLEAN)

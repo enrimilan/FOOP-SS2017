@@ -21,6 +21,7 @@ feature {NONE} -- Private variables
 	constants: CONSTANTS
 	board: ARRAY2[CHARACTER]
 	my_mutex: MUTEX
+	mode: MODE
 
 feature {NONE} -- Initialization and main entry point
 
@@ -28,20 +29,24 @@ feature {NONE} -- Initialization and main entry point
 		local
 			factory: FACTORY
 			direction: STRING
+			mode_value: STRING
 		do
 			create factory
 			create direct
 			create constants
+			create mode
 			create my_mutex.make
 			direction := direct.right			-- default direction: right
-
+			mode_value := mode.computer
 			game := factory.create_game
 			board := build_board
 
+
 			create keyboard_definition
-		
-			create player1.make_new(current, 1, direction, false, game)
-			create player2.make_new(current, 2, direction, false, game)
+
+			create player1.make_new(current, 1, direction, mode_value, game)
+			create player2.make_new(current, 2, direction, mode_value, game)
+
 
 			game.add_snake(1, 'o')
 			player1.set_joined_game(true)

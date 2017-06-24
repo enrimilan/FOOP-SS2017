@@ -11,19 +11,17 @@ create
 	make
 
 feature {NONE} -- Private variables
-	player_id: INTEGER
 	game: GAME
 	dir: DIRECTION
 	constants: CONSTANTS
 
 feature {ANY} -- Initialization and main entry point
 
-	make(game_: GAME; player_: INTEGER)
+	make(game_: GAME)
 		require
 			game_.hasfinished = false
 		do
 			game := game_
-			player_id := player_
 			create constants
 			create dir
 
