@@ -80,12 +80,12 @@ feature {ANY} -- Public features
 		local
 			avaliablePoint: POINT
 		do
-			print("Remove point %N")
-			io.put_boolean (avaliablePoints.has (point))
-			io.put_integer (avaliablePoints.count)
+			--print("Remove point %N")
+			--io.put_boolean (avaliablePoints.has (point))
+			--io.put_integer (avaliablePoints.count)
 			avaliablePoints.prune(point)
-			print("Removed point %N")
-			io.put_integer (avaliablePoints.count)
+			--print("Removed point %N")
+			--io.put_integer (avaliablePoints.count)
 
 
 

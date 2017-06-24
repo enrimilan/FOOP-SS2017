@@ -385,8 +385,8 @@ feature {ANY} -- Public features
 			timeElapsed: DT_TIME_DURATION
 			game: GAME
 		do
-			io.putstring("Start update state for " + id.out)
-			io.new_line
+			--io.putstring("Start update state for " + id.out)
+			--io.new_line
 			snake := state.getsnakes.at (id)
 			snake.setdirection (current.calculatesnake (snake, direction))
 
@@ -441,10 +441,10 @@ feature {ANY} -- Public features
 				print("FOOD EATEN")
 			end
 
-			io.put_string ("The length of the snake: " + snake.getpoints.count.out)
-			io.new_line
-			io.put_string("The head of the snake: X:  " + snake.gethead.get_x.out + " ; Y: " + snake.gethead.get_y.out)
-			io.new_line
+			--io.put_string ("The length of the snake: " + snake.getpoints.count.out)
+			--io.new_line
+			--io.put_string("The head of the snake: X:  " + snake.gethead.get_x.out + " ; Y: " + snake.gethead.get_y.out)
+			--io.new_line
 
 			flag := current.eatspoison (snake, head)
 			flag := current.eatspowerup (snake, head)
@@ -473,8 +473,8 @@ feature {ANY} -- Public features
 			state.settimeelapsed (timeElapsed.second_count)
 			game := current.updategameresult
 
-		io.putstring("Finish update state for " + id.out)
-		io.new_line
+		--io.putstring("Finish update state for " + id.out)
+		--io.new_line
 		end
 
 	updateGameResult: GAME

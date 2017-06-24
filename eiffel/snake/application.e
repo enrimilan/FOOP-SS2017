@@ -37,7 +37,7 @@ feature {NONE} -- Initialization and main entry point
 			create mode
 			create my_mutex.make
 			direction := direct.right			-- default direction: right
-			mode_value := mode.computer
+			mode_value := mode.player
 			game := factory.create_game
 			board := build_board
 
@@ -58,7 +58,7 @@ feature {NONE} -- Initialization and main entry point
 
 			-- Start playing
 			player1.launch
-			player2.launch
+			--player2.launch
 			--important: this operation blocks)
 			listen_for_keyboard_input
 		end
@@ -68,10 +68,10 @@ feature {ANY} -- Public features
 	on_new_direction(player_id: INTEGER; direction: STRING)
 		do
 			my_mutex.lock
-			print(player_id)
-			print(" ")
-			print(direction)
-			print("%N")
+			--print(player_id)
+			--print(" ")
+			--print(direction)
+			--print("%N")
 			game.update_state(player_id, direction)
 			-- maybe change the interval or stop a player here if he lost
 
@@ -86,25 +86,27 @@ feature {NONE} -- Private features
 			state: STATE
 			i: INTEGER
 			j: INTEGER
+			output: STRING
 
 		do
-			print("Start drawing %N")
+			--print("Start drawing %N")
+			output := ""
 			state := game.get_state
 			board.fill_with (' ')
 
-			print("Draw food %N")
+			--print("Draw food %N")
 			--food
 			if state.getfood.get_y /= -1 then
 				board.put ('F', state.getfood.get_y+1, state.getfood.get_x+1)
-					print("Food at: ")
-					print(state.getfood.get_x)
-					print("/")
-					print(state.getfood.get_y)
-					print("%N")
+					--print("Food at: ")
+					--print(state.getfood.get_x)
+					--print("/")
+					--print(state.getfood.get_y)
+					--print("%N")
 			end
 
 
-			print("Draw poisons %N")
+			--print("Draw poisons %N")
 			--poison
 			from state.getposions.start
 			until state.getposions.exhausted
@@ -113,7 +115,7 @@ feature {NONE} -- Private features
 				state.getposions.forth
 			end
 
-			print("Draw power-ups %N")
+			--print("Draw power-ups %N")
 			--powerups
 			from state.getpowerups.start
 			until state.getpowerups.exhausted
@@ -122,7 +124,7 @@ feature {NONE} -- Private features
 				state.getpowerups.forth
 			end
 
-			print("Draw snakes %N")
+			--print("Draw snakes %N")
 			--snakes
 			from state.getsnakes.start
 			until state.getsnakes.exhausted
@@ -131,11 +133,11 @@ feature {NONE} -- Private features
 				until state.getsnakes.item.getpoints.exhausted
 				loop
 					board.put (state.getsnakes.item.get_character_representation, state.getsnakes.item.getpoints.item.get_y+1, state.getsnakes.item.getpoints.item.get_x+1)
-					print("Snake at: ")
-					print(state.getsnakes.item.getpoints.item.get_x)
-					print("/")
-					print(state.getsnakes.item.getpoints.item.get_y)
-					print("%N")
+					--print("Snake at: ")
+					--print(state.getsnakes.item.getpoints.item.get_x)
+					--print("/")
+					--print(state.getsnakes.item.getpoints.item.get_y)
+					--print("%N")
 					state.getsnakes.item.getpoints.forth
 				end
 
@@ -156,24 +158,23 @@ feature {NONE} -- Private features
 			--CHANGE THIS ACCORDING TO OS
 			--OR REMOVE IT FOR A "DEBUG" VIEW
 			system("cls")
-			print("-----------------------------------------%N")
+			output := output + "-----------------------------------------%N"
 			from i:= 1
 			until i >= (constants.board_height)
 			loop
-				print("|")
+				output := output + "|"
 				from j := 1
 				until j >= (constants.board_width)
-
 				loop
-					print(board.item(i,j))
+					output := output + board.item(i,j).out
 					j := j+1
 				end
-				print("|")
-				print("%N")
+				output := output + "|%N"
 				i := i+1
 			end
-			print("-----------------------------------------%N")
-			print("Finished drawing %N")
+			output := output + "-----------------------------------------%N"
+			print(output)
+			--print("Finished drawing %N")
 
 		end
 
@@ -211,8 +212,8 @@ feature {NONE} -- Private features
 				end
 
             	-- TODO used for debugging atm, later to be removed!
-            	io.put_character(c)
-            	io.put_new_line
+            	--io.put_character(c)
+            	--io.put_new_line
         	end
 
         	-- End of the game, stop players
