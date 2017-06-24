@@ -67,39 +67,38 @@ public class Board extends Application {
 
     public void draw(IState state, int id) {
         logger.debug("Start drawing");
-        clear(state);
-
-        // draw snakes
-        logger.debug("Draw snakes");
-        for(ISnake snake : state.getSnakes().values()) {
-            for (IPoint p : snake.getPoints()) {
-                getNodeByRowColumnIndex(p.getY(), p.getX(), field).setStyle("-fx-background-color: " + snake.getColor() + ";");
-            }
-        }
-
-        // draw food
-        Food food = state.getFood();
-        if(food != null) {
-            logger.debug("Draw food of type {} ", food.getType());
-            Node n = getNodeByRowColumnIndex(food.getY(), food.getX(), field);
-            n.setStyle("-fx-background-image: url(\"/img/food"+food.getType()+".png\");");
-        }
-
-        // draw poisons
-        for(Poison p : state.getPoisons()) {
-            logger.debug("Draw poison of type {}", p.getType());
-            Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), field);
-            n.setStyle("-fx-background-image: url(\"/img/poison" + p.getType() + ".png\");");
-        }
-
-        // draw power-ups
-        for (PowerUp powerUp : state.getPowerUps()) {
-            logger.debug("Draw power-up of type {} ({})", powerUp.getType().ordinal(), powerUp.getType());
-            Node n = getNodeByRowColumnIndex(powerUp.getY(), powerUp.getX(), field);
-            n.setStyle("-fx-background-image: url(\"/img/powerup" + powerUp.getType().ordinal() + ".png\");");
-        }
-
         FutureTask<Void> task = new FutureTask<>(() -> {
+            clear(state);
+
+            // draw snakes
+            logger.debug("Draw snakes");
+            for(ISnake snake : state.getSnakes().values()) {
+                for (IPoint p : snake.getPoints()) {
+                    getNodeByRowColumnIndex(p.getY(), p.getX(), field).setStyle("-fx-background-color: " + snake.getColor() + ";");
+                }
+            }
+
+            // draw food
+            Food food = state.getFood();
+            if(food != null) {
+                logger.debug("Draw food of type {} ", food.getType());
+                Node n = getNodeByRowColumnIndex(food.getY(), food.getX(), field);
+                n.setStyle("-fx-background-image: url(\"/img/food"+food.getType()+".png\");");
+            }
+
+            // draw poisons
+            for(Poison p : state.getPoisons()) {
+                logger.debug("Draw poison of type {}", p.getType());
+                Node n = getNodeByRowColumnIndex(p.getY(), p.getX(), field);
+                n.setStyle("-fx-background-image: url(\"/img/poison" + p.getType() + ".png\");");
+            }
+
+            // draw power-ups
+            for (PowerUp powerUp : state.getPowerUps()) {
+                logger.debug("Draw power-up of type {} ({})", powerUp.getType().ordinal(), powerUp.getType());
+                Node n = getNodeByRowColumnIndex(powerUp.getY(), powerUp.getX(), field);
+                n.setStyle("-fx-background-image: url(\"/img/powerup" + powerUp.getType().ordinal() + ".png\");");
+            }
             healthString.set("" + state.getSnakes().get(id).getHealth());
             speedString.set("" + state.getSnakes().get(id).getSpeed());
             long millis = Constants.GAME_DURATION - state.getTimeElapsed();
