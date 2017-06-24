@@ -1,6 +1,5 @@
 package client;
 
-import model.ISnake;
 import model.Mode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +7,10 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+/**
+ * Sends the snake's new direction depending on the speed of the snake.
+ * Can be interpreted as a player of the game
+ */
 public class SnakeDirectionSender implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(SnakeDirectionSender.class);
@@ -25,9 +28,8 @@ public class SnakeDirectionSender implements Runnable {
         logger.debug("Start SnakeDirectionSender");
         try {
             while(running) {
-                ISnake snake = client.getSnake();
-                int sleep = 1000 - snake.getSpeed();
-                Thread.sleep(sleep);
+                int speed = client.getSnake().getSpeed();
+                Thread.sleep(600 - speed);
                 if(client.getMode() == Mode.PLAYER) {
                     out.writeObject(client.getNextDirectionFromBoard());
                 }
@@ -35,13 +37,9 @@ public class SnakeDirectionSender implements Runnable {
                     out.writeObject(client.getNextDirectionUsingAlgorithm());
                 }
             }
-
-        } catch (InterruptedException e) {
-            logger.debug(e.getMessage());
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             logger.debug(e.getMessage());
         }
-
     }
 
     public void stop() {

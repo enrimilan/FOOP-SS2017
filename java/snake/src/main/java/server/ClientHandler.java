@@ -8,6 +8,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Handles a new request (direction) received from a client
+ */
 public class ClientHandler implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(ClientHandler.class);
@@ -31,6 +34,7 @@ public class ClientHandler implements Runnable {
         logger.debug("Start new ClientHandler for client {}", clientId);
         try {
             while(running) {
+                logger.debug("recv direction from client {}",clientId);
                 Direction direction = (Direction) in.readObject();
                 server.onDirectionReceived(clientId, direction);
             }
@@ -46,21 +50,9 @@ public class ClientHandler implements Runnable {
     public void stop() {
         logger.debug("Stop ClientHandler for client {}", clientId);
         running = false;
-        try {
-            out.close();
-        } catch (IOException e) {
-            logger.debug(e.getMessage());
-        }
-        try {
-            in.close();
-        } catch (IOException e) {
-            logger.debug(e.getMessage());
-        }
-        try {
-            socket.close();
-        } catch (IOException e) {
-            logger.debug(e.getMessage());
-        }
+        try {out.close();} catch (IOException e) {logger.debug(e.getMessage());}
+        try {in.close();} catch (IOException e) {logger.debug(e.getMessage());}
+        try {socket.close();} catch (IOException e) {logger.debug(e.getMessage());}
     }
 
     public void notifyClient(IState state) {

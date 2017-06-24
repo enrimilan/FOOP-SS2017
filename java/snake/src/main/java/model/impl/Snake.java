@@ -1,22 +1,30 @@
 package model.impl;
 
-import model.IPoint;
-import model.ISnake;
+import model.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Snake implements ISnake, Serializable {
 
     private int id;
     private int speed = 100;
-    private int health; //TODO
+    private int health = 100;
     private String color;
+    private Direction direction;
     private List<IPoint> points = new ArrayList<IPoint>();
+    private List<IInfluence> influences = new ArrayList<>();
+    private boolean playing = true;
 
-    public Snake(int id) {
+    public Snake(int id, String color, IPoint head) {
         this.id = id;
+        this.color = color;
+        addHead(head);
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 
     @Override
@@ -30,8 +38,22 @@ public class Snake implements ISnake, Serializable {
     }
 
     @Override
-    public int getId() {
-        return id;
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    @Override
+    public int getLength() {
+        return points.size();
+    }
+
+    @Override
+    public void addHead(IPoint point) {
+        points.add(point);
     }
 
     @Override
@@ -40,18 +62,49 @@ public class Snake implements ISnake, Serializable {
     }
 
     @Override
-    public void setPoints(List<IPoint> points) {
-        this.points = points;
+    public IPoint getHead() {
+        if(points.size() > 0) {
+            return points.get(points.size() - 1);
+        }
+        return null;
     }
 
     @Override
-    public void setColor(String color) {
-        this.color = color;
+    public IPoint getTail() {
+        if(points.size() > 0) {
+            return points.get(0);
+        }
+        return null;
     }
 
     @Override
     public String getColor() {
         return color;
+    }
+
+    @Override
+    public Direction getDirection() {
+        return direction;
+    }
+
+    @Override
+    public void setDirection(Direction dir) {
+        this.direction = dir;
+    }
+
+    @Override
+    public List<IInfluence> getInfluences() {
+        return influences;
+    }
+
+    @Override
+    public void setIsPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return playing;
     }
 
 }
