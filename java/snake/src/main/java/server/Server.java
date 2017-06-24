@@ -17,7 +17,7 @@ public class Server {
 
     private static final Logger logger = LogManager.getLogger(Server.class);
     private ExecutorService executor;
-    private List<ClientHandler> clientHandlers = new CopyOnWriteArrayList<ClientHandler>();
+    private List<ClientHandler> clientHandlers = new CopyOnWriteArrayList<>();
     private ClientListener clientListener;
     private AbstractGame game;
 

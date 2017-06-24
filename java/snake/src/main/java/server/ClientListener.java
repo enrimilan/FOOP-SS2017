@@ -11,6 +11,9 @@ import java.util.concurrent.Executors;
 
 import static util.Constants.MAX_PLAYERS;
 
+/**
+ * Listens for players joining the server
+ */
 public class ClientListener implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(ClientListener.class);
@@ -36,6 +39,7 @@ public class ClientListener implements Runnable {
                 executor.submit(clientHandler);
                 server.onClientJoined(clientSocket);
                 if(server.getGame().getState().getSnakes().values().size() == MAX_PLAYERS) {
+                    // no more players can join, stop this listener.
                     stop();
                 }
             }
