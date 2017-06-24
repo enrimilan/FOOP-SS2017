@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * Contains the main logic of the snake game
+ */
 public abstract class AbstractGame {
 
     protected IState state;

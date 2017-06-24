@@ -19,11 +19,6 @@ public class Influence implements IInfluence, Serializable {
     }
 
     @Override
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    @Override
     public int getDuration() {
         return duration;
     }
@@ -41,11 +36,6 @@ public class Influence implements IInfluence, Serializable {
     @Override
     public int getSpeed() {
         return speed;
-    }
-
-    @Override
-    public void setHealth(int health) {
-        this.health = health;
     }
 
     @Override
