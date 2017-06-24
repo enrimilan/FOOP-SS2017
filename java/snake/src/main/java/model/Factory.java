@@ -2,6 +2,9 @@ package model;
 
 import model.impl.*;
 
+/**
+ * Inject implementations
+ */
 public class Factory {
 
     public static IState createState() {
