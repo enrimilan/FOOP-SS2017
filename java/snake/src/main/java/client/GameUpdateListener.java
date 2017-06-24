@@ -7,6 +7,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+/**
+ * Listens for updates from the server
+ */
 public class GameUpdateListener implements Runnable {
 
     private static final Logger logger = LogManager.getLogger(GameUpdateListener.class);

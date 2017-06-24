@@ -69,7 +69,8 @@ public class Board extends Application {
         logger.debug("Start drawing");
         clear(state);
 
-        // drawSnakes
+        // draw snakes
+        logger.debug("Draw snakes");
         for(ISnake snake : state.getSnakes().values()) {
             for (IPoint p : snake.getPoints()) {
                 getNodeByRowColumnIndex(p.getY(), p.getX(), field).setStyle("-fx-background-color: " + snake.getColor() + ";");
