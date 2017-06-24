@@ -1,8 +1,6 @@
 package server;
 
 import model.*;
-import model.impl.Game;
-import model.impl.State;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import util.Constants;
@@ -21,9 +19,9 @@ public class Server {
     private ExecutorService executor;
     private List<ClientHandler> clientHandlers = new CopyOnWriteArrayList<ClientHandler>();
     private ClientListener clientListener;
-    private IGame game;
+    private AbstractGame game;
 
-    public Server(IGame game) {
+    public Server(AbstractGame game) {
         this.game = game;
         this.executor = Executors.newCachedThreadPool();
     }
@@ -79,14 +77,14 @@ public class Server {
         return clientHandlers;
     }
 
-    public IGame getGame() {
+    public AbstractGame getGame() {
         return game;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         // inject implementations
         IState state = Factory.createState();
-        IGame game = Factory.createGame(state);
+        AbstractGame game = Factory.createGame(state);
         Server server = new Server(game);
         server.start();
     }

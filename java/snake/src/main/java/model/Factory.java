@@ -8,7 +8,7 @@ public class Factory {
         return new State();
     }
 
-    public static IGame createGame(IState state) {
+    public static AbstractGame createGame(IState state) {
         return new Game(state);
     }
 

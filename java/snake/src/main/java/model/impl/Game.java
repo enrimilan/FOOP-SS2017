@@ -10,17 +10,16 @@ import java.util.stream.Collectors;
 import static java.util.Arrays.asList;
 import static util.Constants.*;
 
-public class Game implements IGame {
+public class Game extends AbstractGame {
 
     private static final Logger logger = LogManager.getLogger(Game.class);
-    private IState state;
     private List<String> colors = new ArrayList<>();
     private Random rand = new Random();
     private boolean hasFinished;
     private Long startingTime;
 
     public Game(IState state) {
-        this.state = state;
+        super(state);
         colors.addAll(asList(BLUE, DARKRED, DARKGREEN, DARKORANGE));
     }
 
@@ -44,47 +43,6 @@ public class Game implements IGame {
     }
 
     @Override
-    public IState updateState(int id, Direction direction) {
-        ISnake snake = state.getSnakes().get(id);
-        if(snake == null || !snake.isPlaying() || hasFinished) {
-            logger.debug("Snake with id {} not found or not playing anymore", id);
-            return null;
-        }
-        snake.setDirection(calculateDirection(snake, direction));
-
-        // new snake head
-        IPoint head = snake.getHead();
-        if(snake.getDirection() == Direction.RIGHT) snake.addHead(Factory.createPoint(head.getX() + 1, head.getY()));
-        if(snake.getDirection() == Direction.LEFT) snake.addHead(Factory.createPoint(head.getX() - 1, head.getY()));
-        if(snake.getDirection() == Direction.UP) snake.addHead(Factory.createPoint(head.getX(), head.getY() - 1));
-        if(snake.getDirection() == Direction.DOWN) snake.addHead(Factory.createPoint(head.getX(), head.getY() + 1));
-        head = snake.getHead();
-        occupyPoint(head);
-
-        if(!eatsFood(snake, head)) {
-            // the snake didn't eat anything, normal movement
-            removeSnakeTail(snake, 0);
-        }
-        eatsPoison(snake, head);
-        eatsPowerUp(snake, head);
-        bitesItselfOrOtherSnake(snake);
-        collidesWithBorder(snake, head);
-        checkTimeouts(snake);
-
-        // place poison and power-up randomly
-        if(rand.nextInt(100)<POISON_CHANCE && state.getPoisons().size()<POISON_MAX){
-            placePoison();
-        }
-        if(rand.nextInt(100)<POWER_UP_CHANCE && state.getPowerUps().size()<POWER_UP_MAX){
-            placePowerUp();
-        }
-        state.setTimeElapsed(System.currentTimeMillis() - startingTime);
-        updateGameResult();
-        logger.debug("Calculated next state");
-        return state;
-    }
-
-    @Override
     public IState getState() {
         return state;
     }
@@ -94,13 +52,17 @@ public class Game implements IGame {
         return hasFinished;
     }
 
-    /**
-     * Ensure the snake can't move in the opposite direction if it is longer than 1
-     * @param snake the snake
-     * @param direction the new direction
-     * @return the old direction if the snake wants to move in the opposite direction, else the new direction
-     */
-    private Direction calculateDirection(ISnake snake, Direction direction) {
+    @Override
+    protected boolean canUpdateState(ISnake snake, int id) {
+        if(snake == null || !snake.isPlaying() || hasFinished) {
+            logger.debug("Snake with id {} not found or not playing anymore",id);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    protected Direction calculateDirection(ISnake snake, Direction direction) {
         if(snake.getLength()>1) {
             if (snake.getDirection() == Direction.RIGHT && direction == Direction.LEFT) return Direction.RIGHT;
             if (snake.getDirection() == Direction.LEFT && direction == Direction.RIGHT) return Direction.LEFT;
@@ -110,7 +72,29 @@ public class Game implements IGame {
         return direction;
     }
 
-    private boolean eatsFood(ISnake snake, IPoint head) {
+    @Override
+    protected IPoint addNewHead(ISnake snake) {
+        IPoint head = snake.getHead();
+        if(snake.getDirection() == Direction.RIGHT) snake.addHead(Factory.createPoint(head.getX() + 1, head.getY()));
+        if(snake.getDirection() == Direction.LEFT) snake.addHead(Factory.createPoint(head.getX() - 1, head.getY()));
+        if(snake.getDirection() == Direction.UP) snake.addHead(Factory.createPoint(head.getX(), head.getY() - 1));
+        if(snake.getDirection() == Direction.DOWN) snake.addHead(Factory.createPoint(head.getX(), head.getY() + 1));
+        head = snake.getHead();
+        occupyPoint(head);
+        return head;
+    }
+
+    @Override
+    protected void removeSnakeTail(ISnake snake, int index) {
+        for(int i = 0; i <= index; i++) {
+            IPoint tail = snake.getTail();
+            snake.getPoints().remove(tail);
+            makePointAvailable(tail);
+        }
+    }
+
+    @Override
+    protected boolean eatsFood(ISnake snake, IPoint head) {
         logger.debug("Checking if snake eats food");
         if(head.equals(state.getFood().decoratedPoint)) {
             logger.debug("Snake ate food");
@@ -128,7 +112,8 @@ public class Game implements IGame {
         return false;
     }
 
-    private boolean eatsPoison(ISnake snake, IPoint head) {
+    @Override
+    protected boolean eatsPoison(ISnake snake, IPoint head) {
         logger.debug("Checking if snake eats poison");
         List<Poison> poisons = new ArrayList<>(state.getPoisons());
         for(Poison poison : poisons) {
@@ -148,7 +133,8 @@ public class Game implements IGame {
         return false;
     }
 
-    private boolean eatsPowerUp(ISnake snake, IPoint head) {
+    @Override
+    protected boolean eatsPowerUp(ISnake snake, IPoint head) {
         logger.debug("Checking if snake eats a power-up");
         List<PowerUp> powerUps = new ArrayList<>(state.getPowerUps());
         for(PowerUp powerUp : powerUps) {
@@ -169,7 +155,8 @@ public class Game implements IGame {
         return false;
     }
 
-    private boolean bitesItselfOrOtherSnake(ISnake snake) {
+    @Override
+    protected boolean bitesItselfOrOtherSnake(ISnake snake) {
 
         // biting itself
         logger.debug("Checking if snake bites itself");
@@ -201,7 +188,8 @@ public class Game implements IGame {
         return false;
     }
 
-    private boolean collidesWithBorder(ISnake snake, IPoint head) {
+    @Override
+    protected boolean collidesWithBorder(ISnake snake, IPoint head) {
         logger.debug("Checking if snake collides with the border");
         if(head.getX()<0 || head.getX()>=BOARD_WIDTH || head.getY()<0 || head.getY()>=BOARD_HEIGHT){
             logger.debug("Snake collided with the border");
@@ -212,7 +200,8 @@ public class Game implements IGame {
         return false;
     }
 
-    private void checkTimeouts(ISnake snake) {
+    @Override
+    protected void checkTimeouts(ISnake snake) {
         // check for timeouts for poisons
         logger.debug("Checking poison timeouts");
         List<Poison> poisons = new ArrayList<>(state.getPoisons());
@@ -248,25 +237,20 @@ public class Game implements IGame {
         }
     }
 
-    private void placeFood() {
-        Food food = Factory.createFood(occupyRandomPoint());
-        logger.debug("Place food of type " + food.getType()+ " at position ({},{})", food.getX(), food.getY());
-        state.setFood(food);
+    @Override
+    protected void placePoisonAndPowerUpRandomly() {
+        if(rand.nextInt(100)<POISON_CHANCE && state.getPoisons().size()<POISON_MAX){
+            placePoison();
+        }
+        if(rand.nextInt(100)<POWER_UP_CHANCE && state.getPowerUps().size()<POWER_UP_MAX){
+            placePowerUp();
+        }
     }
 
-    private void placePoison() {
-        Poison poison = Factory.createPoison(occupyRandomPoint());
-        logger.info("Place poison of type " + poison.getType()+ " at position ({},{})", poison.getX(), poison.getY());
-        state.getPoisons().add(poison);
-    }
+    @Override
+    protected void updateGameResult() {
+        state.setTimeElapsed(System.currentTimeMillis() - startingTime);
 
-    private void placePowerUp() {
-        PowerUp powerUp = Factory.createPowerUp(occupyRandomPoint());
-        logger.debug("Place power-up of type " + powerUp.getType() + " at position ({},{})", powerUp.getX(), powerUp.getY());
-        state.getPowerUps().add(powerUp);
-    }
-
-    private void updateGameResult() {
         // snakes that lost while playing
         for(ISnake snake : state.getSnakes().values()) {
             if(snake.getHealth() <= 0 || snake.getLength() == 0) {
@@ -314,12 +298,22 @@ public class Game implements IGame {
         }
     }
 
-    private void removeSnakeTail(ISnake snake, int index) {
-        for(int i = 0; i <= index; i++) {
-            IPoint tail = snake.getTail();
-            snake.getPoints().remove(tail);
-            makePointAvailable(tail);
-        }
+    private void placeFood() {
+        Food food = Factory.createFood(occupyRandomPoint());
+        logger.debug("Place food of type " + food.getType()+ " at position ({},{})", food.getX(), food.getY());
+        state.setFood(food);
+    }
+
+    private void placePoison() {
+        Poison poison = Factory.createPoison(occupyRandomPoint());
+        logger.info("Place poison of type " + poison.getType()+ " at position ({},{})", poison.getX(), poison.getY());
+        state.getPoisons().add(poison);
+    }
+
+    private void placePowerUp() {
+        PowerUp powerUp = Factory.createPowerUp(occupyRandomPoint());
+        logger.debug("Place power-up of type " + powerUp.getType() + " at position ({},{})", powerUp.getX(), powerUp.getY());
+        state.getPowerUps().add(powerUp);
     }
 
     private void occupyPoint(IPoint point) {
