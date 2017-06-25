@@ -160,7 +160,15 @@ feature {NONE} -- Private features
 			--CHANGE THIS ACCORDING TO OS
 			--OR REMOVE IT FOR A "DEBUG" VIEW
 			system("cls")
-			output := output + "-----------------------------------------%N"
+			print("Player1: Health: ")
+			print(state.getsnakes.at(1).gethealth)
+			print(" Speed: ")
+			print(state.getsnakes.at(1).getspeed)
+			print(" Player2: Health: ")
+			print(state.getsnakes.at(2).gethealth)
+			print(" Speed: ")
+			print(state.getsnakes.at(2).getspeed)
+			output := output + "%N-----------------------------------------%N"
 			from i:= 1
 			until i >= (constants.board_height)
 			loop
