@@ -29,7 +29,7 @@ feature {NONE} -- Initialization
 		do
 			id := snakeId
 			character_representation := character_representation_in
-			speed := 1000
+			speed := 100
 			health := 100
 			create direct
 			direction := direct.right

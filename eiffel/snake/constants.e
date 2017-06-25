@@ -42,7 +42,7 @@ feature
 	FOOD_HEALTH: INTEGER
 		-- Result is an integer constant denoting health increase after eating the food
 		once
-			Result := 10
+			Result := 50
 		end
 
 	FOOD_SPEED: INTEGER
