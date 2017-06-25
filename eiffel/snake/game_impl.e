@@ -13,7 +13,6 @@ create
 	make
 
 feature {NONE} -- Private variables
-	state: STATE
 	factory: FACTORY
 	constants: CONSTANTS
 	finished: BOOLEAN
@@ -37,7 +36,7 @@ feature {ANY} -- Initialization
 			create clock.make
 			create startingTime.make_from_second_count (1) -- dummy value
 			startingTime := clock.time_now
-			--
+			set_state(state_in)
 		end
 
 feature {ANY} -- Public features
@@ -69,40 +68,6 @@ feature {ANY} -- Public features
 	get_state : STATE
 		do
 			Result := state
-		end
-
-	update_state(id: INTEGER; direction: STRING)
-		local
-			snake: SNAKE
-			head: POINT
-			flag: BOOLEAN
-			timeElapsed: DT_TIME_DURATION
-
-		do
-			snake := state.get_snakes.at (id)
-			if(snake.is_playing = true) then
-				snake.set_direction (current.calculate_snake_direction (snake, direction))
-				head := current.add_new_head (snake)
-				if not (current.eats_food (snake, head)) then
-					current.remove_snake_tail (snake, snake.get_length)
-				end
-				flag := current.eats_poison (snake, head)
-				flag := current.eats_power_up (snake, head)
-				flag := current.bites_itself_or_other_snake (snake)
-				flag := current.collides_with_border (snake, head)
-				current.check_timeouts (snake)
-				-- Place poisons and power-ups
-				if(state.get_poisons.count < constants.poison_max) then
-					place_poison
-				end
-				if(state.get_power_ups.count < constants.power_up_max) then
-					place_power_up
-				end
-
-				timeElapsed := clock.time_now - startingTime
-				state.set_time_elapsed (timeElapsed.second_count)
-				update_game_result
-			end
 		end
 
 	calculate_snake_direction(snake: SNAKE; direction: STRING): STRING
@@ -354,6 +319,16 @@ feature {ANY} -- Public features
 			end
 		end
 
+	place_poisons_and_power_ups
+		do
+			if(state.get_poisons.count < constants.poison_max) then
+					place_poison
+			end
+			if(state.get_power_ups.count < constants.power_up_max) then
+				place_power_up
+			end
+		end
+
 	check_timeouts(snake: SNAKE)
 		local
 			poisons: LINKED_LIST[POISON]
@@ -431,7 +406,10 @@ feature {ANY} -- Public features
 			playing_counter:INTEGER
 			temper:STRING
 			draw:BOOLEAN
+			timeElapsed: DT_TIME_DURATION
 		do
+			timeElapsed := clock.time_now - startingTime
+			state.set_time_elapsed (timeElapsed.second_count)
 			longest := -1
 			temper := " "
 			draw:=true
