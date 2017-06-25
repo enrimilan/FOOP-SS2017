@@ -46,7 +46,7 @@ feature {NONE} -- Initialization and main entry point
 
 			create keyboard_definition
 
-			create player1.make_new(current, 1, direction, mode_value, game)
+			create player1.make_new(current, 1, direction, mode_value2, game)
 			create player2.make_new(current, 2, direction, mode_value2, game)
 
 
@@ -170,7 +170,7 @@ feature {NONE} -- Private features
 			print(state.getsnakes.at(1).gethealth)
 			print(" Speed: ")
 			print(state.getsnakes.at(1).getspeed)
-			print(" Player2: Health: ")
+			print("%NPlayer2: Health: ")
 			print(state.getsnakes.at(2).gethealth)
 			print(" Speed: ")
 			print(state.getsnakes.at(2).getspeed)
