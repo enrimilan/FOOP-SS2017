@@ -47,9 +47,7 @@ feature {NONE} -- Initialization and main entry point
 			create keyboard_definition
 
 			create player1.make_new(current, 1, direction, mode_value, game)
-			create player2.make_new(current, 2, direction, mode_value2, game)
-
-
+			create player2.make_new(current, 2, direction, mode_value, game)
 
 			game.add_snake(1, 'o')
 			player1.set_joined_game(true)
@@ -69,14 +67,19 @@ feature {NONE} -- Initialization and main entry point
 			--workaround, sleep to block
 			current.sleep (1000000000000)
 			-- End of the game, stop players
+
         	player1.stop
         	player2.stop
+
 		end
 
 feature {ANY} -- Public features
 
 	on_new_direction(player_id: INTEGER; direction: STRING)
+		local
+			output:STRING
 		do
+
 			my_mutex.lock
 			--print(player_id)
 			--print(" ")
@@ -85,8 +88,21 @@ feature {ANY} -- Public features
 			game.update_state(player_id, direction)
 			-- maybe change the interval or stop a player here if he lost
 
-			draw_game
-			my_mutex.unlock
+			if not game.has_finished then
+				draw_game
+				my_mutex.unlock
+			else
+				system("cls")
+				output := "%N%N------------------------------------------%N%N%N"
+				output := output+ ("          "+game.get_state.get_results+"         %N%N")
+				output := output + "%N------------------------------------------%N"
+				print(output)
+				player1.stop
+				player2.stop
+			end
+
+
+
 		end
 
 feature {NONE} -- Private features

@@ -35,6 +35,6 @@ feature
 
 	check_timeouts(snake: SNAKE) deferred end
 
-	update_game_result: GAME deferred end
+	update_game_result deferred end
 
 end

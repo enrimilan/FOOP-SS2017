@@ -99,5 +99,10 @@ feature {ANY} -- Public features
 		do
 			Result := mode_value
 		end
+		
+	get_id:INTEGER
+		do
+			Result := id
+		end
 
 end

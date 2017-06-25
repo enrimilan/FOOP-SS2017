@@ -19,16 +19,20 @@ feature {NONE} -- Private variables
 	finished: BOOLEAN
 	startingTime: DT_TIME
 	clock: DT_SYSTEM_CLOCK
+	longest_snake: INTEGER
+	snakes_alive: INTEGER
 
 feature {ANY} -- Initialization
 
 	make(state_in: STATE; newFactory: FACTORY)
+
 		do
 			create constants
 			state := state_in
 			factory := newFactory
 			finished := false
-
+			longest_snake := -1
+			snakes_alive := -1
 			-- Obtaining current time
 			create clock.make
 			create startingTime.make_from_second_count (1) -- dummy value
@@ -73,7 +77,7 @@ feature {ANY} -- Public features
 			head: POINT
 			flag: BOOLEAN
 			timeElapsed: DT_TIME_DURATION
-			game: GAME
+
 		do
 			snake := state.get_snakes.at (id)
 			if(snake.is_playing = true) then
@@ -97,7 +101,7 @@ feature {ANY} -- Public features
 
 				timeElapsed := clock.time_now - startingTime
 				state.set_time_elapsed (timeElapsed.second_count)
-				game := current.update_game_result
+				update_game_result
 			end
 		end
 
@@ -423,78 +427,81 @@ feature {ANY} -- Public features
 			end
 		end
 
-	update_game_result: GAME
+	update_game_result
 		local
-			snakesPlayingNumber: INTEGER
-			snakesPlaying: LINKED_LIST[SNAKE]
-			greatestLength: INTEGER
-			longestSnake: SNAKE
-			snake: SNAKE
+			longest:INTEGER
+			playing_counter:INTEGER
+			temper:STRING
+			draw:BOOLEAN
 		do
-			snakesPlayingNumber := state.get_snakes.count
-			greatestLength := 0
-			-- Snake that lost while playing
-			snakesPlaying := state.get_snakes
-			from snakesPlaying.start
-			until snakesPlaying.off
+			longest := -1
+			temper := " "
+			draw:=true
+			playing_counter := state.get_snakes.count
+			--set longest snake
+			from state.get_snakes.start
+			until state.get_snakes.exhausted
 			loop
-				snake := snakesPlaying.item
-				if (snake.get_health = 0 or snake.get_length = 0)
-				then
-					snake.set_is_playing (false)
-					snakesPlayingNumber := snakesPlayingNumber - 1
-				else
-					if(snake.get_length > greatestLength)
-					then
-						greatestLength := snake.get_length
-					end
+				if state.get_snakes.item.get_length > longest then
+					longest := state.get_snakes.item.get_length
+					longest_snake := state.get_snakes.item.get_id
 				end
-				snakesPlaying.forth
+				state.get_snakes.forth
 			end
 
-			-- If all are out and only one remains playing
-			if(state.get_snakes.count = constants.max_players and snakesPlaying.count = 1)
-			then
-				snakesPlaying := state.get_snakes
-				from snakesPlaying.start
-				until snakesPlaying.off
+			--check if only one snake remains
+			from state.get_snakes.start
+			until state.get_snakes.exhausted
+			loop
+				if not state.get_snakes.item.is_playing then
+					playing_counter := playing_counter-1
+				end
+				state.get_snakes.forth
+			end
+			if playing_counter = 1 then
+				from state.get_snakes.start
+				until state.get_snakes.exhausted
 				loop
-					snake := snakesPlaying.item
-					if(snake.is_playing = true)
-					then
-						state.set_results ("Player " + snake.get_id.out + " won")
-						snake.set_is_playing (false)
+					if state.get_snakes.item.is_playing then
+						temper := "Snake "
+						temper.append_character (state.get_snakes.item.get_character_representation)
+						temper.append_string(" has won!")
+						state.set_results (temper)
 						finished := true
-						Result := current
 					end
+					state.get_snakes.forth
 				end
 			end
 
-			-- Time is up, elect winner
-			if(state.get_time_elapsed >= constants.game_duration)
-			then
-				state.set_time_elapsed (constants.game_duration)
-				finished := true
-				snakesPlaying := state.get_snakes
-				from snakesPlaying.start
-				until snakesPlaying.off
+			--check who has the longest
+
+			--check if draw
+			if not finished and state.get_time_elapsed > constants.game_duration then
+				from state.get_snakes.start
+				until state.get_snakes.exhausted
 				loop
-					snake := snakesPlaying.item
-					if(snake.is_playing = true and snake.get_length = greatestLength)
-					then
-						if (longestSnake = void)
-						then longestSnake := snake
-						else state.set_results ("It is draw")
-							Result := current
-						end
+					if state.get_snakes.item.get_length /= longest then
+						draw := false
 					end
+					state.get_snakes.forth
 				end
-				if(longestSnake /= void)
-				then state.set_results ("Player " + longestSnake.get_id.out + " won")
-					 Result := current
+				if draw then
+					state.set_results ("Its a draw!")
+					finished := true
 				end
+
 			end
-			Result := current
+
+			--who wins?
+			if not finished and state.get_time_elapsed > constants.game_duration then
+				temper := "Snake "
+				temper.append_character (state.get_snakes.at(longest_snake).get_character_representation)
+				temper.append_string(" has won!")
+				state.set_results (temper)
+				finished := true
+			end
+			
+
 		end
 
 feature {NONE} -- Private features
