@@ -22,7 +22,7 @@ feature {ANY} -- Initialization and main entry point
 
 	make(game_: GAME)
 		require
-			game_.hasfinished = false
+			game_.has_finished = false
 		local
 			snake_impl:SNAKE_IMPL
 		do

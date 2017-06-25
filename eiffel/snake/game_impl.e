@@ -46,121 +46,144 @@ feature {ANY} -- Public features
 			food: POINT
 		do
 			-- Adding the snake
-			point := occupyRandomPoint
+			point := occupy_random_point
 			snake := factory.create_snake (id, point, character_representation_in)
 			state.getsnakes.extend (snake)
 
 			-- Place food
 			food := state.getfood
 			if food.get_x = -1 then
-				placeFood
+				place_food
 			end
 		end
 
-	bitesItselfOrOtherSnake(snake: SNAKE): BOOLEAN
-		local
-			index: INTEGER
-			speedGain:INTEGER
-			snakePoints: LINKED_LIST[POINT]
-			snakeHead: POINT
-			snakePoint: POINT
-			snakes: LINKED_LIST[SNAKE]
-			bittenSnake: SNAKE
-			r: REAL_64
-			i: INTEGER
+	has_finished: BOOLEAN
 		do
-			Result := false
-			snakeHead := snake.gethead
-			-- biting itself
-
-			if (snake.getlength > 4) then
-				snakePoints := snake.getpoints
-				from i := 1
-				until i >=  (snakePoints.count - 1)
-				loop
-					snakePoint := snakePoints.at (i)
-					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
-					then
-						Current.removesnaketail (snake, snake.getlength)
-						snake.sethealth (0)
-						snake.setspeed (0)
-						snake.setisplaying (false)
-						Result := true
-					end
-					i := i + 1
-				end
-			end
-
-			-- biting other snake
-			snakes := state.getsnakes
-			index := 0
-			from snakes.start
-			until snakes.off
-			loop
-				bittenSnake := snakes.item
-				if not(bittenSnake.getid = snake.getid)	then
-					--georgs rewritten code
-					from bittenSnake.getpoints.start
-					until bittenSnake.getpoints.exhausted
-					loop
-
-						if(snakeHead.get_x = bittenSnake.getpoints.item.get_x and snakeHead.get_y = bittenSnake.getpoints.item.get_y)then
-							--snake bit bittensnake
-							removesnaketail (bittenSnake, bittenSnake.getlength-index)
-
-							--speed up bitersnake
-							if (snake.getspeed + constants.bitting_speed > constants.max_speed)
-							then
-								snake.setspeed (constants.max_speed)
-							else
-								snake.setspeed (snake.getspeed+constants.bitting_speed)
-							end
-
-							--more health for biter:
-							snake.sethealth (snake.gethealth + constants.bitting_health)
-
-							--alter bitten snake
-							if bittenSnake.getlength=0 then
-								--snake got bitten in head, it is kill
-								bittenSnake.sethealth (0)
-								bittenSnake.setspeed (0)
-								bittenSnake.setisplaying (false)
-							else
-								r := (snake.getlength / bittenSnake.getlength) * constants.bitting_health
-								bittenSnake.sethealth (bittenSnake.gethealth - r.rounded)
-							end
-						end
-						index := index+1
-						bittenSnake.getpoints.forth
-					end
-
-
-
---					index := bittenSnake.getpoints.index_of (snake.gethead, 1)
---					if not (index = 0)
---					then
---						if (snake.getspeed + constants.bitting_speed > constants.max_speed)
---						then
---							speedGain := constants.max_speed - snake.getspeed
---						else
---							speedGain := constants.bitting_speed
---						end
-
---						snake.getinfluences.extend (factory.create_influence (constants.bitting_duration, speedGain, constants.bitting_health, clock.time_now))
---						snake.setspeed (snake.getspeed + speedGain)
---						snake.sethealth (snake.gethealth + constants.bitting_health)
---						
---						current.removesnaketail (bittenSnake, index)
---						current.occupypoint (snake.gethead)
---						Result := true
---					end
-				end
-				snakes.forth
-			end
-
+			Result := finished
 		end
 
-	eatsFood(snake: SNAKE; head: POINT): BOOLEAN
+	get_state : STATE
+		do
+			Result := state
+		end
+
+	update_state(id: INTEGER; direction: STRING)
+		local
+			snake: SNAKE
+			head: POINT
+			flag: BOOLEAN
+			timeElapsed: DT_TIME_DURATION
+			game: GAME
+		do
+			snake := state.getsnakes.at (id)
+			if(snake.isplaying = true) then
+				snake.setdirection (current.calculate_snake_direction (snake, direction))
+				head := current.add_new_head (snake)
+				if not (current.eats_food (snake, head)) then
+					current.remove_snake_tail (snake, snake.getlength)
+				end
+				flag := current.eats_poison (snake, head)
+				flag := current.eats_power_up (snake, head)
+				flag := current.bites_itself_or_other_snake (snake)
+				flag := current.collides_with_border (snake, head)
+				current.check_timeouts (snake)
+				-- Place poisons and power-ups
+				if(state.getposions.count < constants.poison_max) then
+					place_poison
+				end
+				if(state.getpowerups.count < constants.power_up_max) then
+					place_power_up
+				end
+
+				timeElapsed := clock.time_now - startingTime
+				state.settimeelapsed (timeElapsed.second_count)
+				game := current.update_game_result
+			end
+		end
+
+	calculate_snake_direction(snake: SNAKE; direction: STRING): STRING
+		-- ensure that the snake cannot move in the opposite direction, if it's length is bigger than 1
+		do
+			Result := direction
+			if (snake.getlength > 1) then
+				if(direction.is_equal ("LEFT") and snake.getdirection.is_equal ("RIGHT")) then
+					Result := "RIGHT"
+				end
+				if(direction.is_equal ("RIGHT") and snake.getdirection.is_equal ("LEFT")) then
+					Result := "LEFT"
+				end
+				if(direction.is_equal ("UP") and snake.getdirection.is_equal ("DOWN")) then
+					Result := "DOWN"
+				end
+				if(direction.is_equal ("DOWN") and snake.getdirection.is_equal ("UP")) then
+					Result := "UP"
+				end
+			end
+		end
+
+	add_new_head(snake: SNAKE): POINT
+		local
+			head: POINT
+			p: POINT
+		do
+			head := snake.gethead
+			if(snake.getdirection.is_equal ("RIGHT")) then
+				create p.make (head.get_x + 1, head.get_y)
+				snake.addhead (p)
+			end
+			if(snake.getdirection.is_equal ("LEFT")) then
+				create p.make (head.get_x - 1, head.get_y)
+				snake.addhead (p)
+			end
+			if(snake.getdirection.is_equal ("UP")) then
+				create p.make (head.get_x, head.get_y - 1)
+				snake.addhead (p)
+			end
+			if(snake.getdirection.is_equal ("DOWN")) then
+				create p.make (head.get_x, head.get_y + 1)
+				snake.addhead (p)
+			end
+			head := snake.gethead
+			occupy_point (head)
+			Result := head
+		end
+
+	remove_snake_tail(snake: SNAKE; index: INTEGER)
+		local
+			toRemove: LINKED_LIST[POINT]
+			point: POINT
+		do
+			create toRemove.make
+
+			from snake.getpoints.start
+			until snake.getpoints.exhausted
+			loop
+				toRemove.put_front (snake.getpoints.item)
+				snake.getpoints.forth
+			end
+
+			point := toRemove.at (index)
+
+			from
+				toRemove.start
+			until
+				toRemove.exhausted
+			loop
+				point := toremove.at (index)
+				toRemove.prune (point)
+				make_point_available(point)
+			end
+
+			snake.getpoints.wipe_out
+			from toRemove.start
+			until toRemove.exhausted
+			loop
+				snake.getpoints.put_front (toRemove.item)
+				toRemove.forth
+			end
+		end
+
+	eats_food(snake: SNAKE; head: POINT): BOOLEAN
 		local
 			food: POINT
 		do
@@ -168,22 +191,22 @@ feature {ANY} -- Public features
 			if ((food.get_x = head.get_x) and (food.get_y = head.get_y)) then
 				if(snake.getspeed + constants.food_speed > constants.max_speed) then
 					snake.setspeed (constants.max_speed)
-				else snake.setspeed (snake.getspeed + constants.food_speed)
+				else
+					snake.setspeed (snake.getspeed + constants.food_speed)
 				end
 				snake.sethealth (snake.gethealth + constants.food_health)
-				placeFood
+				place_food
 				Result := true
 			else
 				Result := false
 			end
 		end
 
-	eatsPoison(snake: SNAKE; head: POINT): BOOLEAN
+	eats_poison(snake: SNAKE; head: POINT): BOOLEAN
 		local
 			poisons: LINKED_LIST[POISON]
 			poison: POISON
 			randomNumber: REAL
-
 		do
 			poisons := state.getposions
 
@@ -193,7 +216,7 @@ feature {ANY} -- Public features
 				poison := poisons.item
 				if ((poison.get_x = head.get_x) and (poison.get_y = head.get_y)) then
 					--Decrease health or speed randomly
-					randomNumber := getRandomNumber
+					randomNumber := get_random_number
 					if(randomNumber < 0.5)
 					then
 						snake.sethealth (snake.gethealth - constants.poison_health)
@@ -212,7 +235,7 @@ feature {ANY} -- Public features
 			Result := false
 		end
 
-	eatsPowerUp(snake: SNAKE; head: POINT): BOOLEAN
+	eats_power_up(snake: SNAKE; head: POINT): BOOLEAN
 		local
 			powerUps: LINKED_LIST[POWERUP]
 			powerUp : POWERUP
@@ -241,107 +264,112 @@ feature {ANY} -- Public features
 			Result := false
 		end
 
-	collidesWithBorder(snake: SNAKE; head:POINT): BOOLEAN
+	bites_itself_or_other_snake(snake: SNAKE): BOOLEAN
+		local
+			index: INTEGER
+			snakePoints: LINKED_LIST[POINT]
+			snakeHead: POINT
+			snakePoint: POINT
+			snakes: LINKED_LIST[SNAKE]
+			bittenSnake: SNAKE
+			r: REAL_64
+			i: INTEGER
+		do
+			Result := false
+			snakeHead := snake.gethead
+			-- biting itself
+
+			if (snake.getlength > 4) then
+				snakePoints := snake.getpoints
+				from i := 1
+				until i >=  (snakePoints.count - 1)
+				loop
+					snakePoint := snakePoints.at (i)
+					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
+					then
+						Current.remove_snake_tail (snake, snake.getlength)
+						snake.sethealth (0)
+						snake.setspeed (0)
+						snake.setisplaying (false)
+						Result := true
+					end
+					i := i + 1
+				end
+			end
+
+			-- biting other snake
+			snakes := state.getsnakes
+			index := 0
+			from snakes.start
+			until snakes.off
+			loop
+				bittenSnake := snakes.item
+				if not(bittenSnake.getid = snake.getid)	then
+					--georgs rewritten code
+					from bittenSnake.getpoints.start
+					until bittenSnake.getpoints.exhausted
+					loop
+
+						if(snakeHead.get_x = bittenSnake.getpoints.item.get_x and snakeHead.get_y = bittenSnake.getpoints.item.get_y)then
+							--snake bit bittensnake
+							remove_snake_tail (bittenSnake, bittenSnake.getlength-index)
+
+							--speed up bitersnake
+							if (snake.getspeed + constants.bitting_speed > constants.max_speed)
+							then
+								snake.setspeed (constants.max_speed)
+							else
+								snake.setspeed (snake.getspeed+constants.bitting_speed)
+							end
+
+							--more health for biter:
+							snake.sethealth (snake.gethealth + constants.bitting_health)
+
+							--alter bitten snake
+							if bittenSnake.getlength=0 then
+								--snake got bitten in head, it is kill
+								bittenSnake.sethealth (0)
+								bittenSnake.setspeed (0)
+								bittenSnake.setisplaying (false)
+							else
+								r := (snake.getlength / bittenSnake.getlength) * constants.bitting_health
+								bittenSnake.sethealth (bittenSnake.gethealth - r.rounded)
+							end
+						end
+						index := index+1
+						bittenSnake.getpoints.forth
+					end
+				end
+				snakes.forth
+			end
+		end
+
+	collides_with_border(snake: SNAKE; head:POINT): BOOLEAN
 		do
 			Result := false
 			if (head.get_x < 0 or head.get_x >= (constants.board_width) or head.get_y < 0 or head.get_y >= (constants.board_height))
 			then
-				removeSnakeTail(snake, 1)
+				remove_snake_tail(snake, 1)
 				snake.sethealth (0)
 				snake.setspeed (0)
 				snake.setisplaying(false)
 				Result := true
 			end
-
 		end
 
-	removeSnakeTail(snake: SNAKE; index: INTEGER)
+	check_timeouts(snake: SNAKE)
 		local
-			toRemove: LINKED_LIST[POINT]
-			point: POINT
-			i: INTEGER
-		do
-			create toRemove.make
-			--toRemove := snake.getpoints
-
-			from snake.getpoints.start
-			until snake.getpoints.exhausted
-			loop
-				toRemove.put_front (snake.getpoints.item)
-				snake.getpoints.forth
-			end
-
-
-			point := toRemove.at (index)
-
-			from
-				toRemove.start
-			until
-				toRemove.exhausted
-			loop
-				point := toremove.at (index)
-				toRemove.prune (point)
-				makePointAvailable(point)
-			--	i := i + 1
-			end
-
-			snake.getpoints.wipe_out
-			from toRemove.start
-			until toRemove.exhausted
-			loop
-				snake.getpoints.put_front (toRemove.item)
-				toRemove.forth
-			end
-		end
-
-	calculateSnake(snake: SNAKE; direction: STRING): STRING
-		-- ensure that the snake cannot move in the opposite direction, if it's length is bigger than 1
-		do
-			Result := direction
-			if (snake.getlength > 1)
-			then
-				if(direction.is_equal ("LEFT") and snake.getdirection.is_equal ("RIGHT"))
-				then
-					Result := "RIGHT"
-				end
-				if(direction.is_equal ("RIGHT") and snake.getdirection.is_equal ("LEFT"))
-					then
-						Result := "LEFT"
-					end
-				if(direction.is_equal ("UP") and snake.getdirection.is_equal ("DOWN"))
-					then
-						Result := "DOWN"
-					end
-				if(direction.is_equal ("DOWN") and snake.getdirection.is_equal ("UP"))
-					then
-						Result := "UP"
-					end
-			end
-			-- IS reached.
-			-- Result := direction
-		end
-
-	checkTimeouts(snake: SNAKE)
-		local
-			-- poisons
 			poisons: LINKED_LIST[POISON]
 			poison: POISON
-			removeListPoisons: LINKED_LIST[POISON]
-			-- powerUps
 			powerUps: LINKED_LIST[POWERUP]
 			powerUp: POWERUP
-			removeListPowerUps: LINKED_LIST[POWERUP]
-			-- influences
 			influences: LINKED_LIST[INFLUENCE]
 			influence: INFLUENCE
-			removeListInfluences: LINKED_LIST[INFLUENCE]
-			-- time
 			difference: DT_TIME_DURATION
 			itemNr: INTEGER
 		do
 			-- Check for timeouts for poisons
 			create poisons.make
-			--poisons.fill(state.getposions)
 			poisons.copy (state.getposions)
 			itemNr := 0
 			from poisons.start
@@ -352,7 +380,7 @@ feature {ANY} -- Public features
 				if (difference.second_count >= constants.max_artifact_time)
 				then
 					state.removepoison (poison)
-					makePointAvailable(poison.getpoisonpoint)
+					make_point_available(poison.getpoisonpoint)
 
 				end
 				poisons.forth
@@ -370,7 +398,7 @@ feature {ANY} -- Public features
 				if (difference.second_count >= constants.max_artifact_time)
 				then
 					state.removepowerup (powerUp)
-					makePointAvailable(powerUp.getpoweruppoint)
+					make_point_available(powerUp.getpoweruppoint)
 
 				end
 				powerUps.forth
@@ -392,106 +420,15 @@ feature {ANY} -- Public features
 					else snake.setspeed (snake.getspeed - influence.getspeed)
 					end
 					snake.sethealth (snake.gethealth - influence.gethealth)
-					-- remove Influence
-					-- TODO!
 					influences.remove
 					influences.finish
 				end
 				influences.forth
 				itemNr := itemNr + 1
 			end
-
-	--		io.put_string ("I AM HERE")
 		end
 
-	update_state(id: INTEGER; direction: STRING)
-		local
-			snake: SNAKE
-			head: POINT
-			x: INTEGER
-			y: INTEGER
-			p: POINT
-			rand: INTEGER_64
-			flag: BOOLEAN
-			timeElapsed: DT_TIME_DURATION
-			game: GAME
-		do
-			--io.putstring("Start update state for " + id.out)
-			--io.new_line
-			snake := state.getsnakes.at (id)
-
-			if(snake.isplaying = true) then
-
-				snake.setdirection (current.calculatesnake (snake, direction))
-
-				--NEW SNAKE HEAD
-				head := snake.gethead
-				if(snake.getdirection.is_equal ("RIGHT"))
-					then
-						x := head.get_x + 1
-						y := head.get_y
-						create p.make (x, y)
-						snake.addhead (p)
-					end
-
-				if(snake.getdirection.is_equal ("LEFT"))
-					then
-						x := head.get_x - 1
-						y := head.get_y
-						create p.make (x, y)
-						snake.addhead (p)
-					end
-
-				if(snake.getdirection.is_equal ("UP"))
-					then
-						x := head.get_x
-						y := head.get_y - 1
-						create p.make (x, y)
-						snake.addhead (p)
-					end
-
-				if(snake.getdirection.is_equal ("DOWN"))
-					then
-						x := head.get_x
-						y := head.get_y + 1
-						create p.make (x, y)
-						snake.addhead (p)
-					end
-
-				head := snake.gethead
-				current.occupypoint (head)
-
-				if not (current.eatsfood (snake, head)) then
-					current.removesnaketail (snake, snake.getlength)
-				end
-
-				flag := current.eatspoison (snake, head)
-				flag := current.eatspowerup (snake, head)
-				flag := current.bitesitselforothersnake (snake)
-				flag := current.collideswithborder (snake, head)
-
-
-
-				--current.checktimeouts (snake)
-
-				-- Place poisons and power-ups
-				if(state.getposions.count < constants.poison_max) then
-					current.placepoison
-				end
-				if(state.getpowerups.count < constants.power_up_max) then
-					current.placepowerup
-				end
-
-				timeElapsed := clock.time_now - startingTime
-				state.settimeelapsed (timeElapsed.second_count)
-				--game := current.updategameresult
-
-			--io.putstring("Finish update state for " + id.out)
-			--io.new_line	
-			end
-		end
-
-	updateGameResult: GAME
+	update_game_result: GAME
 		local
 			snakesPlayingNumber: INTEGER
 			snakesPlaying: LINKED_LIST[SNAKE]
@@ -565,27 +502,19 @@ feature {ANY} -- Public features
 			Result := current
 		end
 
-	get_state : STATE
+feature {NONE} -- Private features
+
+	place_food
 		do
-			Result := state
+			state.setfood (occupy_random_point)
 		end
 
-	placeFood
-		do
-			state.setfood (occupyRandomPoint)
-		end
-
-	hasFinished: BOOLEAN
-		do
-			Result := finished
-		end
-
-	placePoison
+	place_poison
 		local
 			poison: POISON
 			actualTime: DT_TIME
 		do
-			poison := factory.create_poison (occupyRandomPoint)
+			poison := factory.create_poison (occupy_random_point)
 
 			create actualTime.make_from_second_count (1) -- dummy value
 			actualTime := clock.time_now
@@ -595,16 +524,16 @@ feature {ANY} -- Public features
 
 		end
 
-	placePowerUp
+	place_power_up
 		local
 			powerUp: POWERUP
 			randomNr: REAL
 			type: STRING
 			actualTime: DT_TIME
 		do
-			powerUp := factory.create_powerup (occupyRandomPoint)
+			powerUp := factory.create_powerup (occupy_random_point)
 
-			randomNr := getRandomNumber
+			randomNr := get_random_number
 			if randomNr > 0.5
 			then type := "SPEED"
 			else type := "HEALTH"
@@ -618,7 +547,7 @@ feature {ANY} -- Public features
 			state.addpowerup(powerUp)
 		end
 
-	makePointAvailable(point: POINT)
+	make_point_available(point: POINT)
 		do
 			if not(state.getavaliablepoints.has (point))
 			then
@@ -630,7 +559,7 @@ feature {ANY} -- Public features
 			end
 		end
 
-	getRandomNumber: REAL
+	get_random_number: REAL
 		local
 			rn2: RANDOM
 		do
@@ -638,12 +567,12 @@ feature {ANY} -- Public features
 			Result := rn2.real_item
 		end
 
-	occupyPoint(point: POINT)
+	occupy_point(point: POINT)
 		do
 			state.removeavaliablepoint (point)
 		end
 
-	occupyRandomPoint: POINT
+	occupy_random_point: POINT
 		local
 			p: POINT
 			avaliablePoints: LINKED_LIST[POINT]
