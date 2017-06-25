@@ -287,7 +287,7 @@ feature {ANY} -- Public features
 					snakePoint := snakePoints.at (i)
 					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
 					then
-						Current.remove_snake_tail (snake, snake.get_length)
+						Current.remove_snake_tail (snake, 1)
 						snake.set_health (0)
 						snake.set_speed (0)
 						snake.set_is_playing (false)
