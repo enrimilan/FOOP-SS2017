@@ -54,7 +54,7 @@ feature
 	GAME_DURATION: INTEGER
 		-- Result is an integer constant denoting the duration of each game in seconds
 		once
-			Result := 2*5 -- seconds
+			Result := 2*60 -- seconds
 		end
 
 	MAX_ARTIFACT_TIME: INTEGER
