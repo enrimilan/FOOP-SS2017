@@ -71,9 +71,9 @@ feature {ANY} -- Public features
 		end
 
 	set_interval(interval_in: INTEGER_64)
-		-- Sending new directions interval (in seconds)
+		-- Sending new directions interval (in nanoseconds)
 		do
-			interval := interval_in * 125000000
+			interval := interval_in
 		end
 
 	set_direction(direction: STRING)
