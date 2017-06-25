@@ -130,6 +130,7 @@ feature {ANY} -- Public features
 			head: POINT
 		do
 			head := snake.get_head
+
 			if(snake.get_direction.is_equal ("RIGHT")) then
 				snake.add_head (factory.create_point(head.get_x + 1, head.get_y))
 			end
@@ -288,7 +289,6 @@ feature {ANY} -- Public features
 					then
 						Current.remove_snake_tail (snake, 1)
 						snake.set_health (0)
-						snake.set_speed (0)
 						snake.set_is_playing (false)
 						Result := true
 					end
@@ -328,7 +328,6 @@ feature {ANY} -- Public features
 							if bittenSnake.get_length=0 then
 								--snake got bitten in head, it is kill
 								bittenSnake.set_health (0)
-								bittenSnake.set_speed (0)
 								bittenSnake.set_is_playing (false)
 							else
 								r := (snake.get_length / bittenSnake.get_length) * constants.bitting_health
@@ -350,7 +349,6 @@ feature {ANY} -- Public features
 			then
 				remove_snake_tail(snake, 1)
 				snake.set_health (0)
-				snake.set_speed (0)
 				snake.set_is_playing(false)
 				Result := true
 			end
@@ -500,7 +498,7 @@ feature {ANY} -- Public features
 				state.set_results (temper)
 				finished := true
 			end
-			
+
 
 		end
 
