@@ -70,10 +70,11 @@ feature {ANY} -- Public features
 			i: INTEGER
 		do
 			Result := false
+			snakeHead := snake.gethead
 			-- biting itself
+
 			if (snake.getlength > 4) then
 				snakePoints := snake.getpoints
-				snakeHead := snake.gethead
 				from i := 1
 				until i >=  (snakePoints.count - 1)
 				loop
@@ -95,26 +96,56 @@ feature {ANY} -- Public features
 			until snakes.off
 			loop
 				bittenSnake := snakes.item
-				if not(bittenSnake.getid = snake.getid)
-				then
-					index := bittenSnake.getpoints.index_of (snake.gethead, 1)
-					if not (index = 0)
-					then
-						if (snake.getspeed + constants.bitting_speed > constants.max_speed)
-						then
-							speedGain := constants.max_speed - snake.getspeed
-						else
-							speedGain := constants.bitting_speed
+				if not(bittenSnake.getid = snake.getid)	then
+					--georgs rewritten code
+					from bittenSnake.getpoints.start
+					until bittenSnake.getpoints.exhausted
+					loop
+
+						if(snakeHead.get_x = bittenSnake.getpoints.item.get_x and snakeHead.get_y = bittenSnake.getpoints.item.get_y)then
+							--snake bit bittensnake
+							removesnaketail (bittenSnake, index)
+
+							--speed up bitersnake
+							if (snake.getspeed + constants.bitting_speed > constants.max_speed)
+							then
+								snake.setspeed (constants.max_speed)
+							else
+								snake.setspeed (snake.getspeed+constants.bitting_speed)
+							end
+
+							--more health for biter:
+							snake.sethealth (snake.gethealth + constants.bitting_health)
+
+							--alter bitten snake
+							r := (snake.getlength / bittenSnake.getlength) * constants.bitting_health
+							bittenSnake.sethealth (bittenSnake.gethealth - r.rounded)
+
 						end
-						snake.getinfluences.extend (factory.create_influence (constants.bitting_duration, speedGain, constants.bitting_health, clock.time_now))
-						snake.setspeed (snake.getspeed + speedGain)
-						snake.sethealth (snake.gethealth + constants.bitting_health)
-						r := (snake.getlength / bittenSnake.getlength) * constants.bitting_health
-						bittenSnake.sethealth (bittenSnake.gethealth - r.rounded)
-						current.removesnaketail (bittenSnake, index)
-						current.occupypoint (snake.gethead)
-						Result := true
+						index := index+1
+						bittenSnake.getpoints.forth
 					end
+
+
+
+--					index := bittenSnake.getpoints.index_of (snake.gethead, 1)
+--					if not (index = 0)
+--					then
+--						if (snake.getspeed + constants.bitting_speed > constants.max_speed)
+--						then
+--							speedGain := constants.max_speed - snake.getspeed
+--						else
+--							speedGain := constants.bitting_speed
+--						end
+
+--						snake.getinfluences.extend (factory.create_influence (constants.bitting_duration, speedGain, constants.bitting_health, clock.time_now))
+--						snake.setspeed (snake.getspeed + speedGain)
+--						snake.sethealth (snake.gethealth + constants.bitting_health)
+--						
+--						current.removesnaketail (bittenSnake, index)
+--						current.occupypoint (snake.gethead)
+--						Result := true
+--					end
 				end
 				snakes.forth
 			end
