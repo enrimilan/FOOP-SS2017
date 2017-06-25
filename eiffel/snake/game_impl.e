@@ -124,24 +124,19 @@ feature {ANY} -- Public features
 	add_new_head(snake: SNAKE): POINT
 		local
 			head: POINT
-			p: POINT
 		do
 			head := snake.get_head
 			if(snake.get_direction.is_equal ("RIGHT")) then
-				create p.make (head.get_x + 1, head.get_y)
-				snake.add_head (p)
+				snake.add_head (factory.create_point(head.get_x + 1, head.get_y))
 			end
 			if(snake.get_direction.is_equal ("LEFT")) then
-				create p.make (head.get_x - 1, head.get_y)
-				snake.add_head (p)
+				snake.add_head (factory.create_point(head.get_x - 1, head.get_y))
 			end
 			if(snake.get_direction.is_equal ("UP")) then
-				create p.make (head.get_x, head.get_y - 1)
-				snake.add_head (p)
+				snake.add_head (factory.create_point (head.get_x, head.get_y - 1))
 			end
 			if(snake.get_direction.is_equal ("DOWN")) then
-				create p.make (head.get_x, head.get_y + 1)
-				snake.add_head (p)
+				snake.add_head (factory.create_point (head.get_x, head.get_y + 1))
 			end
 			head := snake.get_head
 			occupy_point (head)
@@ -579,7 +574,7 @@ feature {NONE} -- Private features
 			number: INTEGER
 			rn: RANDOM_NUMBERS
 		do
-			create p.make (0,0)
+			p := factory.create_point (0, 0)
 			avaliablePoints := state.get_available_points
 			create rn.make
 			number := rn.random_integer \\ (avaliablePoints.count) + 1

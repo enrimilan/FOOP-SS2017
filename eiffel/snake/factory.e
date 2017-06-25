@@ -33,6 +33,14 @@ feature {ANY} -- This class is used to create instances. This should be the only
 			Result := snake
 		end
 
+	create_point(x: INTEGER; y: INTEGER): POINT
+		local
+			point: POINT
+		do
+			create point.make (x, y)
+			Result := point
+		end
+
 	create_poison(point: POINT): POISON
 		local
 			poison: POISON
