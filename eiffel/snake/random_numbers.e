@@ -1,5 +1,5 @@
 note
-	description	: "System's root class"
+	description	: "A class for generating random numbers"
 	date: "$Date$"
 	revision: "$Revision$"
 

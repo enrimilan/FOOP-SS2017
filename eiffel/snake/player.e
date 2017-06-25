@@ -17,7 +17,6 @@ feature {NONE} -- Private variables
 	id: INTEGER
 	next_direction: STRING
 	running: BOOLEAN
-	joined_game: BOOLEAN
 	interval: INTEGER_64
 	mode: MODE
 	mode_value: STRING
@@ -35,7 +34,6 @@ feature {ANY} -- Initialization
 			mode_value := mode_in
 			next_direction := direction
 			running := true
-			joined_game := false
 			interval := 10000000000
 			create launch_mutex.make
 		end
@@ -85,21 +83,11 @@ feature {ANY} -- Public features
 			end
 		end
 
-	set_joined_game(joined_game_in: BOOLEAN)
-		do
-			joined_game := joined_game_in
-		end
-
-	has_joined_game: BOOLEAN
-		do
-			Result := joined_game
-		end
-
 	get_mode: STRING
 		do
 			Result := mode_value
 		end
-		
+
 	get_id:INTEGER
 		do
 			Result := id
