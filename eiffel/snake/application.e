@@ -30,6 +30,7 @@ feature {NONE} -- Initialization and main entry point
 			factory: FACTORY
 			direction: STRING
 			mode_value: STRING
+			mode_value2: STRING
 		do
 			create factory
 			create direct
@@ -38,14 +39,15 @@ feature {NONE} -- Initialization and main entry point
 			create my_mutex.make
 			direction := direct.right			-- default direction: right
 			mode_value := mode.player
+			mode_value2 := mode.computer
 			game := factory.create_game
 			board := build_board
 
 
 			create keyboard_definition
 
-			create player1.make_new(current, 1, direction, mode_value, game)
-			create player2.make_new(current, 2, direction, mode_value, game)
+			create player1.make_new(current, 1, direction, mode_value2, game)
+			create player2.make_new(current, 2, direction, mode_value2, game)
 
 
 			game.add_snake(1, 'o')
@@ -58,7 +60,7 @@ feature {NONE} -- Initialization and main entry point
 
 			-- Start playing
 			player1.launch
-			--player2.launch
+			player2.launch
 			--important: this operation blocks)
 			listen_for_keyboard_input
 		end
@@ -111,7 +113,7 @@ feature {NONE} -- Private features
 			from state.getposions.start
 			until state.getposions.exhausted
 			loop
-				board.put ('P',state.getposions.item.get_y,state.getposions.item.get_x)
+				board.put ('P',state.getposions.item.get_y+1,state.getposions.item.get_x+1)
 				state.getposions.forth
 			end
 

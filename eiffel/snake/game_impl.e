@@ -507,7 +507,7 @@ feature {ANY} -- Public features
 			end
 
 			-- If all are out and only one remains playing
-			if(state.getsnakes.count = constants.max_players and snakesPlaying = 1)
+			if(state.getsnakes.count = constants.max_players and snakesPlaying.count = 1)
 			then
 				snakesPlaying := state.getsnakes
 				from snakesPlaying.start
