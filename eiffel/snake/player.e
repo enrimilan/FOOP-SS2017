@@ -22,11 +22,13 @@ feature {NONE} -- Private variables
 	mode: MODE
 	mode_value: STRING
 	game: GAME
+	mutex: MUTEX
 
 feature {ANY} -- Initialization
 	make_new(application: APPLICATION; id_in: INTEGER; direction: STRING; mode_in: STRING; game_: GAME)
 		do
 			create mode
+			create mutex.make
 			game:=game_
 			app := application
 			id := id_in
@@ -51,7 +53,9 @@ feature {ANY} -- Public features
 				not running
 			loop
 				if(mode_value.is_equal(mode.computer)) then
+					mutex.lock
 					next_direction := algo.get_next_direction
+					mutex.unlock
 				end
 				app.on_new_direction(id, next_direction)
 				sleep(interval)
@@ -72,7 +76,9 @@ feature {ANY} -- Public features
 	set_direction(direction: STRING)
 		do
 			if(mode_value.is_equal(mode.player)) then
+				mutex.lock
 				next_direction := direction
+				mutex.unlock
 			end
 		end
 
