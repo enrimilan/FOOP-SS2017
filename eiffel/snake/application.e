@@ -63,6 +63,12 @@ feature {NONE} -- Initialization and main entry point
 			player2.launch
 			--important: this operation blocks)
 			listen_for_keyboard_input
+
+			--workaround, sleep to block
+			current.sleep (1000000000000)
+			-- End of the game, stop players
+        	player1.stop
+        	player2.stop
 		end
 
 feature {ANY} -- Public features
@@ -210,7 +216,7 @@ feature {NONE} -- Private features
 		do
 			from
         	until
-            	c = 'q'
+            	player1.get_mode.is_equal(mode.computer) and player2.get_mode.is_equal(mode.computer)
         	loop
             	c := read_char
             	-- Prepare next direction
@@ -225,10 +231,6 @@ feature {NONE} -- Private features
             	--io.put_character(c)
             	--io.put_new_line
         	end
-
-        	-- End of the game, stop players
-        	player1.stop
-        	player2.stop
 		end
 
 	read_char: CHARACTER
