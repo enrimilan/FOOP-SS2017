@@ -48,6 +48,9 @@ feature {ANY} -- Public features
 	-- Start thread execution
 		do
 			create algo.make (game)
+			if(mode_value.is_equal(mode.computer)) then
+				algo.set_player_id (id)
+			end
 			from
 			until
 				not running
