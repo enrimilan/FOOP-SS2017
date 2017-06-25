@@ -69,8 +69,9 @@ feature {ANY} -- Public features
 			r: REAL_64
 			i: INTEGER
 		do
+			Result := false
 			-- biting itself
-			if (snake.getlength > 3) then
+			if (snake.getlength > 4) then
 				snakePoints := snake.getpoints
 				snakeHead := snake.gethead
 				from i := 1
@@ -80,7 +81,7 @@ feature {ANY} -- Public features
 					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
 					then
 						Current.removesnaketail (snake, i)
-						snake.sethealth (0)
+						snake.sethealth (snake.gethealth-50)
 						Result := true
 					end
 					i := i + 1
@@ -117,7 +118,7 @@ feature {ANY} -- Public features
 				end
 				snakes.forth
 			end
-			Result := false
+
 		end
 
 	eatsFood(snake: SNAKE; head: POINT): BOOLEAN
@@ -407,7 +408,7 @@ feature {ANY} -- Public features
 
 				flag := current.eatspoison (snake, head)
 				flag := current.eatspowerup (snake, head)
-				--flag := current.bitesitselforothersnake (snake)
+				flag := current.bitesitselforothersnake (snake)
 				flag := current.collideswithborder (snake, head)
 
 

@@ -46,8 +46,13 @@ feature {NONE} -- Initialization and main entry point
 
 			create keyboard_definition
 
+<<<<<<< Updated upstream
 			create player1.make_new(current, 1, direction, mode_value2, game)
 			create player2.make_new(current, 2, direction, mode_value2, game)
+=======
+			create player1.make_new(current, 1, direction, mode_value, game)
+			create player2.make_new(current, 2, direction, mode_value, game)
+>>>>>>> Stashed changes
 
 
 			game.add_snake(1, 'o')
