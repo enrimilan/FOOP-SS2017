@@ -13,21 +13,22 @@ create
 	make
 
 feature {NONE} -- Private variables
-	game: GAME
-	keyboard_definition: KEYBOARD_DEFINITION
+	factory: FACTORY
+	constants: CONSTANTS
 	direct: DIRECTION
+	mode: MODE
+	keyboard_definition: KEYBOARD_DEFINITION
 	player1: PLAYER
 	player2: PLAYER
-	constants: CONSTANTS
 	board: ARRAY2[CHARACTER]
-	my_mutex: MUTEX
-	mode: MODE
+	game: GAME
+	mutex: MUTEX
 
 feature {NONE} -- Initialization and main entry point
 
 	make
 		local
-			factory: FACTORY
+			c: CHARACTER
 			direction: STRING
 			mode_value: STRING
 			mode_value2: STRING
@@ -36,61 +37,63 @@ feature {NONE} -- Initialization and main entry point
 			create direct
 			create constants
 			create mode
-			create my_mutex.make
-			direction := direct.right			-- default direction: right
-			mode_value := mode.player
-			mode_value2 := mode.computer
+			create mutex.make
+			create keyboard_definition
+
+			-- Playing modes for the 2 players
+			print("Player modes: c for Computer, p for player%N")
+			print("Player mode for player 1: ")
+			c := read_char
+			print(c)
+			if c = 'c' then
+				mode_value := mode.computer
+			else
+				mode_value := mode.player
+			end
+			print("%NPlayer mode for player 2: ")
+			c := read_char
+			print(c)
+			if c = 'c' then
+				mode_value2 := mode.computer
+			else
+				mode_value2 := mode.player
+			end
+
 			game := factory.create_game
 			board := build_board
 
-
-			create keyboard_definition
-
+			-- Create players and add them to the game
+			direction := direct.right
 			create player1.make_new(current, 1, direction, mode_value, game)
-			create player2.make_new(current, 2, direction, mode_value, game)
-
+			create player2.make_new(current, 2, direction, mode_value2, game)
 			game.add_snake(1, 'o')
-			player1.set_joined_game(true)
-            player1.set_interval(4)
-
 			game.add_snake(2, 'a')
-			player2.set_joined_game(true)
-            player2.set_interval(4)
-
 
 			-- Start playing
 			player1.launch
 			player2.launch
-			--important: this operation blocks)
+			-- Important: this operation blocks
 			listen_for_keyboard_input
 
-			--workaround, sleep to block
+			-- Workaround, sleep to block
 			current.sleep (1000000000000)
-			-- End of the game, stop players
-
-        	player1.stop
-        	player2.stop
-
 		end
 
 feature {ANY} -- Public features
 
 	on_new_direction(player_id: INTEGER; direction: STRING)
 		local
+			state: STATE
 			output:STRING
 		do
-
-			my_mutex.lock
-			--print(player_id)
-			--print(" ")
-			--print(direction)
-			--print("%N")
+			mutex.lock
+			state := game.get_state
 			game.update_state(player_id, direction)
-			-- maybe change the interval or stop a player here if he lost
+			player1.set_interval((600 - state.get_snakes.at(1).get_speed) * 1000000)
+			player2.set_interval((600 - state.get_snakes.at(2).get_speed) * 1000000)
 
 			if not game.has_finished then
 				draw_game
-				my_mutex.unlock
 			else
 				system("cls")
 				output := "%N%N------------------------------------------%N%N%N"
@@ -100,9 +103,7 @@ feature {ANY} -- Public features
 				player1.stop
 				player2.stop
 			end
-
-
-
+			mutex.unlock
 		end
 
 feature {NONE} -- Private features
@@ -114,26 +115,16 @@ feature {NONE} -- Private features
 			j: INTEGER
 			output: STRING
 			duration: INTEGER
-
 		do
-			--print("Start drawing %N")
 			output := ""
 			state := game.get_state
 			board.fill_with (' ')
 
-			--print("Draw food %N")
 			--food
 			if state.get_food.get_y /= -1 then
 				board.put ('F', state.get_food.get_y+1, state.get_food.get_x+1)
-					--print("Food at: ")
-					--print(state.getfood.get_x)
-					--print("/")
-					--print(state.getfood.get_y)
-					--print("%N")
 			end
 
-
-			--print("Draw poisons %N")
 			--poison
 			from state.get_poisons.start
 			until state.get_poisons.exhausted
@@ -142,7 +133,6 @@ feature {NONE} -- Private features
 				state.get_poisons.forth
 			end
 
-			--print("Draw power-ups %N")
 			--powerups
 			from state.get_power_ups.start
 			until state.get_power_ups.exhausted
@@ -151,7 +141,6 @@ feature {NONE} -- Private features
 				state.get_power_ups.forth
 			end
 
-			--print("Draw snakes %N")
 			--snakes
 			from state.get_snakes.start
 			until state.get_snakes.exhausted
@@ -160,27 +149,10 @@ feature {NONE} -- Private features
 				until state.get_snakes.item.get_points.exhausted
 				loop
 					board.put (state.get_snakes.item.get_character_representation, state.get_snakes.item.get_points.item.get_y+1, state.get_snakes.item.get_points.item.get_x+1)
-					--print("Snake at: ")
-					--print(state.getsnakes.item.getpoints.item.get_x)
-					--print("/")
-					--print(state.getsnakes.item.getpoints.item.get_y)
-					--print("%N")
 					state.get_snakes.item.get_points.forth
 				end
-
-				--print("Snake ")
-				--print(state.getsnakes.item.getid)
-				--print(" has influence: ")
-				--if state.getsnakes.item.getinfluences.count > 0 then
-				--	print(state.getsnakes.item.getinfluences.first.getstarttime)
-				--else
-				--	print("none")
-				--end
-
-				print("%N")
 				state.get_snakes.forth
 			end
-
 
 			--CHANGE THIS ACCORDING TO OS
 			--OR REMOVE IT FOR A "DEBUG" VIEW
@@ -197,11 +169,6 @@ feature {NONE} -- Private features
 			print(state.get_snakes.at(2).get_health)
 			print(" Speed: ")
 			print(state.get_snakes.at(2).get_speed)
-			print("%NFood at: ")
-					print(state.get_food.get_x)
-					print("/")
-					print(state.get_food.get_y)
-					print("%N")
 			output := output + "%N------------------------------------------%N"
 			from i:= 1
 			until i > (constants.board_height)
@@ -218,13 +185,10 @@ feature {NONE} -- Private features
 			end
 			output := output + "------------------------------------------%N"
 			print(output)
-			--print("Finished drawing %N")
-			player1.set_interval((600 - state.get_snakes.at(1).get_speed) * 1000000)
-			player2.set_interval((600 - state.get_snakes.at(2).get_speed) * 1000000)
-
 		end
 
 	build_board:ARRAY2[CHARACTER]
+	-- Initialize the playing board
 		require
 			constants.board_width > 0 and constants.board_height > 0
 		local
@@ -241,9 +205,11 @@ feature {NONE} -- Private features
 		end
 
 	listen_for_keyboard_input
+	-- Listen for input from players
 		local
 			c: CHARACTER
 		do
+			print("Press any key to start%N")
 			from
         	until
             	player1.get_mode.is_equal(mode.computer) and player2.get_mode.is_equal(mode.computer)
@@ -256,10 +222,6 @@ feature {NONE} -- Private features
             	if(keyboard_definition.get_player_id_for_input(c) = 2) then
 					player2.set_direction(keyboard_definition.translate_input_to_direction(c))
 				end
-
-            	-- TODO used for debugging atm, later to be removed!
-            	--io.put_character(c)
-            	--io.put_new_line
         	end
 		end
 
@@ -268,7 +230,5 @@ feature {NONE} -- Private features
 		external "C inline use <conio.h>"
         	alias "return getch();"
     	end
-
-
 
 end
