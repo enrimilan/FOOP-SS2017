@@ -24,12 +24,12 @@ feature{ANY} -- Initialization
 
 feature{ANY} -- Public functions
 
-	getTimePlaced: DT_TIME
+	get_time_placed: DT_TIME
 		do
 			Result := timePlaced
 		end
 
-	setTimePlaced(newTimePlaced: DT_TIME)
+	set_time_placed(newTimePlaced: DT_TIME)
 		do
 			timePlaced := newTimePlaced
 		end
@@ -44,7 +44,7 @@ feature{ANY} -- Public functions
 			Result := point.get_y
 		end
 
-	getPoisonPoint: POINT
+	get_poison_point: POINT
 		do
 			Result := point
 		end

@@ -9,19 +9,19 @@ deferred class
 
 feature
 
-	getAvaliablePoints: LINKED_LIST[POINT] deferred end
-	getFood: POINT deferred end
-	setFood(newFood: POINT) deferred end
-	getResults: STRING deferred end
-	setResults(newResult: STRING) deferred end
-	getTimeElapsed: INTEGER deferred end
-	setTimeElapsed(newTime: INTEGER) deferred end
-	getPosions: LINKED_LIST[POISON] deferred end
-	addPoison(newPoison: POISON) deferred end
-	getPowerUps: LINKED_LIST[POWERUP] deferred end
-	addPowerUp(newPowerUp: POWERUP) deferred end
-	getSnakes: LINKED_LIST[SNAKE] deferred end
-	removePoison(poison: POISON) deferred end
-	removePowerUp(powerup: POWERUP) deferred end
-	removeAvaliablePoint(point: POINT) deferred end
+	get_available_points: LINKED_LIST[POINT] deferred end
+	get_food: POINT deferred end
+	set_food(newFood: POINT) deferred end
+	get_results: STRING deferred end
+	set_results(newResult: STRING) deferred end
+	get_time_elapsed: INTEGER deferred end
+	set_time_elapsed(newTime: INTEGER) deferred end
+	get_poisons: LINKED_LIST[POISON] deferred end
+	add_poison(newPoison: POISON) deferred end
+	get_power_ups: LINKED_LIST[POWERUP] deferred end
+	add_power_up(newPowerUp: POWERUP) deferred end
+	get_snakes: LINKED_LIST[SNAKE] deferred end
+	remove_poison(poison: POISON) deferred end
+	remove_power_up(powerup: POWERUP) deferred end
+	remove_available_point(point: POINT) deferred end
 end

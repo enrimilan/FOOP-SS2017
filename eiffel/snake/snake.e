@@ -9,21 +9,21 @@ deferred class
 
 feature
 
-	isPlaying: BOOLEAN deferred end
-	setDirection(newDirection: STRING) deferred end
-	setHealth(newHealth: INTEGER) deferred end
-	setIsPlaying(newIsPlaying: BOOLEAN) deferred end
-	setSpeed(newSpeed: INTEGER) deferred end
-	addHead(newHead: POINT) deferred end
-	getHead: Point deferred end
-	getDirection: STRING deferred end
-	getHealth: INTEGER deferred end
-	getId: INTEGER deferred end
-	getLength: INTEGER deferred end
-	getPoints: LINKED_LIST[POINT] deferred end
-	getSpeed: INTEGER deferred end
-	getInfluences: LINKED_LIST[INFLUENCE] deferred end
-	getTail: POINT deferred end
+	is_playing: BOOLEAN deferred end
+	set_direction(newDirection: STRING) deferred end
+	set_health(newHealth: INTEGER) deferred end
+	set_is_playing(newIsPlaying: BOOLEAN) deferred end
+	set_speed(newSpeed: INTEGER) deferred end
+	add_head(newHead: POINT) deferred end
+	get_head: Point deferred end
+	get_direction: STRING deferred end
+	get_health: INTEGER deferred end
+	get_id: INTEGER deferred end
+	get_length: INTEGER deferred end
+	get_points: LINKED_LIST[POINT] deferred end
+	get_speed: INTEGER deferred end
+	get_influences: LINKED_LIST[INFLUENCE] deferred end
+	get_tail: POINT deferred end
 	get_character_representation: CHARACTER deferred end
 
 end

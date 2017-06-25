@@ -107,8 +107,8 @@ feature {NONE} -- Private features
 
 			--print("Draw food %N")
 			--food
-			if state.getfood.get_y /= -1 then
-				board.put ('F', state.getfood.get_y+1, state.getfood.get_x+1)
+			if state.get_food.get_y /= -1 then
+				board.put ('F', state.get_food.get_y+1, state.get_food.get_x+1)
 					--print("Food at: ")
 					--print(state.getfood.get_x)
 					--print("/")
@@ -119,37 +119,37 @@ feature {NONE} -- Private features
 
 			--print("Draw poisons %N")
 			--poison
-			from state.getposions.start
-			until state.getposions.exhausted
+			from state.get_poisons.start
+			until state.get_poisons.exhausted
 			loop
-				board.put ('P',state.getposions.item.get_y+1,state.getposions.item.get_x+1)
-				state.getposions.forth
+				board.put ('P',state.get_poisons.item.get_y+1,state.get_poisons.item.get_x+1)
+				state.get_poisons.forth
 			end
 
 			--print("Draw power-ups %N")
 			--powerups
-			from state.getpowerups.start
-			until state.getpowerups.exhausted
+			from state.get_power_ups.start
+			until state.get_power_ups.exhausted
 			loop
-				board.put('U',state.getpowerups.item.get_y+1, state.getpowerups.item.get_x+1)
-				state.getpowerups.forth
+				board.put('U',state.get_power_ups.item.get_y+1, state.get_power_ups.item.get_x+1)
+				state.get_power_ups.forth
 			end
 
 			--print("Draw snakes %N")
 			--snakes
-			from state.getsnakes.start
-			until state.getsnakes.exhausted
+			from state.get_snakes.start
+			until state.get_snakes.exhausted
 			loop
-				from state.getsnakes.item.getpoints.start
-				until state.getsnakes.item.getpoints.exhausted
+				from state.get_snakes.item.get_points.start
+				until state.get_snakes.item.get_points.exhausted
 				loop
-					board.put (state.getsnakes.item.get_character_representation, state.getsnakes.item.getpoints.item.get_y+1, state.getsnakes.item.getpoints.item.get_x+1)
+					board.put (state.get_snakes.item.get_character_representation, state.get_snakes.item.get_points.item.get_y+1, state.get_snakes.item.get_points.item.get_x+1)
 					--print("Snake at: ")
 					--print(state.getsnakes.item.getpoints.item.get_x)
 					--print("/")
 					--print(state.getsnakes.item.getpoints.item.get_y)
 					--print("%N")
-					state.getsnakes.item.getpoints.forth
+					state.get_snakes.item.get_points.forth
 				end
 
 				--print("Snake ")
@@ -162,29 +162,29 @@ feature {NONE} -- Private features
 				--end
 
 				print("%N")
-				state.getsnakes.forth
+				state.get_snakes.forth
 			end
 
 
 			--CHANGE THIS ACCORDING TO OS
 			--OR REMOVE IT FOR A "DEBUG" VIEW
-			duration := constants.game_duration - state.gettimeelapsed
+			duration := constants.game_duration - state.get_time_elapsed
 			system("cls")
 			print((duration / 60).floor)
 			print(":")
 			print(duration \\ 60)
 			print("%NPlayer1: Health: ")
-			print(state.getsnakes.at(1).gethealth)
+			print(state.get_snakes.at(1).get_health)
 			print(" Speed: ")
-			print(state.getsnakes.at(1).getspeed)
+			print(state.get_snakes.at(1).get_speed)
 			print("%NPlayer2: Health: ")
-			print(state.getsnakes.at(2).gethealth)
+			print(state.get_snakes.at(2).get_health)
 			print(" Speed: ")
-			print(state.getsnakes.at(2).getspeed)
+			print(state.get_snakes.at(2).get_speed)
 			print("%NFood at: ")
-					print(state.getfood.get_x)
+					print(state.get_food.get_x)
 					print("/")
-					print(state.getfood.get_y)
+					print(state.get_food.get_y)
 					print("%N")
 			output := output + "%N------------------------------------------%N"
 			from i:= 1
@@ -203,8 +203,8 @@ feature {NONE} -- Private features
 			output := output + "------------------------------------------%N"
 			print(output)
 			--print("Finished drawing %N")
-			player1.set_interval((600 - state.getsnakes.at(1).getspeed) * 1000000)
-			player2.set_interval((600 - state.getsnakes.at(2).getspeed) * 1000000)
+			player1.set_interval((600 - state.get_snakes.at(1).get_speed) * 1000000)
+			player2.set_interval((600 - state.get_snakes.at(2).get_speed) * 1000000)
 
 		end
 

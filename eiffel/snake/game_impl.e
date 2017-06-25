@@ -48,10 +48,10 @@ feature {ANY} -- Public features
 			-- Adding the snake
 			point := occupy_random_point
 			snake := factory.create_snake (id, point, character_representation_in)
-			state.getsnakes.extend (snake)
+			state.get_snakes.extend (snake)
 
 			-- Place food
-			food := state.getfood
+			food := state.get_food
 			if food.get_x = -1 then
 				place_food
 			end
@@ -75,12 +75,12 @@ feature {ANY} -- Public features
 			timeElapsed: DT_TIME_DURATION
 			game: GAME
 		do
-			snake := state.getsnakes.at (id)
-			if(snake.isplaying = true) then
-				snake.setdirection (current.calculate_snake_direction (snake, direction))
+			snake := state.get_snakes.at (id)
+			if(snake.is_playing = true) then
+				snake.set_direction (current.calculate_snake_direction (snake, direction))
 				head := current.add_new_head (snake)
 				if not (current.eats_food (snake, head)) then
-					current.remove_snake_tail (snake, snake.getlength)
+					current.remove_snake_tail (snake, snake.get_length)
 				end
 				flag := current.eats_poison (snake, head)
 				flag := current.eats_power_up (snake, head)
@@ -88,15 +88,15 @@ feature {ANY} -- Public features
 				flag := current.collides_with_border (snake, head)
 				current.check_timeouts (snake)
 				-- Place poisons and power-ups
-				if(state.getposions.count < constants.poison_max) then
+				if(state.get_poisons.count < constants.poison_max) then
 					place_poison
 				end
-				if(state.getpowerups.count < constants.power_up_max) then
+				if(state.get_power_ups.count < constants.power_up_max) then
 					place_power_up
 				end
 
 				timeElapsed := clock.time_now - startingTime
-				state.settimeelapsed (timeElapsed.second_count)
+				state.set_time_elapsed (timeElapsed.second_count)
 				game := current.update_game_result
 			end
 		end
@@ -105,17 +105,17 @@ feature {ANY} -- Public features
 		-- ensure that the snake cannot move in the opposite direction, if it's length is bigger than 1
 		do
 			Result := direction
-			if (snake.getlength > 1) then
-				if(direction.is_equal ("LEFT") and snake.getdirection.is_equal ("RIGHT")) then
+			if (snake.get_length > 1) then
+				if(direction.is_equal ("LEFT") and snake.get_direction.is_equal ("RIGHT")) then
 					Result := "RIGHT"
 				end
-				if(direction.is_equal ("RIGHT") and snake.getdirection.is_equal ("LEFT")) then
+				if(direction.is_equal ("RIGHT") and snake.get_direction.is_equal ("LEFT")) then
 					Result := "LEFT"
 				end
-				if(direction.is_equal ("UP") and snake.getdirection.is_equal ("DOWN")) then
+				if(direction.is_equal ("UP") and snake.get_direction.is_equal ("DOWN")) then
 					Result := "DOWN"
 				end
-				if(direction.is_equal ("DOWN") and snake.getdirection.is_equal ("UP")) then
+				if(direction.is_equal ("DOWN") and snake.get_direction.is_equal ("UP")) then
 					Result := "UP"
 				end
 			end
@@ -126,24 +126,24 @@ feature {ANY} -- Public features
 			head: POINT
 			p: POINT
 		do
-			head := snake.gethead
-			if(snake.getdirection.is_equal ("RIGHT")) then
+			head := snake.get_head
+			if(snake.get_direction.is_equal ("RIGHT")) then
 				create p.make (head.get_x + 1, head.get_y)
-				snake.addhead (p)
+				snake.add_head (p)
 			end
-			if(snake.getdirection.is_equal ("LEFT")) then
+			if(snake.get_direction.is_equal ("LEFT")) then
 				create p.make (head.get_x - 1, head.get_y)
-				snake.addhead (p)
+				snake.add_head (p)
 			end
-			if(snake.getdirection.is_equal ("UP")) then
+			if(snake.get_direction.is_equal ("UP")) then
 				create p.make (head.get_x, head.get_y - 1)
-				snake.addhead (p)
+				snake.add_head (p)
 			end
-			if(snake.getdirection.is_equal ("DOWN")) then
+			if(snake.get_direction.is_equal ("DOWN")) then
 				create p.make (head.get_x, head.get_y + 1)
-				snake.addhead (p)
+				snake.add_head (p)
 			end
-			head := snake.gethead
+			head := snake.get_head
 			occupy_point (head)
 			Result := head
 		end
@@ -155,11 +155,11 @@ feature {ANY} -- Public features
 		do
 			create toRemove.make
 
-			from snake.getpoints.start
-			until snake.getpoints.exhausted
+			from snake.get_points.start
+			until snake.get_points.exhausted
 			loop
-				toRemove.put_front (snake.getpoints.item)
-				snake.getpoints.forth
+				toRemove.put_front (snake.get_points.item)
+				snake.get_points.forth
 			end
 
 			point := toRemove.at (index)
@@ -174,11 +174,11 @@ feature {ANY} -- Public features
 				make_point_available(point)
 			end
 
-			snake.getpoints.wipe_out
+			snake.get_points.wipe_out
 			from toRemove.start
 			until toRemove.exhausted
 			loop
-				snake.getpoints.put_front (toRemove.item)
+				snake.get_points.put_front (toRemove.item)
 				toRemove.forth
 			end
 		end
@@ -187,14 +187,14 @@ feature {ANY} -- Public features
 		local
 			food: POINT
 		do
-			food := state.getfood
+			food := state.get_food
 			if ((food.get_x = head.get_x) and (food.get_y = head.get_y)) then
-				if(snake.getspeed + constants.food_speed > constants.max_speed) then
-					snake.setspeed (constants.max_speed)
+				if(snake.get_speed + constants.food_speed > constants.max_speed) then
+					snake.set_speed (constants.max_speed)
 				else
-					snake.setspeed (snake.getspeed + constants.food_speed)
+					snake.set_speed (snake.get_speed + constants.food_speed)
 				end
-				snake.sethealth (snake.gethealth + constants.food_health)
+				snake.set_health (snake.get_health + constants.food_health)
 				place_food
 				Result := true
 			else
@@ -208,7 +208,7 @@ feature {ANY} -- Public features
 			poison: POISON
 			randomNumber: REAL
 		do
-			poisons := state.getposions
+			poisons := state.get_poisons
 
 			from poisons.start
 			until poisons.off
@@ -219,14 +219,14 @@ feature {ANY} -- Public features
 					randomNumber := get_random_number
 					if(randomNumber < 0.5)
 					then
-						snake.sethealth (snake.gethealth - constants.poison_health)
+						snake.set_health (snake.get_health - constants.poison_health)
 					else
-						if (snake.getspeed - constants.poison_speed >= constants.min_speed) then
-							snake.setspeed (snake.getspeed - constants.poison_speed)
+						if (snake.get_speed - constants.poison_speed >= constants.min_speed) then
+							snake.set_speed (snake.get_speed - constants.poison_speed)
 						end
 					end
 					-- add poison to list to be removed
-					state.removepoison(poison)
+					state.remove_poison(poison)
 					poisons.finish
 					Result := true
 				end
@@ -240,22 +240,22 @@ feature {ANY} -- Public features
 			powerUps: LINKED_LIST[POWERUP]
 			powerUp : POWERUP
 		do
-			powerUps := state.getpowerups
+			powerUps := state.get_power_ups
 			from powerUps.start
 			until powerUps.off
 			loop
 				powerUp := powerUps.item
 				if ((powerUp.get_x = head.get_x) and (powerUp.get_y = head.get_y)) then
-					if((powerUp.gettype.is_equal ("SPEED")) and (snake.getspeed + constants.power_up_speed <= constants.max_speed))
+					if((powerUp.get_type.is_equal ("SPEED")) and (snake.get_speed + constants.power_up_speed <= constants.max_speed))
 					then
-						snake.setspeed (snake.getspeed + constants.power_up_speed)
-						snake.getinfluences.extend (factory.create_influence (constants.power_up_duration, constants.power_up_speed, 0, clock.time_now))
+						snake.set_speed (snake.get_speed + constants.power_up_speed)
+						snake.get_influences.extend (factory.create_influence (constants.power_up_duration, constants.power_up_speed, 0, clock.time_now))
 					else
-						snake.sethealth (snake.gethealth + constants.power_up_health)
-						snake.getinfluences.extend (factory.create_influence (constants.power_up_duration, 0, constants.poison_health, clock.time_now))
+						snake.set_health (snake.get_health + constants.power_up_health)
+						snake.get_influences.extend (factory.create_influence (constants.power_up_duration, 0, constants.poison_health, clock.time_now))
 					end
 					-- remove powerUp from list
-					state.removepowerup (powerUp)
+					state.remove_power_up (powerUp)
 					powerUps.finish
 					Result := true
 				end
@@ -276,21 +276,21 @@ feature {ANY} -- Public features
 			i: INTEGER
 		do
 			Result := false
-			snakeHead := snake.gethead
+			snakeHead := snake.get_head
 			-- biting itself
 
-			if (snake.getlength > 4) then
-				snakePoints := snake.getpoints
+			if (snake.get_length > 4) then
+				snakePoints := snake.get_points
 				from i := 1
 				until i >=  (snakePoints.count - 1)
 				loop
 					snakePoint := snakePoints.at (i)
 					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
 					then
-						Current.remove_snake_tail (snake, snake.getlength)
-						snake.sethealth (0)
-						snake.setspeed (0)
-						snake.setisplaying (false)
+						Current.remove_snake_tail (snake, snake.get_length)
+						snake.set_health (0)
+						snake.set_speed (0)
+						snake.set_is_playing (false)
 						Result := true
 					end
 					i := i + 1
@@ -298,46 +298,46 @@ feature {ANY} -- Public features
 			end
 
 			-- biting other snake
-			snakes := state.getsnakes
+			snakes := state.get_snakes
 			index := 0
 			from snakes.start
 			until snakes.off
 			loop
 				bittenSnake := snakes.item
-				if not(bittenSnake.getid = snake.getid)	then
+				if not(bittenSnake.get_id = snake.get_id)	then
 					--georgs rewritten code
-					from bittenSnake.getpoints.start
-					until bittenSnake.getpoints.exhausted
+					from bittenSnake.get_points.start
+					until bittenSnake.get_points.exhausted
 					loop
 
-						if(snakeHead.get_x = bittenSnake.getpoints.item.get_x and snakeHead.get_y = bittenSnake.getpoints.item.get_y)then
+						if(snakeHead.get_x = bittenSnake.get_points.item.get_x and snakeHead.get_y = bittenSnake.get_points.item.get_y)then
 							--snake bit bittensnake
-							remove_snake_tail (bittenSnake, bittenSnake.getlength-index)
+							remove_snake_tail (bittenSnake, bittenSnake.get_length-index)
 
 							--speed up bitersnake
-							if (snake.getspeed + constants.bitting_speed > constants.max_speed)
+							if (snake.get_speed + constants.bitting_speed > constants.max_speed)
 							then
-								snake.setspeed (constants.max_speed)
+								snake.set_speed (constants.max_speed)
 							else
-								snake.setspeed (snake.getspeed+constants.bitting_speed)
+								snake.set_speed (snake.get_speed+constants.bitting_speed)
 							end
 
 							--more health for biter:
-							snake.sethealth (snake.gethealth + constants.bitting_health)
+							snake.set_health (snake.get_health + constants.bitting_health)
 
 							--alter bitten snake
-							if bittenSnake.getlength=0 then
+							if bittenSnake.get_length=0 then
 								--snake got bitten in head, it is kill
-								bittenSnake.sethealth (0)
-								bittenSnake.setspeed (0)
-								bittenSnake.setisplaying (false)
+								bittenSnake.set_health (0)
+								bittenSnake.set_speed (0)
+								bittenSnake.set_is_playing (false)
 							else
-								r := (snake.getlength / bittenSnake.getlength) * constants.bitting_health
-								bittenSnake.sethealth (bittenSnake.gethealth - r.rounded)
+								r := (snake.get_length / bittenSnake.get_length) * constants.bitting_health
+								bittenSnake.set_health (bittenSnake.get_health - r.rounded)
 							end
 						end
 						index := index+1
-						bittenSnake.getpoints.forth
+						bittenSnake.get_points.forth
 					end
 				end
 				snakes.forth
@@ -350,9 +350,9 @@ feature {ANY} -- Public features
 			if (head.get_x < 0 or head.get_x >= (constants.board_width) or head.get_y < 0 or head.get_y >= (constants.board_height))
 			then
 				remove_snake_tail(snake, 1)
-				snake.sethealth (0)
-				snake.setspeed (0)
-				snake.setisplaying(false)
+				snake.set_health (0)
+				snake.set_speed (0)
+				snake.set_is_playing(false)
 				Result := true
 			end
 		end
@@ -370,17 +370,17 @@ feature {ANY} -- Public features
 		do
 			-- Check for timeouts for poisons
 			create poisons.make
-			poisons.copy (state.getposions)
+			poisons.copy (state.get_poisons)
 			itemNr := 0
 			from poisons.start
 			until poisons.exhausted
 			loop
 				poison := poisons.item
-				difference := clock.time_now - poison.gettimeplaced
+				difference := clock.time_now - poison.get_time_placed
 				if (difference.second_count >= constants.max_artifact_time)
 				then
-					state.removepoison (poison)
-					make_point_available(poison.getpoisonpoint)
+					state.remove_poison (poison)
+					make_point_available(poison.get_poison_point)
 
 				end
 				poisons.forth
@@ -388,17 +388,17 @@ feature {ANY} -- Public features
 			end
 
 			-- Check for timeouts for powerUps
-			powerUps := state.getpowerups
+			powerUps := state.get_power_ups
 			itemNr := 0
 			from powerUps.start
 			until powerUps.exhausted
 			loop
 				powerUp := powerUps.item
-				difference := clock.time_now - powerUp.gettimeplaced
+				difference := clock.time_now - powerUp.get_time_placed
 				if (difference.second_count >= constants.max_artifact_time)
 				then
-					state.removepowerup (powerUp)
-					make_point_available(powerUp.getpoweruppoint)
+					state.remove_power_up (powerUp)
+					make_point_available(powerUp.get_power_up_point)
 
 				end
 				powerUps.forth
@@ -406,20 +406,20 @@ feature {ANY} -- Public features
 			end
 
 			-- Check for timeouts for influences
-			influences := snake.getinfluences
+			influences := snake.get_influences
 			itemNr := 0
 			from influences.start
 			until influences.off
 			loop
 				influence := influences.item
-				difference := clock.time_now - influence.getstarttime
-				if(difference.second_count >= influence.getduration)
+				difference := clock.time_now - influence.get_start_time
+				if(difference.second_count >= influence.get_duration)
 				then
-					if (snake.getspeed - influence.getspeed < constants.min_speed)
-					then snake.setspeed (constants.min_speed)
-					else snake.setspeed (snake.getspeed - influence.getspeed)
+					if (snake.get_speed - influence.get_speed < constants.min_speed)
+					then snake.set_speed (constants.min_speed)
+					else snake.set_speed (snake.get_speed - influence.get_speed)
 					end
-					snake.sethealth (snake.gethealth - influence.gethealth)
+					snake.set_health (snake.get_health - influence.get_health)
 					influences.remove
 					influences.finish
 				end
@@ -436,39 +436,39 @@ feature {ANY} -- Public features
 			longestSnake: SNAKE
 			snake: SNAKE
 		do
-			snakesPlayingNumber := state.getsnakes.count
+			snakesPlayingNumber := state.get_snakes.count
 			greatestLength := 0
 			-- Snake that lost while playing
-			snakesPlaying := state.getsnakes
+			snakesPlaying := state.get_snakes
 			from snakesPlaying.start
 			until snakesPlaying.off
 			loop
 				snake := snakesPlaying.item
-				if (snake.gethealth = 0 or snake.getlength = 0)
+				if (snake.get_health = 0 or snake.get_length = 0)
 				then
-					snake.setisplaying (false)
+					snake.set_is_playing (false)
 					snakesPlayingNumber := snakesPlayingNumber - 1
 				else
-					if(snake.getlength > greatestLength)
+					if(snake.get_length > greatestLength)
 					then
-						greatestLength := snake.getlength
+						greatestLength := snake.get_length
 					end
 				end
 				snakesPlaying.forth
 			end
 
 			-- If all are out and only one remains playing
-			if(state.getsnakes.count = constants.max_players and snakesPlaying.count = 1)
+			if(state.get_snakes.count = constants.max_players and snakesPlaying.count = 1)
 			then
-				snakesPlaying := state.getsnakes
+				snakesPlaying := state.get_snakes
 				from snakesPlaying.start
 				until snakesPlaying.off
 				loop
 					snake := snakesPlaying.item
-					if(snake.isplaying = true)
+					if(snake.is_playing = true)
 					then
-						state.setresults ("Player " + snake.getid.out + " won")
-						snake.setisplaying (false)
+						state.set_results ("Player " + snake.get_id.out + " won")
+						snake.set_is_playing (false)
 						finished := true
 						Result := current
 					end
@@ -476,26 +476,26 @@ feature {ANY} -- Public features
 			end
 
 			-- Time is up, elect winner
-			if(state.gettimeelapsed >= constants.game_duration)
+			if(state.get_time_elapsed >= constants.game_duration)
 			then
-				state.settimeelapsed (constants.game_duration)
+				state.set_time_elapsed (constants.game_duration)
 				finished := true
-				snakesPlaying := state.getsnakes
+				snakesPlaying := state.get_snakes
 				from snakesPlaying.start
 				until snakesPlaying.off
 				loop
 					snake := snakesPlaying.item
-					if(snake.isplaying = true and snake.getlength = greatestLength)
+					if(snake.is_playing = true and snake.get_length = greatestLength)
 					then
 						if (longestSnake = void)
 						then longestSnake := snake
-						else state.setresults ("It is draw")
+						else state.set_results ("It is draw")
 							Result := current
 						end
 					end
 				end
 				if(longestSnake /= void)
-				then state.setresults ("Player " + longestSnake.getid.out + " won")
+				then state.set_results ("Player " + longestSnake.get_id.out + " won")
 					 Result := current
 				end
 			end
@@ -506,7 +506,7 @@ feature {NONE} -- Private features
 
 	place_food
 		do
-			state.setfood (occupy_random_point)
+			state.set_food (occupy_random_point)
 		end
 
 	place_poison
@@ -518,9 +518,9 @@ feature {NONE} -- Private features
 
 			create actualTime.make_from_second_count (1) -- dummy value
 			actualTime := clock.time_now
-			poison.settimeplaced (actualTime)
+			poison.set_time_placed (actualTime)
 
-			state.addpoison (poison)
+			state.add_poison (poison)
 
 		end
 
@@ -538,23 +538,23 @@ feature {NONE} -- Private features
 			then type := "SPEED"
 			else type := "HEALTH"
 			end
-			powerUp.settype (type)
+			powerUp.set_type (type)
 
 			create actualTime.make_from_second_count (1) -- dummy value
 			actualTime := clock.time_now
-			powerUp.settimeplaced (actualTime)
+			powerUp.set_time_placed (actualTime)
 
-			state.addpowerup(powerUp)
+			state.add_power_up(powerUp)
 		end
 
 	make_point_available(point: POINT)
 		do
-			if not(state.getavaliablepoints.has (point))
+			if not(state.get_available_points.has (point))
 			then
 				if((point.get_x >= 0 and point.get_x <= (constants.board_width)) and
 				  (point.get_y >= 0 and point.get_y <= (constants.board_height)))
 				then
-					state.getavaliablepoints.extend (point)
+					state.get_available_points.extend (point)
 				end
 			end
 		end
@@ -569,7 +569,7 @@ feature {NONE} -- Private features
 
 	occupy_point(point: POINT)
 		do
-			state.removeavaliablepoint (point)
+			state.remove_available_point (point)
 		end
 
 	occupy_random_point: POINT
@@ -580,7 +580,7 @@ feature {NONE} -- Private features
 			rn: RANDOM_NUMBERS
 		do
 			create p.make (0,0)
-			avaliablePoints := state.getavaliablepoints
+			avaliablePoints := state.get_available_points
 			create rn.make
 			number := rn.random_integer \\ (avaliablePoints.count) + 1
 			p := avaliablePoints.at (number)

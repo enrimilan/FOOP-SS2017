@@ -16,11 +16,9 @@ feature {NONE} -- variables
 	snakes: LINKED_LIST[SNAKE]
 	poisons: LINKED_LIST[POISON]
 	powerUps: LINKED_LIST[POWERUP]
-	avaliablePoints:LINKED_LIST[POINT]
+	availablePoints:LINKED_LIST[POINT]
 	constants: CONSTANTS
-
 	timeElapsed: INTEGER
-
 	food: POINT
 	theResult: STRING
 
@@ -35,15 +33,13 @@ feature {ANY} -- Initialization
 			create snakes.make
 			create poisons.make
 			create powerUps.make
-			create avaliablePoints.make
+			create availablePoints.make
 			create constants
 			timeElapsed := 0
-			avaliablePoints.compare_objects
+			availablePoints.compare_objects
 
 			create food.make(-1,-1) -- dummy values
 			theResult := " " -- dummy value
-
-			--io.put_string ("I AM HERE")
 
 			from i := 0
 			invariant (i >= 0) and (i <= constants.board_width)
@@ -54,56 +50,21 @@ feature {ANY} -- Initialization
 				until j >= constants.board_height
 				loop
 					create p.make(i,j)
-					avaliablePoints.extend (p)
+					availablePoints.extend (p)
 					j := j + 1
 				end
 				i := i + 1
 			end
-
-			--io.put_string ("AND NOW HERE")
-
-			-- FOR TESTING PURPOSES
-			--across
-            --            avaliablePoints as aP
-            --loop
-            --           p := aP.item
-            --           io.put_integer (p.get_x)
-            --            io.put_string (" ; ")
-            --            io.put_integer (p.get_y)
-            --            io.put_new_line
-            -- end
 		end
 
 feature {ANY} -- Public features
 
-	removeAvaliablePoint(point: POINT)
-		local
-			avaliablePoint: POINT
+	remove_available_point(point: POINT)
 		do
-			--print("Remove point %N")
-			--io.put_boolean (avaliablePoints.has (point))
-			--io.put_integer (avaliablePoints.count)
-			avaliablePoints.prune(point)
-			--print("Removed point %N")
-			--io.put_integer (avaliablePoints.count)
-
-
-
-			--from avaliablePoints.start
-			--until avaliablePoints.exhausted
-			--loop
-			--	if(avaliablePoints.item.get_x = point.get_x and avaliablePoints.item.get_y = point.get_y)
-			--	then
-			--		avaliablePoints.remove
-			--		avaliablePoints.finish
-			--	end
-			--	avaliablePoints.forth
-			--end
-			--print("Finished removing %N")
+			availablePoints.prune(point)
 		end
 
-
-	removePoison(poison: POISON)
+	remove_poison(poison: POISON)
 		local
 			i: INTEGER
 		do
@@ -113,7 +74,7 @@ feature {ANY} -- Public features
 			poisons.remove
 		end
 
-	removePowerUp(powerup: POWERUP)
+	remove_power_up(powerup: POWERUP)
 		local
 			i: INTEGER
 		do
@@ -123,63 +84,64 @@ feature {ANY} -- Public features
 			powerups.remove
 		end
 
-	getAvaliablePoints: LINKED_LIST[POINT]
+	get_available_points: LINKED_LIST[POINT]
 		do
-			Result := avaliablePoints
+			Result := availablePoints
 		end
 
-	getFood: POINT
+	get_food: POINT
 		do
 			Result := food
 		end
 
-	setFood(newFood: POINT)
+	set_food(newFood: POINT)
 		do
 			food := newFood
 		end
 
-	getResults: STRING
+	get_results: STRING
 		do
 			Result := theResult
 		end
 
-	setResults(newResult: STRING)
+	set_results(newResult: STRING)
 		do
 			theResult := newResult
 		end
 
-	getTimeElapsed: INTEGER
+	get_time_elapsed: INTEGER
 		do
 			Result := timeElapsed
 		end
 
-	setTimeElapsed(newTime: INTEGER)
+	set_time_elapsed(newTime: INTEGER)
 		do
 			timeElapsed:= newTime
 		end
 
-	getPosions: LINKED_LIST[POISON]
+	get_poisons: LINKED_LIST[POISON]
 		do
 			Result := poisons
 		end
 
-	addPoison(newPoison: POISON)
+	add_poison(newPoison: POISON)
 		do
 			poisons.extend (newPoison)
 		end
 
-	getPowerUps: LINKED_LIST[POWERUP]
+	get_power_ups: LINKED_LIST[POWERUP]
 		do
 			Result := powerUps
 		end
 
-	addPowerUp(newPowerUp: POWERUP)
+	add_power_up(newPowerUp: POWERUP)
 		do
 			powerUps.extend (newPowerUp)
 		end
 
-	getSnakes: LINKED_LIST[SNAKE]
+	get_snakes: LINKED_LIST[SNAKE]
 		do
 			Result := snakes
 		end
+	
 end

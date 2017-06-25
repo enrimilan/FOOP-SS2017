@@ -27,7 +27,7 @@ feature {ANY} -- This class is used to create instances. This should be the only
 			snake_impl: SNAKE_IMPL
 		do
 			create snake_impl.make(id, character_representation_in)
-			snake_impl.addhead (newhead)
+			snake_impl.add_head (newhead)
 			snake := snake_impl
 			--io.put_integer (snake.gethead.get_x)
 			Result := snake
@@ -51,7 +51,7 @@ feature {ANY} -- This class is used to create instances. This should be the only
 
 	create_influence(duration:INTEGER; speed: INTEGER; health: INTEGER; startTime: DT_TIME): INFLUENCE
 		local
-			influence: INFLUENCE
+			influence: INFLUENCE_IMPL
 		do
 			create influence.make (duration, speed, health, startTime)
 			Result := influence

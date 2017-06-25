@@ -23,7 +23,7 @@ feature {NONE} -- Private variables
 	points: LINKED_LIST[POINT]
 	influences: LINKED_LIST[INFLUENCE]
 
-feature {NONE} -- Initialization
+feature {ANY} -- Initialization
 
 	make(snakeId: INTEGER; character_representation_in: CHARACTER)
 		do
@@ -40,77 +40,77 @@ feature {NONE} -- Initialization
 
 feature {ANY} -- Public functions
 
-	isPlaying: BOOLEAN
+	is_playing: BOOLEAN
 		do
 			Result := playing
 		end
 
-	setDirection(newDirection: STRING)
+	set_direction(newDirection: STRING)
 		do
 			direction := newDirection
 		end
 
-	setHealth(newHealth: INTEGER)
+	set_health(newHealth: INTEGER)
 		do
 			health := newHealth
 		end
 
-	setIsPlaying(newIsPlaying: BOOLEAN)
+	set_is_playing(newIsPlaying: BOOLEAN)
 		do
 			playing := newIsPlaying
 		end
 
-	setSpeed(newSpeed: INTEGER)
+	set_speed(newSpeed: INTEGER)
 		do
 			speed := newSpeed
 		end
 
-	addHead(newHead: POINT)
+	add_head(newHead: POINT)
 		do
 			points.extend (newHead)
 		end
 
-	getHead: POINT
+	get_head: POINT
 		do
 			Result := points.last
 		end
 
-	getDirection: String
+	get_direction: String
 		do
 			Result := direction
 		end
 
-	getHealth: INTEGER
+	get_health: INTEGER
 		do
 			Result := health
 		end
 
-	getId: INTEGER
+	get_id: INTEGER
 		do
 			Result := id
 		end
 
-	getLength: INTEGER
+	get_length: INTEGER
 		do
 			Result := points.count
 		end
 
-	getPoints: LINKED_LIST[POINT]
+	get_points: LINKED_LIST[POINT]
 		do
 			Result := points
 		end
 
-	getSpeed: INTEGER
+	get_speed: INTEGER
 		do
 			Result := speed
 		end
 
-	getTail: POINT
+	get_tail: POINT
 		do
 			Result := points.last
 		end
 
-	getInfluences: LINKED_LIST[INFLUENCE]
+	get_influences: LINKED_LIST[INFLUENCE]
 		do
 			Result := influences
 		end

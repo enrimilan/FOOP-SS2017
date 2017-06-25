@@ -26,22 +26,22 @@ feature{ANY} -- Initialization
 
 feature{ANY} -- Public functions
 
-	getTimePlaced: DT_TIME
+	get_time_placed: DT_TIME
 		do
 			Result := timePlaced
 		end
 
-	setTimePlaced(newTimePlaced: DT_TIME)
+	set_time_placed(newTimePlaced: DT_TIME)
 		do
 			timePlaced := newTimePlaced
 		end
 
-	getType: STRING
+	get_type: STRING
 		do
 			Result := type
 		end
 
-	setType(newType: STRING)
+	set_type(newType: STRING)
 		do
 			type := newType
 		end
@@ -56,7 +56,7 @@ feature{ANY} -- Public functions
 			Result := point.get_y
 		end
 
-	getPowerUpPoint: POINT
+	get_power_up_point: POINT
 		do
 			Result := point
 		end

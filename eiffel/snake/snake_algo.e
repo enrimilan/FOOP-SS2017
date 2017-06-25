@@ -44,7 +44,7 @@ feature {ANY} -- Public features
 		do
 			next_dir:=direction_to_food
 			--if snake len > 1, cannot turn, check this
-			if snake.getpoints.count>1 then
+			if snake.get_points.count>1 then
 				next_dir := alter_dir_if_snake_long(next_dir)
 			end
 			Result:=next_dir
@@ -53,13 +53,13 @@ feature {ANY} -- Public features
 	alter_dir_if_snake_long(next_dir:STRING):STRING
 		do
 				Result:=next_dir
-			if 	next_dir.is_equal(dir.up) and snake.getdirection.is_equal (dir.down) or
-			 	next_dir.is_equal(dir.down) and snake.getdirection.is_equal (dir.up)
+			if 	next_dir.is_equal(dir.up) and snake.get_direction.is_equal (dir.down) or
+			 	next_dir.is_equal(dir.down) and snake.get_direction.is_equal (dir.up)
 			then
 				Result:=dir.left
 			end
-			if 	next_dir.is_equal(dir.left) and snake.getdirection.is_equal (dir.right) or
-			 	next_dir.is_equal(dir.right) and snake.getdirection.is_equal (dir.left)
+			if 	next_dir.is_equal(dir.left) and snake.get_direction.is_equal (dir.right) or
+			 	next_dir.is_equal(dir.right) and snake.get_direction.is_equal (dir.left)
 			then
 				Result:=dir.up
 			end
@@ -70,7 +70,7 @@ feature {ANY} -- Public features
 
 	direction_to_food:STRING
 		require
-			snake.getid/=-1
+			snake.get_id/=-1
 		local
 			player_x:INTEGER
 			player_y:INTEGER
@@ -79,11 +79,11 @@ feature {ANY} -- Public features
 
 		do
 			Result:="none"
-			if snake.isplaying then
-				player_x := snake.gethead.get_x
-				player_y := snake.gethead.get_y
-				food_x := game.get_state.getfood.get_x
-				food_y := game.get_state.getfood.get_y
+			if snake.is_playing then
+				player_x := snake.get_head.get_x
+				player_y := snake.get_head.get_y
+				food_x := game.get_state.get_food.get_x
+				food_y := game.get_state.get_food.get_y
 
 				if player_x = food_x then
 					--on same x level
@@ -133,7 +133,7 @@ feature {ANY} -- Public features
 		found:BOOLEAN
 		do
 			player_id := id
-			snake := game.get_state.getsnakes.at (id)
+			snake := game.get_state.get_snakes.at (id)
 		end
 
 

@@ -4,68 +4,25 @@ note
 	date: "$Date$"
 	revision: "$Revision$"
 
-class
+deferred class
 	INFLUENCE
-
-create
-	make
-
-feature {NONE}
-	duration: INTEGER
-	speed: INTEGER
-	health: INTEGER
-	startTime: DT_TIME
-
-feature{ANY}
-
-	make(newDuration: INTEGER; newSpeed: INTEGER; newHealth: INTEGER; newStartTime: DT_TIME)
-		do
-			duration := newDuration
-			speed := newSpeed
-			health := newHealth
-			startTime := newStartTime
-		end
 
 feature {ANY}
 
-	setDuration(newDuration: INTEGER)
-		do
-			duration := newDuration
-		end
+	set_duration(newDuration: INTEGER) deferred end
 
-	setSpeed(newSpeed: INTEGER)
-		do
-			speed := newSpeed
-		end
+	set_speed(newSpeed: INTEGER) deferred end
 
-	setHealth(newHealth: INTEGER)
-		do
-			health := newHealth
-		end
+	set_health(newHealth: INTEGER) deferred end
 
-	setStartTime(newStartTime: DT_TIME)
-		do
-			startTime := newStartTime
-		end
+	set_start_time(newStartTime: DT_TIME) deferred end
 
-	getDuration: INTEGER
-		do
-			Result := duration
-		end
+	get_duration: INTEGER deferred end
 
-	getSpeed: INTEGER
-		do
-			Result := speed
-		end
+	get_speed: INTEGER deferred end
 
-	getHealth: INTEGER
-		do
-			Result := health
-		end
+	get_health: INTEGER deferred end
 
-	getStartTime: DT_TIME
-		do
-			Result := startTime
-		end
+	get_start_time: DT_TIME deferred end
 
 end
