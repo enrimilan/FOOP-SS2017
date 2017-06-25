@@ -129,8 +129,6 @@ feature {ANY} -- Public features
 	set_player_id(id:INTEGER)
 		require
 			id>=0
-		local
-		found:BOOLEAN
 		do
 			player_id := id
 			snake := game.get_state.get_snakes.at (id)
