@@ -423,8 +423,8 @@ feature {ANY} -- Public features
 					current.placepowerup
 				end
 
-				--timeElapsed := clock.time_now - startingTime
-				--state.settimeelapsed (timeElapsed.second_count)
+				timeElapsed := clock.time_now - startingTime
+				state.settimeelapsed (timeElapsed.second_count)
 				--game := current.updategameresult
 
 			--io.putstring("Finish update state for " + id.out)

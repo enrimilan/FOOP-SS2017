@@ -46,13 +46,8 @@ feature {NONE} -- Initialization and main entry point
 
 			create keyboard_definition
 
-<<<<<<< Updated upstream
 			create player1.make_new(current, 1, direction, mode_value2, game)
 			create player2.make_new(current, 2, direction, mode_value2, game)
-=======
-			create player1.make_new(current, 1, direction, mode_value, game)
-			create player2.make_new(current, 2, direction, mode_value, game)
->>>>>>> Stashed changes
 
 
 			game.add_snake(1, 'o')
@@ -100,6 +95,7 @@ feature {NONE} -- Private features
 			i: INTEGER
 			j: INTEGER
 			output: STRING
+			duration: INTEGER
 
 		do
 			--print("Start drawing %N")
@@ -170,8 +166,12 @@ feature {NONE} -- Private features
 
 			--CHANGE THIS ACCORDING TO OS
 			--OR REMOVE IT FOR A "DEBUG" VIEW
+			duration := constants.game_duration - state.gettimeelapsed
 			system("cls")
-			print("Player1: Health: ")
+			print((duration / 60).floor)
+			print(":")
+			print(duration \\ 60)
+			print("%NPlayer1: Health: ")
 			print(state.getsnakes.at(1).gethealth)
 			print(" Speed: ")
 			print(state.getsnakes.at(1).getspeed)
