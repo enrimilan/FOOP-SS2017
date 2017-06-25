@@ -79,41 +79,45 @@ feature {ANY} -- Public features
 
 		do
 			Result:="none"
-			player_x := snake.gethead.get_x
-			player_y := snake.gethead.get_y
-			food_x := game.get_state.getfood.get_x
-			food_y := game.get_state.getfood.get_y
+			if snake.isplaying then
+				player_x := snake.gethead.get_x
+				player_y := snake.gethead.get_y
+				food_x := game.get_state.getfood.get_x
+				food_y := game.get_state.getfood.get_y
 
-			if player_x = food_x then
-				--on same x level
-				if player_y < food_y then
-					Result:=dir.down
-				else
-					Result:=dir.up
+				if player_x = food_x then
+					--on same x level
+					if player_y < food_y then
+						Result:=dir.down
+					else
+						Result:=dir.up
+					end
 				end
-			end
 
-			if player_y = food_y then
-				--on same y level
-				if player_x < food_x then
+				if player_y = food_y then
+					--on same y level
+					if player_x < food_x then
+						Result:=dir.right
+					else
+						Result:=dir.left
+					end
+				end
+				if Result.is_equal("none") then
+					if player_x < food_x then
+						Result:=dir.right
+					else
+						Result:=dir.left
+					end
+				end
+				if Result.is_equal("none") then
+					if player_y < food_y then
+						Result:=dir.down
+					else
+						Result:=dir.up
+					end
+				end
+				else
 					Result:=dir.right
-				else
-					Result:=dir.left
-				end
-			end
-			if Result.is_equal("none") then
-				if player_x < food_x then
-					Result:=dir.right
-				else
-					Result:=dir.left
-				end
-			end
-			if Result.is_equal("none") then
-				if player_y < food_y then
-					Result:=dir.down
-				else
-					Result:=dir.up
-				end
 			end
 		ensure
 			Result.is_equal(dir.up) or

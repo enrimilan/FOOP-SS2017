@@ -47,23 +47,18 @@ feature {NONE} -- Initialization and main entry point
 			create keyboard_definition
 
 			create player1.make_new(current, 1, direction, mode_value, game)
-			create player2.make_new(current, 2, direction, mode_value, game)
+			create player2.make_new(current, 2, direction, mode_value2, game)
 
 
 
 			game.add_snake(1, 'o')
 			player1.set_joined_game(true)
-<<<<<<< HEAD
             player1.set_interval(4)
 
 			game.add_snake(2, 'a')
 			player2.set_joined_game(true)
             player2.set_interval(4)
-=======
 
-			game.add_snake(2, 'a')
-			player2.set_joined_game(true)
->>>>>>> 5003a0f652c0df749ae411ed18a503eb5c8e9243
 
 			-- Start playing
 			player1.launch

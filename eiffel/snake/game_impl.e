@@ -81,8 +81,10 @@ feature {ANY} -- Public features
 					snakePoint := snakePoints.at (i)
 					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
 					then
-						Current.removesnaketail (snake, snake.getlength-i+1)
-						snake.sethealth (snake.gethealth-50)
+						Current.removesnaketail (snake, snake.getlength)
+						snake.sethealth (0)
+						snake.setspeed (0)
+						snake.setisplaying (false)
 						Result := true
 					end
 					i := i + 1
