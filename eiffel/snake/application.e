@@ -46,18 +46,18 @@ feature {NONE} -- Initialization and main entry point
 
 			create keyboard_definition
 
-			create player1.make_new(current, 1, direction, mode_value2, game)
-			create player2.make_new(current, 2, direction, mode_value2, game)
+			create player1.make_new(current, 1, direction, mode_value, game)
+			create player2.make_new(current, 2, direction, mode_value, game)
 
 
 
 			game.add_snake(1, 'o')
 			player1.set_joined_game(true)
-            player1.set_interval(8)
+            player1.set_interval(4)
 
 			game.add_snake(2, 'a')
 			player2.set_joined_game(true)
-            player2.set_interval(8)
+            player2.set_interval(4)
 
 			-- Start playing
 			player1.launch
@@ -185,13 +185,13 @@ feature {NONE} -- Private features
 					print("/")
 					print(state.getfood.get_y)
 					print("%N")
-			output := output + "%N-----------------------------------------%N"
+			output := output + "%N------------------------------------------%N"
 			from i:= 1
-			until i >= (constants.board_height)
+			until i > (constants.board_height)
 			loop
 				output := output + "|"
 				from j := 1
-				until j >= (constants.board_width)
+				until j > (constants.board_width)
 				loop
 					output := output + board.item(i,j).out
 					j := j+1
@@ -199,7 +199,7 @@ feature {NONE} -- Private features
 				output := output + "|%N"
 				i := i+1
 			end
-			output := output + "-----------------------------------------%N"
+			output := output + "------------------------------------------%N"
 			print(output)
 			--print("Finished drawing %N")
 

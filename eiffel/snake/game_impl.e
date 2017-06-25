@@ -81,7 +81,7 @@ feature {ANY} -- Public features
 					snakePoint := snakePoints.at (i)
 					if(snakeHead.get_x = snakePoint.get_x and snakeHead.get_y = snakePoint.get_y)
 					then
-						Current.removesnaketail (snake, i)
+						Current.removesnaketail (snake, snake.getlength-i+1)
 						snake.sethealth (snake.gethealth-50)
 						Result := true
 					end
@@ -104,7 +104,7 @@ feature {ANY} -- Public features
 
 						if(snakeHead.get_x = bittenSnake.getpoints.item.get_x and snakeHead.get_y = bittenSnake.getpoints.item.get_y)then
 							--snake bit bittensnake
-							removesnaketail (bittenSnake, index)
+							removesnaketail (bittenSnake, bittenSnake.getlength-index)
 
 							--speed up bitersnake
 							if (snake.getspeed + constants.bitting_speed > constants.max_speed)
@@ -118,9 +118,15 @@ feature {ANY} -- Public features
 							snake.sethealth (snake.gethealth + constants.bitting_health)
 
 							--alter bitten snake
-							r := (snake.getlength / bittenSnake.getlength) * constants.bitting_health
-							bittenSnake.sethealth (bittenSnake.gethealth - r.rounded)
-
+							if bittenSnake.getlength=0 then
+								--snake got bitten in head, it is kill
+								bittenSnake.sethealth (0)
+								bittenSnake.setspeed (0)
+								bittenSnake.setisplaying (false)
+							else
+								r := (snake.getlength / bittenSnake.getlength) * constants.bitting_health
+								bittenSnake.sethealth (bittenSnake.gethealth - r.rounded)
+							end
 						end
 						index := index+1
 						bittenSnake.getpoints.forth
@@ -238,8 +244,9 @@ feature {ANY} -- Public features
 			Result := false
 			if (head.get_x < 0 or head.get_x >= (constants.board_width) or head.get_y < 0 or head.get_y >= (constants.board_height))
 			then
-				removeSnakeTail(snake, snake.getlength)
+				removeSnakeTail(snake, 1)
 				snake.sethealth (0)
+				snake.setspeed (0)
 				snake.setisplaying(false)
 				Result := true
 			end
@@ -252,17 +259,36 @@ feature {ANY} -- Public features
 			point: POINT
 			i: INTEGER
 		do
-			toRemove := snake.getpoints
-			from
-				i := 1
-			until
-				i >= index+1
+			create toRemove.make
+			--toRemove := snake.getpoints
+
+			from snake.getpoints.start
+			until snake.getpoints.exhausted
 			loop
-				point := toRemove.at (i)
-				toRemove.go_i_th (i)
-				toRemove.remove
+				toRemove.put_front (snake.getpoints.item)
+				snake.getpoints.forth
+			end
+
+
+			point := toRemove.at (index)
+
+			from
+				toRemove.start
+			until
+				toRemove.exhausted
+			loop
+				point := toremove.at (index)
+				toRemove.prune (point)
 				makePointAvailable(point)
-				i := i + 1
+			--	i := i + 1
+			end
+
+			snake.getpoints.wipe_out
+			from toRemove.start
+			until toRemove.exhausted
+			loop
+				snake.getpoints.put_front (toRemove.item)
+				toRemove.forth
 			end
 		end
 
@@ -434,7 +460,7 @@ feature {ANY} -- Public features
 				current.occupypoint (head)
 
 				if not (current.eatsfood (snake, head)) then
-					current.removesnaketail (snake, 1)
+					current.removesnaketail (snake, snake.getlength)
 				end
 
 				flag := current.eatspoison (snake, head)
