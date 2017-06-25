@@ -124,18 +124,8 @@ feature {ANY} -- Public features
 		local
 			food: POINT
 		do
---			print("CHECKING FOODEAT: ")
---			print("Food at: ")
---			print(state.getfood.get_x)
---			print("/")
---			print(state.getfood.get_y)
---			print("%NSnake at: ")
---			print(head.get_x)
---			print("/")
---			print(head.get_y)
 			food := state.getfood
 			if ((food.get_x = head.get_x) and (food.get_y = head.get_y)) then
-			--	print("FOOD EATEN")
 				if(snake.getspeed + constants.food_speed > constants.max_speed) then
 					snake.setspeed (constants.max_speed)
 				else snake.setspeed (snake.getspeed + constants.food_speed)
@@ -151,15 +141,11 @@ feature {ANY} -- Public features
 	eatsPoison(snake: SNAKE; head: POINT): BOOLEAN
 		local
 			poisons: LINKED_LIST[POISON]
-			poison_to_remove: POISON
 			poison: POISON
-			itemNr: INTEGER
 			randomNumber: REAL
-			toRet: BOOLEAN
+
 		do
-			toRet := false
 			poisons := state.getposions
-			itemNr := 1
 
 			from poisons.start
 			until poisons.off
@@ -179,29 +165,19 @@ feature {ANY} -- Public features
 					-- add poison to list to be removed
 					state.removepoison(poison)
 					poisons.finish
-					toRet := true
+					Result := true
 				end
 				poisons.forth
-				itemNr := itemNr + 1
 			end
-			if toRet /= true then
-				Result := false
-			else
-				Result := true
-			end
+			Result := false
 		end
 
 	eatsPowerUp(snake: SNAKE; head: POINT): BOOLEAN
 		local
 			powerUps: LINKED_LIST[POWERUP]
-			removeList: LINKED_LIST[POWERUP]
 			powerUp : POWERUP
-			itemNr: INTEGER
-			toRet: BOOLEAN
 		do
-			toRet := false
 			powerUps := state.getpowerups
-			itemNr := 0
 			from powerUps.start
 			until powerUps.off
 			loop
@@ -218,16 +194,11 @@ feature {ANY} -- Public features
 					-- remove powerUp from list
 					state.removepowerup (powerUp)
 					powerUps.finish
-					toRet := true
+					Result := true
 				end
 				powerUps.forth
-				itemNr := itemNr + 1
 			end
-			if toRet /= true then
-				Result := false
-			else
-				Result := true
-			end
+			Result := false
 		end
 
 	collidesWithBorder(snake: SNAKE; head:POINT): BOOLEAN
@@ -434,44 +405,30 @@ feature {ANY} -- Public features
 			head := snake.gethead
 			current.occupypoint (head)
 
-			if not (current.eatsfood (snake, head))
-			then
+			if not (current.eatsfood (snake, head)) then
 				current.removesnaketail (snake, 1)
-			else
-				print("FOOD EATEN")
 			end
-
-			--io.put_string ("The length of the snake: " + snake.getpoints.count.out)
-			--io.new_line
-			--io.put_string("The head of the snake: X:  " + snake.gethead.get_x.out + " ; Y: " + snake.gethead.get_y.out)
-			--io.new_line
 
 			flag := current.eatspoison (snake, head)
 			flag := current.eatspowerup (snake, head)
-			flag := current.bitesitselforothersnake (snake)
-			flag := current.collideswithborder (snake, head)
+			--flag := current.bitesitselforothersnake (snake)
+			--flag := current.collideswithborder (snake, head)
 
 
 
-			current.checktimeouts (snake)
+			--current.checktimeouts (snake)
 
-			-- Place poisons and powerUps
-		--	io.put_string ("The count of poisons in state: " + state.getposions.count.out)
-		--	io.new_line
-			if(state.getposions.count < constants.poison_max)
-				then
-					current.placepoison
-					io.put_string("Poison count after placing a poison: " + state.getposions.count.out)
-					io.new_line
-				end
-			if(state.getpowerups.count < constants.power_up_max)
-				then
-					current.placepowerup
-				end
+			-- Place poisons and power-ups
+			if(state.getposions.count < constants.poison_max) then
+				current.placepoison
+			end
+			if(state.getpowerups.count < constants.power_up_max) then
+				current.placepowerup
+			end
 
-			timeElapsed := clock.time_now - startingTime
-			state.settimeelapsed (timeElapsed.second_count)
-			game := current.updategameresult
+			--timeElapsed := clock.time_now - startingTime
+			--state.settimeelapsed (timeElapsed.second_count)
+			--game := current.updategameresult
 
 		--io.putstring("Finish update state for " + id.out)
 		--io.new_line
@@ -635,71 +592,14 @@ feature {ANY} -- Public features
 			avaliablePoints: LINKED_LIST[POINT]
 			number: INTEGER
 			rn: RANDOM_NUMBERS
-			-- FOR TESTING PURPOSES
-			--random_sequence: RANDOM
-			--arbTime: DT_TIME
-			--dif: DT_TIME_DURATION
-			--intList: LINKED_LIST[INTEGER]
-			--i: INTEGER
-			--index: INTEGER
 		do
 			create p.make (0,0)
 			avaliablePoints := state.getavaliablepoints
-
 			create rn.make
 			number := rn.random_integer \\ (avaliablePoints.count) + 1
-
 			p := avaliablePoints.at (number)
-
-			-- FOR TESTING PURPOSES
-		--	create intList.make
-		--	from i:= 0
-		--	until i >= 10
-		--	loop
-		--		intList.extend (i)
-		--		i := i + 1
-		--	end
-
-		--	intList.go_i_th (4)
-		--	intList.remove
-
-		--	index := 4
-		--	from i := 0
-		--	until i >= index
-		--	loop
-		--		intList.go_i_th (intList.count)
-		--		intList.remove
-		--		i := i + 1
-		--	end
-
-		--	intList.start
-
-		--	from intList.start
-		--	until intList.off
-		--	loop
-		--		io.put_integer (intList.item)
-		--		intList.forth
-		--	end
-
-			-- FOR TESTING PURPOSES
-			--io.put_string ("POINT: ")
-			--io.put_integer (p.get_x)
-			--io.put_string (" ; ")
-			--io.put_integer (p.get_y)
-			--io.put_new_line
-
-			-- FOR TESTING PURPOSES
-			--create arbTime.make (12, 12, 0)
-			--dif := arbTime - startingTime
-			--io.put_string ("ARBITRARY TIME: " + arbTime.out)
-			--io.new_line
-			--io.put_string ("STARTING TIME: " + startingTime.out)
-			--io.put_new_line
-			--io.putint (dif.second_count)
-
 			avaliablePoints.go_i_th (number)
 			avaliablePoints.remove
-
 			Result := p
 		end
 
