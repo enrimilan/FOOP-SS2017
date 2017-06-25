@@ -95,4 +95,9 @@ feature {ANY} -- Public features
 			Result := joined_game
 		end
 
+	get_mode: STRING
+		do
+			Result := mode_value
+		end
+
 end
