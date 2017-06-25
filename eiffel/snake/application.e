@@ -209,7 +209,7 @@ feature {NONE} -- Private features
 		local
 			c: CHARACTER
 		do
-			print("Press any key to start%N")
+			print("%NPress any key to start%N")
 			from
         	until
             	player1.get_mode.is_equal(mode.computer) and player2.get_mode.is_equal(mode.computer)
