@@ -204,11 +204,11 @@ feature {ANY} -- Public features
 	collidesWithBorder(snake: SNAKE; head:POINT): BOOLEAN
 		do
 			Result := false
-			if (head.get_x < 0 or head.get_x > (constants.board_width) or head.get_y < 0 or head.get_y > (constants.board_height))
+			if (head.get_x < 0 or head.get_x >= (constants.board_width) or head.get_y < 0 or head.get_y >= (constants.board_height))
 			then
-				--io.put_string ("GAME_IMPL.collidesWithBorderI: AM HERE")
 				removeSnakeTail(snake, snake.getlength)
 				snake.sethealth (0)
+				snake.setisplaying(false)
 				Result := true
 			end
 
@@ -359,79 +359,76 @@ feature {ANY} -- Public features
 			--io.putstring("Start update state for " + id.out)
 			--io.new_line
 			snake := state.getsnakes.at (id)
-			snake.setdirection (current.calculatesnake (snake, direction))
 
+			if(snake.isplaying = true) then
 
-			if
-				(snake.getlength > 1)
-			then
-				print("break")
-			end
+				snake.setdirection (current.calculatesnake (snake, direction))
 
-			--NEW SNAKE HEAD
-			head := snake.gethead
-			if(snake.getdirection.is_equal ("RIGHT"))
-				then
-					x := head.get_x + 1
-					y := head.get_y
-					create p.make (x, y)
-					snake.addhead (p)
+				--NEW SNAKE HEAD
+				head := snake.gethead
+				if(snake.getdirection.is_equal ("RIGHT"))
+					then
+						x := head.get_x + 1
+						y := head.get_y
+						create p.make (x, y)
+						snake.addhead (p)
+					end
+
+				if(snake.getdirection.is_equal ("LEFT"))
+					then
+						x := head.get_x - 1
+						y := head.get_y
+						create p.make (x, y)
+						snake.addhead (p)
+					end
+
+				if(snake.getdirection.is_equal ("UP"))
+					then
+						x := head.get_x
+						y := head.get_y - 1
+						create p.make (x, y)
+						snake.addhead (p)
+					end
+
+				if(snake.getdirection.is_equal ("DOWN"))
+					then
+						x := head.get_x
+						y := head.get_y + 1
+						create p.make (x, y)
+						snake.addhead (p)
+					end
+
+				head := snake.gethead
+				current.occupypoint (head)
+
+				if not (current.eatsfood (snake, head)) then
+					current.removesnaketail (snake, 1)
 				end
 
-			if(snake.getdirection.is_equal ("LEFT"))
-				then
-					x := head.get_x - 1
-					y := head.get_y
-					create p.make (x, y)
-					snake.addhead (p)
+				flag := current.eatspoison (snake, head)
+				flag := current.eatspowerup (snake, head)
+				--flag := current.bitesitselforothersnake (snake)
+				flag := current.collideswithborder (snake, head)
+
+
+
+				--current.checktimeouts (snake)
+
+				-- Place poisons and power-ups
+				if(state.getposions.count < constants.poison_max) then
+					current.placepoison
+				end
+				if(state.getpowerups.count < constants.power_up_max) then
+					current.placepowerup
 				end
 
-			if(snake.getdirection.is_equal ("UP"))
-				then
-					x := head.get_x
-					y := head.get_y - 1
-					create p.make (x, y)
-					snake.addhead (p)
-				end
+				--timeElapsed := clock.time_now - startingTime
+				--state.settimeelapsed (timeElapsed.second_count)
+				--game := current.updategameresult
 
-			if(snake.getdirection.is_equal ("DOWN"))
-				then
-					x := head.get_x
-					y := head.get_y + 1
-					create p.make (x, y)
-					snake.addhead (p)
-				end
-
-			head := snake.gethead
-			current.occupypoint (head)
-
-			if not (current.eatsfood (snake, head)) then
-				current.removesnaketail (snake, 1)
+			--io.putstring("Finish update state for " + id.out)
+			--io.new_line	
 			end
-
-			flag := current.eatspoison (snake, head)
-			flag := current.eatspowerup (snake, head)
-			--flag := current.bitesitselforothersnake (snake)
-			--flag := current.collideswithborder (snake, head)
-
-
-
-			--current.checktimeouts (snake)
-
-			-- Place poisons and power-ups
-			if(state.getposions.count < constants.poison_max) then
-				current.placepoison
-			end
-			if(state.getpowerups.count < constants.power_up_max) then
-				current.placepowerup
-			end
-
-			--timeElapsed := clock.time_now - startingTime
-			--state.settimeelapsed (timeElapsed.second_count)
-			--game := current.updategameresult
-
-		--io.putstring("Finish update state for " + id.out)
-		--io.new_line
 		end
 
 	updateGameResult: GAME
