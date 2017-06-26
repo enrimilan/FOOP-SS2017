@@ -65,11 +65,6 @@ feature {ANY} -- Public features
 			Result := finished
 		end
 
-	get_state : STATE
-		do
-			Result := state
-		end
-
 	calculate_snake_direction(snake: SNAKE; direction: STRING): STRING
 		-- ensure that the snake cannot move in the opposite direction, if it's length is bigger than 1
 		do
