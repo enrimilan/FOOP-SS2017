@@ -43,7 +43,7 @@ feature {NONE} -- Initialization and main entry point
 			-- Playing modes for the 2 players
 			print("Player modes: c for Computer, p for player%N")
 			print("Player mode for player 1: ")
-			c := read_char
+			c := read_char(false)
 			print(c)
 			if c = 'c' then
 				mode_value := mode.computer
@@ -51,7 +51,7 @@ feature {NONE} -- Initialization and main entry point
 				mode_value := mode.player
 			end
 			print("%NPlayer mode for player 2: ")
-			c := read_char
+			c := read_char(false)
 			print(c)
 			if c = 'c' then
 				mode_value2 := mode.computer
@@ -209,12 +209,11 @@ feature {NONE} -- Private features
 		local
 			c: CHARACTER
 		do
-			print("%NPress any key to start%N")
 			from
         	until
             	player1.get_mode.is_equal(mode.computer) and player2.get_mode.is_equal(mode.computer)
         	loop
-            	c := read_char
+            	c := read_char(true)
             	-- Prepare next direction
             	if(keyboard_definition.get_player_id_for_input(c) = 1) then
             		player1.set_direction(keyboard_definition.translate_input_to_direction(c))
@@ -225,10 +224,20 @@ feature {NONE} -- Private features
         	end
 		end
 
-	read_char: CHARACTER
+	read_char(with_timeout: BOOLEAN): CHARACTER
 		-- Read input from keyboard without waiting for the user to press ENTER
 		external "C inline use <conio.h>"
-        	alias "return getch();"
+        	alias "{
+        		if (!$with_timeout) {
+        			return getch();
+        		}
+        		else if(_kbhit()) {
+        			return getch();
+        		} 
+        		else { 
+        			return 1;
+        		}
+        	}"
     	end
 
 end
