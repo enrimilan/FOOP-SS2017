@@ -23,6 +23,7 @@ feature {NONE} -- Private variables
 	board: ARRAY2[CHARACTER]
 	game: GAME
 	mutex: MUTEX
+	clear_command: READABLE_STRING_GENERAL
 
 feature {NONE} -- Initialization and main entry point
 
@@ -39,6 +40,8 @@ feature {NONE} -- Initialization and main entry point
 			create mode
 			create mutex.make
 			create keyboard_definition
+
+			clear_command := "cls"
 
 			-- Playing modes for the 2 players
 			print("Player modes: c for Computer, p for player%N")
@@ -69,6 +72,11 @@ feature {NONE} -- Initialization and main entry point
 			game.add_snake(1, 'o')
 			game.add_snake(2, 'a')
 
+			-- OS dependent clear screen commands
+			if(current.default_shell.has_substring("bash")) then
+				clear_command := "clear"
+			end
+
 			-- Start playing
 			player1.launch
 			player2.launch
@@ -95,7 +103,7 @@ feature {ANY} -- Public features
 			if not game.has_finished then
 				draw_game
 			else
-				system("cls")
+				system(clear_command)
 				output := "%N%N------------------------------------------%N%N%N"
 				output := output+ ("          "+game.get_state.get_results+"         %N%N")
 				output := output + "%N------------------------------------------%N"
@@ -154,10 +162,9 @@ feature {NONE} -- Private features
 				state.get_snakes.forth
 			end
 
-			--CHANGE THIS ACCORDING TO OS
-			--OR REMOVE IT FOR A "DEBUG" VIEW
 			duration := constants.game_duration - state.get_time_elapsed
-			system("cls")
+
+			system(clear_command)
 			print((duration / 60).floor)
 			print(":")
 			print(duration \\ 60)
