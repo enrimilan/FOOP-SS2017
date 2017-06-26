@@ -11,8 +11,12 @@ gcc -Wall -c conio.c
 ar -cvq libconio.a conio.o
 ```
 
+To make this library available, copy it into `/libs`: 
+
+``sudo cp libconio.a /lib``
+
 ## Building
-Open EiffelStudio an hit `compile`.
+Open EiffelStudio and hit `compile`.
 
 ## Running
 ```
