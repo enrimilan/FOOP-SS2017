@@ -9,3 +9,9 @@
 * Start squeak and select `Squeak5.1-16549-32bit.8.image`
 
 * Play!
+
+## Playing
+
+Player 1 plays using the arrow keys
+
+Player 2 plays using asdw keys

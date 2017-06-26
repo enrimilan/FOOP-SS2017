@@ -2,7 +2,11 @@
 
 Up to 4 players can join the game.
 
-## Starting
+## Building
+
+``mvn install``
+
+## Running
 
 Starting the server:
 
@@ -21,3 +25,7 @@ Starting the client in computer mode:
 ```
 mvn exec:java -Dexec.mainClass=client.Client -Dexec.args="COMPUTER"
 ```
+
+## Playing
+
+Each player plays using the arrows keys
