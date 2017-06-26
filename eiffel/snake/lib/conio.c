@@ -1,8 +1,12 @@
 #include <termios.h>
 #include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "conio.h"
 
 static struct termios old, new;
+int timeout = 0;
 
 /* Initialize new terminal i/o settings */
 void initTermios(int echo) 
@@ -25,6 +29,22 @@ char getch_(int echo)
 {
   char ch;
   initTermios(echo);
+  if(timeout)
+  {
+    struct timeval tmo;
+    fd_set readfds;
+    /* wait only 0.5 seconds for user input */
+    FD_ZERO(&readfds);
+    FD_SET(0, &readfds);
+    tmo.tv_sec = 0.5;
+    tmo.tv_usec = 0;
+    switch (select(1, &readfds, NULL, NULL, &tmo)) {
+    case -1:
+        break;
+    case 0:
+        return 1;
+    }
+  }
   ch = getchar();
   resetTermios();
   return ch;
@@ -40,4 +60,10 @@ char getch(void)
 char getche(void) 
 {
   return getch_(1);
+}
+
+int _kbhit()
+{
+  timeout = 1;
+  return 1;
 }
