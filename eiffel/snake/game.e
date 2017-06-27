@@ -94,10 +94,6 @@ feature
 		require
 			snake.get_id >= 0 and snake.get_id <= 2
 		deferred
-		ensure
-			Result.get_x >= 0 AND Result.get_x <= 40
-			Result.get_y >= 0 AND Result.get_y <= 20
-			snake.get_length = old snake.get_length + 1
 		end
 
 	remove_snake_tail(snake: SNAKE; index: INTEGER)
