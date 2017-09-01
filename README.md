@@ -1,5 +1,5 @@
 # Advanced Object-oriented programming
-A snake game in 3 different languages: Java, Smalltalk and Eiffel
+A snake game in 3 different languages: Java, Smalltalk and Eiffel <a href="https://www.youtube.com/watch?v=QRTL4xGf1xo" target="_blank">Click for demo</a>
 
 ## Protocol
 The game consists of these artifacts:
